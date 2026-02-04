@@ -58,6 +58,23 @@ function getParam(name) {
   return params.get(name);
 }
 
+function checkGalleryPassword(gallery) {
+  if (!gallery?.password) return true;
+  const key = `wbg_access:${gallery.id || 'default'}`;
+  if (localStorage.getItem(key) === 'true') return true;
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const input = prompt('Passwort für diese Galerie:');
+    if (input === null) break;
+    if (input === gallery.password) {
+      localStorage.setItem(key, 'true');
+      return true;
+    }
+    alert('Falsches Passwort.');
+  }
+  window.location.href = './index.html';
+  return false;
+}
+
 function resolveUrl(url) {
   if (!url) return '';
   if (url.startsWith('http://') || url.startsWith('https://')) return url;
@@ -341,6 +358,7 @@ async function init() {
     const id = getParam('id');
     currentGallery = (galleryConfig.galleries || []).find((g) => g.id === id) || (galleryConfig.galleries || [])[0];
     if (!currentGallery) throw new Error('Keine Galerie gefunden');
+    if (!checkGalleryPassword(currentGallery)) return;
 
     const titleValue = currentGallery.subcategory || currentGallery.name || 'Galerie';
     titleEl.textContent = titleValue;
