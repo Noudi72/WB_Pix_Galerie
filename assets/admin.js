@@ -378,7 +378,7 @@ function renderGalleryTable() {
   galleryTableBody.innerHTML = '';
   rows.forEach(({ gallery, idx }) => {
     const tr = document.createElement('tr');
-    const sub = gallery.subcategory || '';
+    const sub = gallery.subcategory || gallery.name || '';
     const folder = gallery.folder || '';
     const date = gallery.date || '';
     const count = gallery.images?.length || 0;
@@ -387,7 +387,6 @@ function renderGalleryTable() {
     const pathParts = [getCategoryName(gallery.category), sub, folder].filter(Boolean);
     const pathLabel = pathParts.length ? pathParts.join(' / ') : '—';
     tr.innerHTML = `
-      <td>${gallery.name || `Galerie ${idx + 1}`}</td>
       <td>
         <select class="table-select" data-field="category" data-idx="${idx}">
           ${buildCategoryOptions(gallery.category)}
@@ -422,7 +421,8 @@ function selectGalleryByIndex(idx, { focusWizard = false } = {}) {
     if (wizardSection) {
       wizardSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-    if (galleryNameInput) galleryNameInput.focus({ preventScroll: true });
+    const focusTarget = gallerySubcategoryInput || galleryNameInput;
+    if (focusTarget) focusTarget.focus({ preventScroll: true });
   }
 }
 
@@ -447,6 +447,10 @@ function updateGalleryField(idx, field, value) {
     if (field === 'subcategory') gallerySubcategoryInput.value = value || '';
     if (field === 'folder') galleryFolderInput.value = value || '';
     if (field === 'category') galleryCategorySelect.value = value || '';
+  }
+  if (field === 'subcategory') {
+    gallery.name = value || '';
+    if (currentGallery === gallery && galleryNameInput) galleryNameInput.value = value || '';
   }
   if (field === 'subcategory' || field === 'folder') updateSuggestions();
   renderGalleryTable();
@@ -475,7 +479,7 @@ function loadGalleryFromSelect() {
   const idx = Number(gallerySelect.value);
   currentGallery = (galleryConfig?.galleries || [])[idx] || null;
   if (!currentGallery) return;
-  galleryNameInput.value = currentGallery.name || '';
+  if (galleryNameInput) galleryNameInput.value = currentGallery.name || '';
   galleryDescInput.value = currentGallery.description || '';
   galleryCategorySelect.value = currentGallery.category || '';
   gallerySubcategoryInput.value = currentGallery.subcategory || '';
@@ -500,10 +504,11 @@ function ensureCategoryExists() {
 function saveGallery() {
   if (!currentGallery) return;
   ensureCategoryExists();
-  currentGallery.name = galleryNameInput.value.trim();
+  const subValue = gallerySubcategoryInput.value.trim();
+  currentGallery.name = subValue || (galleryNameInput ? galleryNameInput.value.trim() : '');
   currentGallery.description = galleryDescInput.value.trim();
   currentGallery.category = galleryCategorySelect.value;
-  currentGallery.subcategory = gallerySubcategoryInput.value.trim();
+  currentGallery.subcategory = subValue;
   currentGallery.folder = galleryFolderInput.value.trim();
   currentGallery.date = galleryDateInput.value || '';
   const pwd = galleryPasswordInput.value.trim();
