@@ -7,6 +7,13 @@ const countChip = document.getElementById('gallery-count-chip');
 let galleryConfig = null;
 let selectedCategory = 'all';
 
+function buildThumbUrl(url, width = 480, height = 320) {
+  if (!url) return '';
+  if (!url.includes('res.cloudinary.com') || !url.includes('/upload/')) return url;
+  const transform = `c_fill,w_${width},h_${height},q_auto,f_auto`;
+  return url.replace(/\/upload\/([^/]+\/)?/, `/upload/${transform}/`);
+}
+
 function normalize(text) {
   return String(text || '').toLowerCase();
 }
@@ -65,9 +72,10 @@ function renderGalleries() {
   items.forEach((gallery) => {
     const card = document.createElement('div');
     card.className = 'card';
-    const preview = (gallery.images && gallery.images[0]) ? gallery.images[0].thumbnailUrl || gallery.images[0].url : '';
+    const previewRaw = (gallery.images && gallery.images[0]) ? gallery.images[0].thumbnailUrl || gallery.images[0].url : '';
+    const preview = buildThumbUrl(previewRaw);
     card.innerHTML = `
-      ${preview ? `<img src="${preview}" alt="${gallery.name || 'Galerie'}">` : '<div style="height: 160px; background: var(--surface-2);"></div>'}
+      ${preview ? `<img src="${preview}" alt="${gallery.name || 'Galerie'}" loading="lazy" decoding="async">` : '<div style="height: 160px; background: var(--surface-2);"></div>'}
       <div class="card-body">
         <div class="card-title">${gallery.name || 'Galerie'}</div>
         <div class="card-meta">${gallery.description || ''}</div>

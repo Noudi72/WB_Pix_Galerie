@@ -4,6 +4,8 @@ const titleEl = document.getElementById('gallery-title');
 const subtitleEl = document.getElementById('gallery-subtitle');
 const countChip = document.getElementById('image-count-chip');
 const searchInput = document.getElementById('gallery-search');
+const filterAllBtn = document.getElementById('filter-all');
+const filterFavBtn = document.getElementById('filter-favorites');
 
 const lightbox = document.getElementById('lightbox');
 const lightboxImg = document.getElementById('lightbox-image');
@@ -15,6 +17,8 @@ let galleryConfig = null;
 let currentGallery = null;
 let filteredImages = [];
 let currentIndex = 0;
+let showFavoritesOnly = false;
+let favoriteIds = new Set();
 
 function normalize(text) {
   return String(text || '').toLowerCase();
@@ -31,6 +35,30 @@ function resolveUrl(url) {
   return new URL(url, window.location.href).href;
 }
 
+function buildThumbUrl(url, width = 520, height = 390) {
+  if (!url) return '';
+  if (!url.includes('res.cloudinary.com') || !url.includes('/upload/')) return url;
+  const transform = `c_fill,w_${width},h_${height},q_auto,f_auto`;
+  return url.replace(/\/upload\/([^/]+\/)?/, `/upload/${transform}/`);
+}
+
+function loadFavorites(galleryId) {
+  try {
+    const raw = localStorage.getItem(`wbg_likes:${galleryId}`);
+    if (!raw) return new Set();
+    const parsed = JSON.parse(raw);
+    return new Set(Array.isArray(parsed) ? parsed : []);
+  } catch (_) {
+    return new Set();
+  }
+}
+
+function saveFavorites(galleryId) {
+  try {
+    localStorage.setItem(`wbg_likes:${galleryId}`, JSON.stringify(Array.from(favoriteIds)));
+  } catch (_) {}
+}
+
 function renderImages(images = []) {
   grid.innerHTML = '';
   filteredImages = images;
@@ -45,8 +73,27 @@ function renderImages(images = []) {
   images.forEach((img, idx) => {
     const item = document.createElement('div');
     item.className = 'gallery-item';
-    const src = resolveUrl(img.thumbnailUrl || img.url);
-    item.innerHTML = `<img src="${src}" alt="${img.name || 'Bild'}">`;
+    const baseSrc = resolveUrl(img.thumbnailUrl || img.url);
+    const src = buildThumbUrl(baseSrc);
+    const imgId = img.id || img.publicId || img.name || String(idx);
+    const isFav = favoriteIds.has(imgId);
+    item.innerHTML = `
+      <img src="${src}" alt="${img.name || 'Bild'}" loading="lazy" decoding="async">
+      <button class="like-btn${isFav ? ' active' : ''}" aria-label="Favorit">${isFav ? '♥' : '♡'}</button>
+    `;
+    const likeBtn = item.querySelector('.like-btn');
+    if (likeBtn) {
+      likeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (favoriteIds.has(imgId)) {
+          favoriteIds.delete(imgId);
+        } else {
+          favoriteIds.add(imgId);
+        }
+        saveFavorites(currentGallery?.id || 'default');
+        applySearch();
+      });
+    }
     item.addEventListener('click', () => openLightbox(idx));
     grid.appendChild(item);
   });
@@ -55,14 +102,19 @@ function renderImages(images = []) {
 function applySearch() {
   if (!currentGallery) return;
   const query = normalize(searchInput.value);
-  if (!query) {
-    renderImages(currentGallery.images || []);
-    return;
+  let result = (currentGallery.images || []).slice();
+  if (showFavoritesOnly) {
+    result = result.filter((img, idx) => {
+      const imgId = img.id || img.publicId || img.name || String(idx);
+      return favoriteIds.has(imgId);
+    });
   }
-  const filtered = (currentGallery.images || []).filter((img) => {
+  if (query) {
+    result = result.filter((img) => {
     return normalize(img.name).includes(query) || normalize(img.id).includes(query);
-  });
-  renderImages(filtered);
+    });
+  }
+  renderImages(result);
 }
 
 function openLightbox(idx) {
@@ -113,6 +165,7 @@ async function init() {
 
     titleEl.textContent = currentGallery.name || 'Galerie';
     subtitleEl.textContent = currentGallery.description || '';
+    favoriteIds = loadFavorites(currentGallery.id || 'default');
     renderImages(currentGallery.images || []);
   } catch (err) {
     emptyState.style.display = 'block';
@@ -122,3 +175,17 @@ async function init() {
 }
 
 init();
+
+filterAllBtn.addEventListener('click', () => {
+  showFavoritesOnly = false;
+  filterAllBtn.classList.add('active');
+  filterFavBtn.classList.remove('active');
+  applySearch();
+});
+
+filterFavBtn.addEventListener('click', () => {
+  showFavoritesOnly = true;
+  filterFavBtn.classList.add('active');
+  filterAllBtn.classList.remove('active');
+  applySearch();
+});

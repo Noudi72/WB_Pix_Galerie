@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WB Foto Manager – Admin</title>
+  <link rel="stylesheet" href="./assets/app.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="back-link" href="./index.html">← Zurück</a>
+      <div class="header-actions">
+        <span class="chip">Admin</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <h1 class="page-title">Admin</h1>
+    <p class="muted">Bilder hochladen, Galerien pflegen und `gallery.json` aktualisieren.</p>
+
+    <section class="admin-section">
+      <h3>Cloudinary Einstellungen</h3>
+      <div class="admin-grid">
+        <div class="admin-field">
+          <label for="cloud-name">Cloud Name</label>
+          <input id="cloud-name" type="text" placeholder="z. B. dnvqw9wif">
+        </div>
+        <div class="admin-field">
+          <label for="upload-preset">Upload Preset (Unsigned)</label>
+          <input id="upload-preset" type="text" placeholder="z. B. wb_pix_upload">
+        </div>
+      </div>
+      <p class="admin-note">Diese Werte werden lokal gespeichert (LocalStorage).</p>
+    </section>
+
+    <section class="admin-section">
+      <h3>Galerie auswählen</h3>
+      <div class="admin-field">
+        <label for="gallery-select">Galerie</label>
+        <select id="gallery-select"></select>
+      </div>
+      <div class="admin-actions">
+        <button class="btn" id="new-gallery-btn">Neue Galerie</button>
+      </div>
+    </section>
+
+    <section class="admin-section">
+      <h3>Galerie bearbeiten</h3>
+      <div class="admin-grid">
+        <div class="admin-field">
+          <label for="gallery-name">Name</label>
+          <input id="gallery-name" type="text">
+        </div>
+        <div class="admin-field">
+          <label for="gallery-description">Beschreibung</label>
+          <input id="gallery-description" type="text">
+        </div>
+        <div class="admin-field">
+          <label for="gallery-category">Kategorie</label>
+          <select id="gallery-category"></select>
+        </div>
+        <div class="admin-field">
+          <label for="gallery-password">Passwort (optional)</label>
+          <input id="gallery-password" type="text" placeholder="leer lassen = öffentlich">
+        </div>
+      </div>
+      <div class="admin-actions">
+        <button class="btn" id="save-gallery-btn">Galerie speichern</button>
+      </div>
+    </section>
+
+    <section class="admin-section">
+      <h3>Bilder hinzufügen</h3>
+      <div class="admin-grid">
+        <div class="admin-field">
+          <label for="image-files">Dateien auswählen</label>
+          <input id="image-files" type="file" multiple accept="image/*">
+        </div>
+        <div class="admin-field">
+          <label for="image-url">Bild-URL manuell hinzufügen</label>
+          <input id="image-url" type="url" placeholder="https://...">
+        </div>
+      </div>
+      <div class="admin-actions">
+        <button class="btn" id="upload-images-btn">Hochladen</button>
+        <button class="btn" id="add-url-btn">URL hinzufügen</button>
+      </div>
+      <p class="admin-note">Uploads nutzen Cloudinary (Unsigned Upload Preset). Ohne Preset kannst du per URL hinzufügen.</p>
+    </section>
+
+    <section class="admin-section">
+      <h3>Export</h3>
+      <div class="admin-actions">
+        <button class="btn" id="download-json-btn">gallery.json herunterladen</button>
+      </div>
+      <p class="admin-note">Die Datei im Repo ersetzen und neu deployen (GitHub Pages).</p>
+    </section>
+  </main>
+
+  <script src="./assets/admin.js"></script>
+</body>
+</html>
