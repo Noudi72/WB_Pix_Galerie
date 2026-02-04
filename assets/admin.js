@@ -639,7 +639,7 @@ function applyPrivateFix() {
   hits.forEach((g) => {
     g.category = privateCategoryId;
     g.subcategory = 'shootings';
-    g.folder = g.folder || 'noël';
+    g.folder = 'noël';
     g.name = g.subcategory;
   });
   populateGallerySelect();

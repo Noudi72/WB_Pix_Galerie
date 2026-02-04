@@ -99,6 +99,49 @@ function loadCommentsFromGallery() {
   commentsById = map;
 }
 
+function loadCommentsLocal(galleryId) {
+  try {
+    const raw = localStorage.getItem(`wbg_comments:${galleryId}`);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch (_) {
+    return {};
+  }
+}
+
+function saveCommentsLocal(galleryId) {
+  try {
+    localStorage.setItem(`wbg_comments:${galleryId}`, JSON.stringify(commentsById));
+  } catch (_) {}
+}
+
+function mergeCommentMaps(base, extra) {
+  const result = { ...base };
+  Object.entries(extra || {}).forEach(([key, list]) => {
+    if (!Array.isArray(list)) return;
+    if (!Array.isArray(result[key])) result[key] = [];
+    const existing = new Set(result[key].map(item => `${item.ts || ''}|${item.text || ''}`));
+    list.forEach((item) => {
+      const token = `${item.ts || ''}|${item.text || ''}`;
+      if (existing.has(token)) return;
+      result[key].push(item);
+      existing.add(token);
+    });
+  });
+  return result;
+}
+
+function syncCommentsToImages() {
+  (currentGallery?.images || []).forEach((img, idx) => {
+    const imgId = getImageId(img, idx);
+    const list = commentsById[imgId];
+    if (Array.isArray(list) && list.length) {
+      img.comments = list.slice();
+    }
+  });
+}
+
 function getGitHubSettings() {
   return {
     owner: localStorage.getItem('wbg_gh_owner') || '',
@@ -275,6 +318,7 @@ if (commentSaveBtn) {
     if (!Array.isArray(img.comments)) img.comments = [];
     img.comments.push(entry);
     renderComments(img, currentIndex);
+    saveCommentsLocal(currentGallery.id || 'default');
     if (commentStatus) {
       commentStatus.textContent = 'Kommentar gespeichert…';
     }
@@ -304,8 +348,12 @@ async function init() {
     const folder = currentGallery.folder ? ` · ${currentGallery.folder}` : '';
     const date = currentGallery.date ? ` · ${currentGallery.date}` : '';
     subtitleEl.textContent = `${currentGallery.description || ''}${sub}${folder}${date}`;
-    favoriteIds = loadFavorites(currentGallery.id || 'default');
+    const galleryId = currentGallery.id || 'default';
+    favoriteIds = loadFavorites(galleryId);
     loadCommentsFromGallery();
+    const localComments = loadCommentsLocal(galleryId);
+    commentsById = mergeCommentMaps(commentsById, localComments);
+    syncCommentsToImages();
     renderImages(currentGallery.images || []);
   } catch (err) {
     emptyState.style.display = 'block';
