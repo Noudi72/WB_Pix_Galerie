@@ -25,12 +25,16 @@
     {
       "id": "events",
       "name": "Events"
+    },
+    {
+      "id": "privat",
+      "name": "Privat"
     }
   ],
   "galleries": [
     {
       "id": "noel",
-      "name": "Sport",
+      "name": "shootings",
       "images": [
         {
           "id": "img_1768923083247_0",
@@ -310,9 +314,9 @@
         }
       ],
       "description": "EHCB vs ZSC",
-      "category": "sport",
+      "category": "privat",
       "folder": "EHCB vs ZSC",
-      "subcategory": "Eishockey",
+      "subcategory": "shootings",
       "date": "2025-11-14"
     },
     {
@@ -861,7 +865,8 @@
       ],
       "description": "EHCB vs HCD",
       "category": "sport",
-      "folder": "01_Sport"
+      "folder": "01_Sport",
+      "subcategory": "Eishockey"
     },
     {
       "id": "sport-street-inlinehockey",
@@ -869,7 +874,8 @@
       "images": [],
       "description": "Demnächst verfügbar",
       "category": "sport",
-      "folder": "01_Sport"
+      "folder": "",
+      "subcategory": "Street-Inlinehockey"
     },
     {
       "id": "sport-motorsport",
@@ -877,7 +883,8 @@
       "images": [],
       "description": "Demnächst verfügbar",
       "category": "sport",
-      "folder": "01_Sport"
+      "folder": "",
+      "subcategory": "Motorsport"
     },
     {
       "id": "sport-wintersport",
@@ -885,7 +892,8 @@
       "images": [],
       "description": "Demnächst verfügbar",
       "category": "sport",
-      "folder": "01_Sport"
+      "folder": "",
+      "subcategory": "Wintersport"
     },
     {
       "id": "landschaft-berge-alpen",
@@ -893,7 +901,8 @@
       "images": [],
       "description": "Demnächst verfügbar",
       "category": "landschaft",
-      "folder": "02_Landschaft"
+      "folder": "",
+      "subcategory": "Berge & Alpen"
     },
     {
       "id": "landschaft-kueste-meer",
@@ -901,7 +910,8 @@
       "images": [],
       "description": "Demnächst verfügbar",
       "category": "landschaft",
-      "folder": "02_Landschaft"
+      "folder": "",
+      "subcategory": "Küste & Meer"
     },
     {
       "id": "landschaft-wald-forst",
@@ -909,7 +919,8 @@
       "images": [],
       "description": "Demnächst verfügbar",
       "category": "landschaft",
-      "folder": "02_Landschaft"
+      "folder": "",
+      "subcategory": "Wald & Forst"
     },
     {
       "id": "landschaft-nacht",
@@ -917,7 +928,8 @@
       "images": [],
       "description": "Demnächst verfügbar",
       "category": "landschaft",
-      "folder": "02_Landschaft"
+      "folder": "",
+      "subcategory": "Nachtfotografie"
     },
     {
       "id": "portrait-business",
@@ -925,7 +937,8 @@
       "images": [],
       "description": "Demnächst verfügbar",
       "category": "portrait",
-      "folder": "03_Portrait"
+      "folder": "",
+      "subcategory": "Business & Corporate"
     },
     {
       "id": "portrait-lifestyle",
@@ -933,7 +946,8 @@
       "images": [],
       "description": "Demnächst verfügbar",
       "category": "portrait",
-      "folder": "03_Portrait"
+      "folder": "",
+      "subcategory": "Lifestyle & Street"
     },
     {
       "id": "portrait-familie",
@@ -941,7 +955,8 @@
       "images": [],
       "description": "Demnächst verfügbar",
       "category": "portrait",
-      "folder": "03_Portrait"
+      "folder": "",
+      "subcategory": "Familie & Kinder"
     },
     {
       "id": "portrait-studio",
@@ -949,7 +964,8 @@
       "images": [],
       "description": "Demnächst verfügbar",
       "category": "portrait",
-      "folder": "03_Portrait"
+      "folder": "",
+      "subcategory": "Studio"
     },
     {
       "id": "tiere-wildlife",
@@ -957,7 +973,8 @@
       "images": [],
       "description": "Demnächst verfügbar",
       "category": "tiere",
-      "folder": "04_Tiere"
+      "folder": "",
+      "subcategory": "Wildlife & Wildtiere"
     },
     {
       "id": "tiere-haustiere",
@@ -965,7 +982,8 @@
       "images": [],
       "description": "Demnächst verfügbar",
       "category": "tiere",
-      "folder": "04_Tiere"
+      "folder": "",
+      "subcategory": "Haustiere"
     },
     {
       "id": "tiere-zoo",
@@ -973,7 +991,8 @@
       "images": [],
       "description": "Demnächst verfügbar",
       "category": "tiere",
-      "folder": "04_Tiere"
+      "folder": "",
+      "subcategory": "Zoo & Vogelpark"
     },
     {
       "id": "tiere-makro",
@@ -981,7 +1000,8 @@
       "images": [],
       "description": "Demnächst verfügbar",
       "category": "tiere",
-      "folder": "04_Tiere"
+      "folder": "",
+      "subcategory": "Makro & Insekten"
     },
     {
       "id": "architektur-urban",
@@ -989,7 +1009,8 @@
       "images": [],
       "description": "Demnächst verfügbar",
       "category": "architektur",
-      "folder": "05_Architektur"
+      "folder": "",
+      "subcategory": "Urban & Stadt"
     },
     {
       "id": "architektur-lost",
@@ -997,7 +1018,8 @@
       "images": [],
       "description": "Demnächst verfügbar",
       "category": "architektur",
-      "folder": "05_Architektur"
+      "folder": "",
+      "subcategory": "Lost Places"
     },
     {
       "id": "architektur-innen",
@@ -1005,7 +1027,8 @@
       "images": [],
       "description": "Demnächst verfügbar",
       "category": "architektur",
-      "folder": "05_Architektur"
+      "folder": "",
+      "subcategory": "Innenarchitektur"
     },
     {
       "id": "events-konzerte",
@@ -1013,7 +1036,8 @@
       "images": [],
       "description": "Demnächst verfügbar",
       "category": "events",
-      "folder": "06_Events"
+      "folder": "",
+      "subcategory": "Konzerte"
     },
     {
       "id": "events-hochzeiten",
@@ -1021,7 +1045,8 @@
       "images": [],
       "description": "Demnächst verfügbar",
       "category": "events",
-      "folder": "06_Events"
+      "folder": "",
+      "subcategory": "Hochzeiten"
     },
     {
       "id": "events-firmenfeiern",
@@ -1029,7 +1054,8 @@
       "images": [],
       "description": "Demnächst verfügbar",
       "category": "events",
-      "folder": "06_Events"
+      "folder": "",
+      "subcategory": "Firmenfeiern"
     }
   ],
   "portfolio": [
