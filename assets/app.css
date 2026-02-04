@@ -427,6 +427,10 @@ body.dark-mode .site-header {
   color: var(--text);
 }
 
+.admin-field input::placeholder {
+  color: var(--muted);
+}
+
 .admin-actions {
   display: flex;
   flex-wrap: wrap;

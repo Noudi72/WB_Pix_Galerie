@@ -57,9 +57,15 @@
 
     <section class="admin-section">
       <h3>Galerie auswählen</h3>
-      <div class="admin-field">
-        <label for="gallery-select">Galerie</label>
-        <select id="gallery-select"></select>
+      <div class="admin-grid">
+        <div class="admin-field">
+          <label for="gallery-search">Galerie suchen</label>
+          <input id="gallery-search" type="text" placeholder="z. B. Eishockey">
+        </div>
+        <div class="admin-field">
+          <label for="gallery-select">Galerie</label>
+          <select id="gallery-select"></select>
+        </div>
       </div>
       <div class="admin-actions">
         <button class="btn" id="new-gallery-btn">Neue Galerie</button>
@@ -126,6 +132,22 @@
             <input id="resize-before-upload" type="checkbox" checked>
             Bilder vor Upload verkleinern (empfohlen)
           </label>
+        </div>
+        <div class="admin-field">
+          <label for="resize-max-side">Maximale Kantenlänge</label>
+          <select id="resize-max-side">
+            <option value="3000">3000 px</option>
+            <option value="4000" selected>4000 px</option>
+            <option value="5000">5000 px</option>
+          </select>
+        </div>
+        <div class="admin-field">
+          <label for="resize-quality">Qualität</label>
+          <select id="resize-quality">
+            <option value="0.8">80%</option>
+            <option value="0.88" selected>88%</option>
+            <option value="0.92">92%</option>
+          </select>
         </div>
       </div>
       <div class="admin-actions">

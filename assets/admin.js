@@ -9,11 +9,14 @@ const galleryFolderInput = document.getElementById('gallery-folder');
 const galleryDateInput = document.getElementById('gallery-date');
 const newCategoryInput = document.getElementById('new-category');
 const galleryPasswordInput = document.getElementById('gallery-password');
+const gallerySearchInput = document.getElementById('gallery-search');
 const imageFilesInput = document.getElementById('image-files');
 const imageUrlInput = document.getElementById('image-url');
 const uploadDropzone = document.getElementById('upload-dropzone');
 const uploadStatus = document.getElementById('upload-status');
 const resizeBeforeUpload = document.getElementById('resize-before-upload');
+const resizeMaxSide = document.getElementById('resize-max-side');
+const resizeQuality = document.getElementById('resize-quality');
 
 const newGalleryBtn = document.getElementById('new-gallery-btn');
 const saveGalleryBtn = document.getElementById('save-gallery-btn');
@@ -43,7 +46,7 @@ let currentGallery = null;
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 async function downscaleImage(file) {
   const img = await createImageBitmap(file);
-  const maxSide = 4000;
+  const maxSide = Number(resizeMaxSide?.value || 4000);
   const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
   const targetW = Math.round(img.width * scale);
   const targetH = Math.round(img.height * scale);
@@ -54,8 +57,9 @@ async function downscaleImage(file) {
   const ctx = canvas.getContext('2d');
   ctx.drawImage(img, 0, 0, targetW, targetH);
 
+  const quality = Number(resizeQuality?.value || 0.88);
   const blob = await new Promise((resolve) => {
-    canvas.toBlob(resolve, 'image/jpeg', 0.88);
+    canvas.toBlob(resolve, 'image/jpeg', quality);
   });
   if (!blob) return file;
   return new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' });
@@ -126,6 +130,8 @@ function loadSettings() {
   ghBranchInput.value = localStorage.getItem('wbg_gh_branch') || 'main';
   ghPathInput.value = localStorage.getItem('wbg_gh_path') || 'gallery.json';
   ghTokenInput.value = localStorage.getItem('wbg_gh_token') || '';
+  if (resizeMaxSide) resizeMaxSide.value = localStorage.getItem('wbg_resize_max') || '4000';
+  if (resizeQuality) resizeQuality.value = localStorage.getItem('wbg_resize_quality') || '0.88';
 }
 
 function saveSettings() {
@@ -136,6 +142,8 @@ function saveSettings() {
   localStorage.setItem('wbg_gh_branch', ghBranchInput.value.trim());
   localStorage.setItem('wbg_gh_path', ghPathInput.value.trim());
   localStorage.setItem('wbg_gh_token', ghTokenInput.value.trim());
+  if (resizeMaxSide) localStorage.setItem('wbg_resize_max', resizeMaxSide.value);
+  if (resizeQuality) localStorage.setItem('wbg_resize_quality', resizeQuality.value);
 }
 
 function buildThumbUrl(url, width = 520, height = 390) {
@@ -159,12 +167,34 @@ function populateCategories() {
 function populateGallerySelect() {
   gallerySelect.innerHTML = '';
   const galleries = galleryConfig?.galleries || [];
+  const query = (gallerySearchInput?.value || '').trim().toLowerCase();
+  const options = [];
   galleries.forEach((gallery, idx) => {
+    const label = `${gallery.name || ''} ${gallery.subcategory || ''} ${gallery.folder || ''} ${gallery.date || ''}`.toLowerCase();
+    if (query && !label.includes(query)) return;
     const opt = document.createElement('option');
     opt.value = String(idx);
-    opt.textContent = gallery.name || `Galerie ${idx + 1}`;
-    gallerySelect.appendChild(opt);
+    const meta = [gallery.subcategory, gallery.folder, gallery.date].filter(Boolean).join(' · ');
+    opt.textContent = meta ? `${gallery.name || `Galerie ${idx + 1}`} (${meta})` : (gallery.name || `Galerie ${idx + 1}`);
+    options.push(opt);
   });
+  options.forEach(opt => gallerySelect.appendChild(opt));
+
+  if (!options.length) {
+    gallerySelect.disabled = true;
+    currentGallery = null;
+    galleryNameInput.value = '';
+    galleryDescInput.value = '';
+    gallerySubcategoryInput.value = '';
+    galleryFolderInput.value = '';
+    galleryDateInput.value = '';
+    galleryPasswordInput.value = '';
+    return;
+  }
+
+  gallerySelect.disabled = false;
+  if (!gallerySelect.value) gallerySelect.value = options[0].value;
+  loadGalleryFromSelect();
 }
 
 function loadGalleryFromSelect() {
@@ -380,6 +410,8 @@ async function init() {
   ghBranchInput.addEventListener('change', saveSettings);
   ghPathInput.addEventListener('change', saveSettings);
   ghTokenInput.addEventListener('change', saveSettings);
+  if (resizeMaxSide) resizeMaxSide.addEventListener('change', saveSettings);
+  if (resizeQuality) resizeQuality.addEventListener('change', saveSettings);
 
   const res = await fetch('./gallery.json', { cache: 'no-store' });
   if (!res.ok) {
@@ -395,6 +427,11 @@ async function init() {
   loadGalleryFromSelect();
 
   gallerySelect.addEventListener('change', loadGalleryFromSelect);
+  if (gallerySearchInput) {
+    gallerySearchInput.addEventListener('input', () => {
+      populateGallerySelect();
+    });
+  }
   saveGalleryBtn.addEventListener('click', saveGallery);
   newGalleryBtn.addEventListener('click', createGallery);
   uploadImagesBtn.addEventListener('click', uploadFiles);
