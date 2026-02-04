@@ -1,0 +1,835 @@
+{
+  "version": "3.0",
+  "generated": "2026-02-04T10:17:23.982Z",
+  "categories": [
+    {
+      "id": "sport",
+      "name": "Sport"
+    },
+    {
+      "id": "landschaft",
+      "name": "Landschaft"
+    },
+    {
+      "id": "portrait",
+      "name": "Portrait"
+    },
+    {
+      "id": "tiere",
+      "name": "Tiere"
+    },
+    {
+      "id": "architektur",
+      "name": "Architektur"
+    },
+    {
+      "id": "events",
+      "name": "Events"
+    }
+  ],
+  "galleries": [
+    {
+      "id": "noel",
+      "name": "Privat",
+      "images": [
+        {
+          "id": "img_1768923083247_0",
+          "name": "NG_bw_1",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768923070/ffhuvqg6yr0ldjtnbzyz.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768923070/ffhuvqg6yr0ldjtnbzyz.jpg",
+          "uploadDate": "2026-01-20T15:31:23.247Z",
+          "width": 1024,
+          "height": 1536,
+          "source": "cloudinary"
+        },
+        {
+          "id": "img_1768923083247_1",
+          "name": "NG_bw_2",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768923070/g6qvlvjf9oyaftujnwcu.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768923070/g6qvlvjf9oyaftujnwcu.jpg",
+          "uploadDate": "2026-01-20T15:31:23.247Z",
+          "width": 682,
+          "height": 1023,
+          "source": "cloudinary"
+        },
+        {
+          "id": "img_1768923083247_2",
+          "name": "NG_bw_3",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768923070/defazfjsthgxqyjn7wcc.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768923070/defazfjsthgxqyjn7wcc.jpg",
+          "uploadDate": "2026-01-20T15:31:23.247Z",
+          "width": 1024,
+          "height": 1536,
+          "source": "cloudinary"
+        },
+        {
+          "id": "img_1768923083247_3",
+          "name": "NG_bw",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768923070/o9saddceog4tigggtujx.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768923070/o9saddceog4tigggtujx.jpg",
+          "uploadDate": "2026-01-20T15:31:23.247Z",
+          "width": 682,
+          "height": 1023,
+          "source": "cloudinary"
+        },
+        {
+          "id": "img_1768923083247_4",
+          "name": "NG_dramatic color",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768923070/qykemhalexiiywgdzbyd.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768923070/qykemhalexiiywgdzbyd.jpg",
+          "uploadDate": "2026-01-20T15:31:23.247Z",
+          "width": 1664,
+          "height": 2496,
+          "source": "cloudinary"
+        }
+      ],
+      "description": "Portraits",
+      "category": "portrait",
+      "folder": "03_Portrait",
+      "password": "Noudi72"
+    },
+    {
+      "id": "eishockey",
+      "name": "Eishockey",
+      "images": [
+        {
+          "id": "img_1768941715052_0",
+          "name": "2J4A0380",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941674/k1chyuxauthkrq7pkz0p.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941674/k1chyuxauthkrq7pkz0p.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "k1chyuxauthkrq7pkz0p"
+        },
+        {
+          "id": "img_1768941715052_1",
+          "name": "2J4A0331",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941675/qjhb0taol7lkxqnfipi3.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941675/qjhb0taol7lkxqnfipi3.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "qjhb0taol7lkxqnfipi3"
+        },
+        {
+          "id": "img_1768941715052_2",
+          "name": "2J4A0354",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941675/w0pc6ys6aivrhxl8o6lk.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941675/w0pc6ys6aivrhxl8o6lk.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "w0pc6ys6aivrhxl8o6lk"
+        },
+        {
+          "id": "img_1768941715052_3",
+          "name": "2J4A0400",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941675/lnz6ga47ezegevr83sdc.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941675/lnz6ga47ezegevr83sdc.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "lnz6ga47ezegevr83sdc"
+        },
+        {
+          "id": "img_1768941715052_4",
+          "name": "2J4A0369",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941675/lsgahejxvvgarmac0ts3.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941675/lsgahejxvvgarmac0ts3.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "lsgahejxvvgarmac0ts3"
+        },
+        {
+          "id": "img_1768941715052_5",
+          "name": "2J4A0405",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941675/clslfgysgrl3296olyg7.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941675/clslfgysgrl3296olyg7.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "clslfgysgrl3296olyg7"
+        },
+        {
+          "id": "img_1768941715052_6",
+          "name": "2J4A0408",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941676/tdngtnzqxlnyvasobbfz.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941676/tdngtnzqxlnyvasobbfz.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "tdngtnzqxlnyvasobbfz"
+        },
+        {
+          "id": "img_1768941715052_7",
+          "name": "2J4A0392",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941677/u52irpk17ru2tculgxwz.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941677/u52irpk17ru2tculgxwz.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "u52irpk17ru2tculgxwz"
+        },
+        {
+          "id": "img_1768941715052_8",
+          "name": "2J4A0411",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941677/pqrucwl3y5qqlcm2mict.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941677/pqrucwl3y5qqlcm2mict.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "pqrucwl3y5qqlcm2mict"
+        },
+        {
+          "id": "img_1768941715052_9",
+          "name": "2J4A0431",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941678/u5h2yuuj3wanjd1msmjr.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941678/u5h2yuuj3wanjd1msmjr.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "u5h2yuuj3wanjd1msmjr"
+        },
+        {
+          "id": "img_1768941715052_10",
+          "name": "2J4A0412",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941678/buezf49p1txjkttpme9j.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941678/buezf49p1txjkttpme9j.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "buezf49p1txjkttpme9j"
+        },
+        {
+          "id": "img_1768941715052_11",
+          "name": "2J4A0417",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941679/j3bb9o2iyb2pmi33tdyl.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941679/j3bb9o2iyb2pmi33tdyl.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "j3bb9o2iyb2pmi33tdyl"
+        },
+        {
+          "id": "img_1768941715052_12",
+          "name": "2J4A0418",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941679/supowrfaa8u8k1i0stzi.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941679/supowrfaa8u8k1i0stzi.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "supowrfaa8u8k1i0stzi"
+        },
+        {
+          "id": "img_1768941715052_13",
+          "name": "2J4A0448",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941679/az8mbcown5xvfe6usra6.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941679/az8mbcown5xvfe6usra6.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "az8mbcown5xvfe6usra6"
+        },
+        {
+          "id": "img_1768941715052_14",
+          "name": "2J4A0449",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941679/ldmlqyjk7vmiw3g5mocb.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941679/ldmlqyjk7vmiw3g5mocb.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "ldmlqyjk7vmiw3g5mocb"
+        },
+        {
+          "id": "img_1768941715052_15",
+          "name": "2J4A0472",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941680/sercknyubkilwuvubbdx.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941680/sercknyubkilwuvubbdx.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "sercknyubkilwuvubbdx"
+        },
+        {
+          "id": "img_1768941715052_16",
+          "name": "2J4A0551",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941682/pcbwl8oxsxwezzsuicoe.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941682/pcbwl8oxsxwezzsuicoe.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "pcbwl8oxsxwezzsuicoe"
+        },
+        {
+          "id": "img_1768941715052_17",
+          "name": "2J4A0494",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941682/v1nyrprn3kfjx6s4qipc.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941682/v1nyrprn3kfjx6s4qipc.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "v1nyrprn3kfjx6s4qipc"
+        },
+        {
+          "id": "img_1768941715052_18",
+          "name": "2J4A0522",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941682/wehhmekjjuesaqjnu7k8.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941682/wehhmekjjuesaqjnu7k8.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "wehhmekjjuesaqjnu7k8"
+        },
+        {
+          "id": "img_1768941715052_19",
+          "name": "2J4A0562",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941682/sxvaifyr0g0ggvisbm1o.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941682/sxvaifyr0g0ggvisbm1o.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "sxvaifyr0g0ggvisbm1o"
+        },
+        {
+          "id": "img_1768941715052_20",
+          "name": "2J4A0555",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941682/neegofngvakaqyzarpbj.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941682/neegofngvakaqyzarpbj.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "neegofngvakaqyzarpbj"
+        },
+        {
+          "id": "img_1768941715052_21",
+          "name": "2J4A0482",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941683/ktvt0obzurdcnooo59on.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941683/ktvt0obzurdcnooo59on.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "ktvt0obzurdcnooo59on"
+        },
+        {
+          "id": "img_1768941715052_22",
+          "name": "2J4A0627",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941684/jrr4ctwrllzd8dbl4vwl.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941684/jrr4ctwrllzd8dbl4vwl.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "jrr4ctwrllzd8dbl4vwl"
+        },
+        {
+          "id": "img_1768941715052_23",
+          "name": "2J4A0621",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941684/t5qhigt2zbwfyhgwzqhu.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941684/t5qhigt2zbwfyhgwzqhu.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "t5qhigt2zbwfyhgwzqhu"
+        },
+        {
+          "id": "img_1768941715052_24",
+          "name": "2J4A0601",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941684/vf2hxjmvts79krru73h1.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941684/vf2hxjmvts79krru73h1.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "vf2hxjmvts79krru73h1"
+        },
+        {
+          "id": "img_1768941715052_25",
+          "name": "2J4A0645",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941685/cd9owgbez9fdssxf0ssh.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941685/cd9owgbez9fdssxf0ssh.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "cd9owgbez9fdssxf0ssh"
+        },
+        {
+          "id": "img_1768941715052_26",
+          "name": "2J4A0636",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941685/p99v1o36fdd3yo4eyuid.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941685/p99v1o36fdd3yo4eyuid.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "p99v1o36fdd3yo4eyuid"
+        },
+        {
+          "id": "img_1768941715052_27",
+          "name": "2J4A0624",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941685/jjtmrryupl05puwr08ko.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941685/jjtmrryupl05puwr08ko.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "jjtmrryupl05puwr08ko"
+        },
+        {
+          "id": "img_1768941715052_28",
+          "name": "2J4A0646",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941685/g1eostczmu46hv0zltm8.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941685/g1eostczmu46hv0zltm8.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "g1eostczmu46hv0zltm8"
+        },
+        {
+          "id": "img_1768941715052_29",
+          "name": "2J4A0678",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941686/sbdxd98cq81ivnfqi4gf.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941686/sbdxd98cq81ivnfqi4gf.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "sbdxd98cq81ivnfqi4gf"
+        },
+        {
+          "id": "img_1768941715052_30",
+          "name": "2J4A0682",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941686/rdpvyx8jwwbxbp2blb5t.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941686/rdpvyx8jwwbxbp2blb5t.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "rdpvyx8jwwbxbp2blb5t"
+        },
+        {
+          "id": "img_1768941715052_31",
+          "name": "2J4A0695",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941687/dbvcfffv4zgk4pi6bm7v.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941687/dbvcfffv4zgk4pi6bm7v.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "dbvcfffv4zgk4pi6bm7v"
+        },
+        {
+          "id": "img_1768941715052_32",
+          "name": "2J4A0722",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941688/huvrw9zfzofexih9t6bf.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941688/huvrw9zfzofexih9t6bf.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "huvrw9zfzofexih9t6bf"
+        },
+        {
+          "id": "img_1768941715052_33",
+          "name": "2J4A0697",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941688/dwriaj5mxpb1mfadfeqa.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941688/dwriaj5mxpb1mfadfeqa.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "dwriaj5mxpb1mfadfeqa"
+        },
+        {
+          "id": "img_1768941715052_34",
+          "name": "2J4A0771",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941688/jzytpxkl4xtfq3lsoqmu.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941688/jzytpxkl4xtfq3lsoqmu.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "jzytpxkl4xtfq3lsoqmu"
+        },
+        {
+          "id": "img_1768941715052_35",
+          "name": "2J4A0761",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941688/z6wcqkqk6v8h9eaf39h1.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941688/z6wcqkqk6v8h9eaf39h1.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "z6wcqkqk6v8h9eaf39h1"
+        },
+        {
+          "id": "img_1768941715052_36",
+          "name": "2J4A0712",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941688/gvxnaeqgp7wmab9rzhyy.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941688/gvxnaeqgp7wmab9rzhyy.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "gvxnaeqgp7wmab9rzhyy"
+        },
+        {
+          "id": "img_1768941715052_37",
+          "name": "2J4A0777",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941689/ri8n6flgh5m4xalwzhfu.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941689/ri8n6flgh5m4xalwzhfu.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "ri8n6flgh5m4xalwzhfu"
+        },
+        {
+          "id": "img_1768941715052_38",
+          "name": "2J4A0781",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941689/es6zzve9pbtjhbq84931.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941689/es6zzve9pbtjhbq84931.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "es6zzve9pbtjhbq84931"
+        },
+        {
+          "id": "img_1768941715052_39",
+          "name": "2J4A0788",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941690/evnu31b5bovrj0p9bauj.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941690/evnu31b5bovrj0p9bauj.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "evnu31b5bovrj0p9bauj"
+        },
+        {
+          "id": "img_1768941715052_40",
+          "name": "2J4A0816",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941690/twe4yptl6mwhqahjzjcy.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941690/twe4yptl6mwhqahjzjcy.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "twe4yptl6mwhqahjzjcy"
+        },
+        {
+          "id": "img_1768941715052_41",
+          "name": "2J4A0841",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941691/wcbyyp6v6otjmngvlboi.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941691/wcbyyp6v6otjmngvlboi.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "wcbyyp6v6otjmngvlboi"
+        },
+        {
+          "id": "img_1768941715052_42",
+          "name": "2J4A0862",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941692/f1m2uarbbajcxce1wixu.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941692/f1m2uarbbajcxce1wixu.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "f1m2uarbbajcxce1wixu"
+        },
+        {
+          "id": "img_1768941715052_43",
+          "name": "2J4A0866",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941692/djmsgkkr8ehwr8spi4by.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941692/djmsgkkr8ehwr8spi4by.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "djmsgkkr8ehwr8spi4by"
+        },
+        {
+          "id": "img_1768941715052_44",
+          "name": "2J4A0894",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941693/ozgvcovvl95s2f8iwsf9.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941693/ozgvcovvl95s2f8iwsf9.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "ozgvcovvl95s2f8iwsf9"
+        },
+        {
+          "id": "img_1768941715052_45",
+          "name": "2J4A0865",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941693/bhjkqtspvz0xpg3lawc1.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941693/bhjkqtspvz0xpg3lawc1.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "bhjkqtspvz0xpg3lawc1"
+        },
+        {
+          "id": "img_1768941715052_46",
+          "name": "2J4A0867",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941693/qcjlrgoh0tscpor4x7nn.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941693/qcjlrgoh0tscpor4x7nn.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "qcjlrgoh0tscpor4x7nn"
+        },
+        {
+          "id": "img_1768941715052_47",
+          "name": "2J4A0898",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941693/okodmavzpq6kxig7wjwp.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941693/okodmavzpq6kxig7wjwp.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 6000,
+          "height": 4000,
+          "source": "cloudinary",
+          "publicId": "okodmavzpq6kxig7wjwp"
+        },
+        {
+          "id": "img_1768941715052_48",
+          "name": "2J4A0906 (bearbeitet)",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768941694/myw5tkm5c8olgk7orc98.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768941694/myw5tkm5c8olgk7orc98.jpg",
+          "uploadDate": "2026-01-20T20:41:55.052Z",
+          "width": 5750,
+          "height": 3874,
+          "source": "cloudinary",
+          "publicId": "myw5tkm5c8olgk7orc98"
+        }
+      ],
+      "description": "EHCB vs HCD",
+      "category": "sport",
+      "folder": "01_Sport"
+    },
+    {
+      "id": "sport-street-inlinehockey",
+      "name": "Street-Inlinehockey",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "sport",
+      "folder": "01_Sport"
+    },
+    {
+      "id": "sport-motorsport",
+      "name": "Motorsport",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "sport",
+      "folder": "01_Sport"
+    },
+    {
+      "id": "sport-wintersport",
+      "name": "Wintersport",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "sport",
+      "folder": "01_Sport"
+    },
+    {
+      "id": "landschaft-berge-alpen",
+      "name": "Berge & Alpen",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "landschaft",
+      "folder": "02_Landschaft"
+    },
+    {
+      "id": "landschaft-kueste-meer",
+      "name": "Küste & Meer",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "landschaft",
+      "folder": "02_Landschaft"
+    },
+    {
+      "id": "landschaft-wald-forst",
+      "name": "Wald & Forst",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "landschaft",
+      "folder": "02_Landschaft"
+    },
+    {
+      "id": "landschaft-nacht",
+      "name": "Nachtfotografie",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "landschaft",
+      "folder": "02_Landschaft"
+    },
+    {
+      "id": "portrait-business",
+      "name": "Business & Corporate",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "portrait",
+      "folder": "03_Portrait"
+    },
+    {
+      "id": "portrait-lifestyle",
+      "name": "Lifestyle & Street",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "portrait",
+      "folder": "03_Portrait"
+    },
+    {
+      "id": "portrait-familie",
+      "name": "Familie & Kinder",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "portrait",
+      "folder": "03_Portrait"
+    },
+    {
+      "id": "portrait-studio",
+      "name": "Studio",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "portrait",
+      "folder": "03_Portrait"
+    },
+    {
+      "id": "tiere-wildlife",
+      "name": "Wildlife & Wildtiere",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "tiere",
+      "folder": "04_Tiere"
+    },
+    {
+      "id": "tiere-haustiere",
+      "name": "Haustiere",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "tiere",
+      "folder": "04_Tiere"
+    },
+    {
+      "id": "tiere-zoo",
+      "name": "Zoo & Vogelpark",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "tiere",
+      "folder": "04_Tiere"
+    },
+    {
+      "id": "tiere-makro",
+      "name": "Makro & Insekten",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "tiere",
+      "folder": "04_Tiere"
+    },
+    {
+      "id": "architektur-urban",
+      "name": "Urban & Stadt",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "architektur",
+      "folder": "05_Architektur"
+    },
+    {
+      "id": "architektur-lost",
+      "name": "Lost Places",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "architektur",
+      "folder": "05_Architektur"
+    },
+    {
+      "id": "architektur-innen",
+      "name": "Innenarchitektur",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "architektur",
+      "folder": "05_Architektur"
+    },
+    {
+      "id": "events-konzerte",
+      "name": "Konzerte",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "events",
+      "folder": "06_Events"
+    },
+    {
+      "id": "events-hochzeiten",
+      "name": "Hochzeiten",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "events",
+      "folder": "06_Events"
+    },
+    {
+      "id": "events-firmenfeiern",
+      "name": "Firmenfeiern",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "events",
+      "folder": "06_Events"
+    }
+  ],
+  "portfolio": [
+    {
+      "image": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768988305/ksxotxkij4nkfijga2dt.jpg",
+      "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768988305/ksxotxkij4nkfijga2dt.jpg",
+      "title": null,
+      "description": null
+    },
+    {
+      "image": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768988422/t2ms1cndef4cgzrsdkul.jpg",
+      "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768988422/t2ms1cndef4cgzrsdkul.jpg",
+      "title": null,
+      "description": null
+    },
+    {
+      "image": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768988459/ygc0cgxjzh5qmtx6ajsf.jpg",
+      "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768988459/ygc0cgxjzh5qmtx6ajsf.jpg",
+      "title": null,
+      "description": null
+    },
+    {
+      "image": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768988614/ct6sagdpiuqjiikgpplu.jpg",
+      "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768988614/ct6sagdpiuqjiikgpplu.jpg",
+      "title": null,
+      "description": null
+    }
+  ],
+  "baseUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload"
+}

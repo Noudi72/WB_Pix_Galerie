@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WB Foto Manager – Galerien</title>
+  <link rel="stylesheet" href="./assets/app.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>WB Foto Manager</div>
+      </div>
+      <span class="chip" id="gallery-count-chip">0 Galerien</span>
+    </div>
+  </header>
+
+  <main class="container">
+    <h1 class="page-title">Kundengalerien</h1>
+    <p class="muted">Kategorie auswählen oder gezielt nach einer Galerie suchen.</p>
+
+    <div class="toolbar">
+      <div class="search">
+        <span>🔍</span>
+        <input id="search-input" type="search" placeholder="Galerien durchsuchen...">
+      </div>
+      <div class="category-list" id="category-list"></div>
+    </div>
+
+    <section class="grid gallery-grid" id="gallery-grid"></section>
+    <p class="muted" id="empty-state" style="margin-top: 18px; display: none;">Keine Galerien gefunden.</p>
+  </main>
+
+  <script src="./assets/index.js"></script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WB Foto Manager – Galerie</title>
+  <link rel="stylesheet" href="./assets/app.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="back-link" href="./index.html">← Zurück</a>
+      <span class="chip" id="image-count-chip">0 Bilder</span>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="gallery-header">
+      <div>
+        <h1 class="page-title" id="gallery-title">Galerie</h1>
+        <p class="muted" id="gallery-subtitle"></p>
+      </div>
+      <div class="search" style="max-width: 320px;">
+        <span>🔍</span>
+        <input id="gallery-search" type="search" placeholder="Bilder suchen...">
+      </div>
+    </div>
+
+    <section class="grid gallery-grid" id="gallery-grid"></section>
+    <p class="muted" id="gallery-empty" style="margin-top: 18px; display: none;">Keine Bilder gefunden.</p>
+  </main>
+
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" id="lightbox-close">×</button>
+    <button class="lightbox-nav prev" id="lightbox-prev">‹</button>
+    <img id="lightbox-image" alt="">
+    <button class="lightbox-nav next" id="lightbox-next">›</button>
+  </div>
+
+  <script src="./assets/gallery.js"></script>
+</body>
+</html>
