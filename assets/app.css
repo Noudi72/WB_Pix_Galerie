@@ -368,10 +368,66 @@ body.dark-mode .site-header {
   display: flex;
 }
 
-.lightbox img {
+.lightbox-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
   max-width: 92vw;
   max-height: 92vh;
+}
+
+.lightbox img {
+  max-width: 92vw;
+  max-height: 60vh;
   border-radius: var(--radius-md);
+}
+
+.lightbox-panel {
+  width: min(900px, 92vw);
+  background: rgba(20, 19, 18, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  color: #fff;
+}
+
+.lightbox-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.lightbox-panel textarea {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.4);
+  color: #fff;
+  padding: 8px 10px;
+}
+
+.lightbox-panel-actions {
+  margin-top: 8px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.comment-list {
+  margin-top: 10px;
+  display: grid;
+  gap: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.comment-item {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.35);
+  font-size: 0.85rem;
 }
 
 .lightbox-close,
@@ -464,6 +520,65 @@ body.dark-mode .site-header {
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 10px;
+}
+
+.admin-image-list {
+  margin-top: 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.admin-image-item {
+  display: grid;
+  grid-template-columns: 88px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+}
+
+.admin-image-thumb {
+  width: 88px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.admin-image-meta {
+  font-size: 0.85rem;
+  color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.btn.danger {
+  border-color: rgba(210, 82, 82, 0.5);
+  color: #d25252;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  z-index: 10000;
+}
+
+.modal-content {
+  width: min(900px, 92vw);
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  padding: 18px;
+  box-shadow: var(--shadow);
 }
 
 .wizard-inline-actions {

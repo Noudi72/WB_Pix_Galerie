@@ -109,6 +109,9 @@
       <p class="admin-note" id="gallery-table-status"></p>
       <p class="admin-note">Sortierung per Klick auf die Tabellen‑Header. Mehrfach‑Sort mit Shift+Klick.</p>
       <p class="admin-note">Änderungen sind lokal, nachher in Schritt 3 zu GitHub pushen.</p>
+      <div class="admin-actions">
+        <button class="btn" id="push-json-global-btn">Alle Änderungen zu GitHub pushen</button>
+      </div>
     </section>
 
     <section class="admin-section">
@@ -228,6 +231,8 @@
           </div>
           <p class="admin-note">Uploads nutzen Cloudinary (Unsigned Upload Preset). Ohne Preset kannst du per URL hinzufügen.</p>
           <p class="admin-note" id="upload-status"></p>
+          <div class="admin-image-list" id="admin-image-list"></div>
+          <p class="admin-note">Bilder können hier entfernt werden (nur aus der Galerie‑Liste).</p>
         </div>
 
         <div class="wizard-step-panel" data-step="3">
@@ -270,6 +275,40 @@
         <button class="btn" id="wizard-next">Weiter</button>
       </div>
     </section>
+
+    <div class="modal is-hidden" id="upload-modal">
+      <div class="modal-content">
+        <h3>Upload‑Ziel wählen</h3>
+        <p class="admin-note">Kategorie, Unterkategorie und Ordner festlegen, bevor der Upload startet.</p>
+        <div class="admin-grid">
+          <div class="admin-field">
+            <label for="upload-category">Kategorie</label>
+            <select id="upload-category"></select>
+          </div>
+          <div class="admin-field">
+            <label for="upload-subcategory">Unterkategorie</label>
+            <input id="upload-subcategory" type="text" list="upload-subcategory-list" placeholder="z. B. Eishockey">
+            <datalist id="upload-subcategory-list"></datalist>
+          </div>
+          <div class="admin-field">
+            <label for="upload-folder">Ordner</label>
+            <input id="upload-folder" type="text" placeholder="z. B. EHCB vs HCD">
+          </div>
+          <div class="admin-field">
+            <label for="upload-date">Datum</label>
+            <input id="upload-date" type="date">
+          </div>
+          <div class="admin-field">
+            <label for="upload-new-category">Neue Kategorie (optional)</label>
+            <input id="upload-new-category" type="text" placeholder="z. B. Sport">
+          </div>
+        </div>
+        <div class="admin-actions">
+          <button class="btn" id="upload-cancel" type="button">Abbrechen</button>
+          <button class="btn" id="upload-confirm" type="button">Upload starten</button>
+        </div>
+      </div>
+    </div>
 
   </main>
 

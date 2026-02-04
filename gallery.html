@@ -41,7 +41,20 @@
   <div class="lightbox" id="lightbox">
     <button class="lightbox-close" id="lightbox-close">×</button>
     <button class="lightbox-nav prev" id="lightbox-prev">‹</button>
-    <img id="lightbox-image" alt="">
+    <div class="lightbox-content">
+      <img id="lightbox-image" alt="">
+      <div class="lightbox-panel">
+        <div class="lightbox-panel-header">
+          <h4>Kommentar</h4>
+          <span class="chip" id="comment-count">0</span>
+        </div>
+        <textarea id="comment-input" rows="3" placeholder="Kommentar zum Bild..."></textarea>
+        <div class="lightbox-panel-actions">
+          <button class="btn" id="comment-save" type="button">Kommentar speichern</button>
+        </div>
+        <div class="comment-list" id="comment-list"></div>
+      </div>
+    </div>
     <button class="lightbox-nav next" id="lightbox-next">›</button>
   </div>
 

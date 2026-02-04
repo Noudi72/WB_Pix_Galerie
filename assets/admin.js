@@ -30,6 +30,19 @@ const galleryTableSearch = document.getElementById('gallery-table-search');
 const galleryTablePasswordFilter = document.getElementById('gallery-table-password');
 const galleryTableStatus = document.getElementById('gallery-table-status');
 const galleryTableSortButtons = galleryTable?.querySelectorAll('.table-sort') || [];
+const globalPushBtn = document.getElementById('push-json-global-btn');
+
+const uploadModal = document.getElementById('upload-modal');
+const uploadCategorySelect = document.getElementById('upload-category');
+const uploadSubcategoryInput = document.getElementById('upload-subcategory');
+const uploadSubcategoryList = document.getElementById('upload-subcategory-list');
+const uploadFolderInput = document.getElementById('upload-folder');
+const uploadDateInput = document.getElementById('upload-date');
+const uploadNewCategoryInput = document.getElementById('upload-new-category');
+const uploadCancelBtn = document.getElementById('upload-cancel');
+const uploadConfirmBtn = document.getElementById('upload-confirm');
+
+const adminImageList = document.getElementById('admin-image-list');
 
 const newGalleryBtn = document.getElementById('new-gallery-btn');
 const saveGalleryBtn = document.getElementById('save-gallery-btn');
@@ -70,6 +83,7 @@ let gallerySort = [
   { key: 'subcategory', dir: 'asc' },
   { key: 'folder', dir: 'asc' }
 ];
+let pendingUploadFiles = [];
 async function downscaleImage(file) {
   const img = await createImageBitmap(file);
   const maxSide = Number(resizeMaxSide?.value || 4000);
@@ -196,6 +210,12 @@ function buildThumbUrl(url, width = 520, height = 390) {
   return url.replace(/\/upload\/([^/]+\/)?/, `/upload/${transform}/`);
 }
 
+function resolveUrl(url) {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  return new URL(url, window.location.href).href;
+}
+
 function populateCategories() {
   galleryCategorySelect.innerHTML = '';
   const categories = galleryConfig?.categories || [];
@@ -275,6 +295,72 @@ function buildCategoryOptions(selected) {
     const isSelected = cat.id === selected ? ' selected' : '';
     return `<option value="${cat.id}"${isSelected}>${cat.name}</option>`;
   }).join('');
+}
+
+function populateUploadModalOptions() {
+  if (!uploadCategorySelect || !uploadSubcategoryList) return;
+  uploadCategorySelect.innerHTML = buildCategoryOptions(galleryCategorySelect?.value || '');
+  const subSet = new Set();
+  (galleryConfig?.galleries || []).forEach((g) => {
+    if (g.subcategory) subSet.add(g.subcategory);
+  });
+  uploadSubcategoryList.innerHTML = '';
+  Array.from(subSet).sort((a, b) => a.localeCompare(b, 'de')).forEach((value) => {
+    const opt = document.createElement('option');
+    opt.value = value;
+    uploadSubcategoryList.appendChild(opt);
+  });
+  if (uploadSubcategoryInput) uploadSubcategoryInput.value = gallerySubcategoryInput?.value || '';
+  if (uploadFolderInput) uploadFolderInput.value = galleryFolderInput?.value || '';
+  if (uploadDateInput) uploadDateInput.value = galleryDateInput?.value || '';
+  if (uploadNewCategoryInput) uploadNewCategoryInput.value = '';
+}
+
+function openUploadModal(files) {
+  if (!uploadModal) return;
+  pendingUploadFiles = files || [];
+  populateUploadModalOptions();
+  uploadModal.classList.remove('is-hidden');
+}
+
+function closeUploadModal() {
+  if (!uploadModal) return;
+  uploadModal.classList.add('is-hidden');
+  pendingUploadFiles = [];
+}
+
+function ensureCategoryByName(name) {
+  const trimmed = name.trim();
+  if (!trimmed) return '';
+  const id = trimmed.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+  const exists = (galleryConfig.categories || []).some(c => c.id === id);
+  if (!exists) {
+    galleryConfig.categories.push({ id, name: trimmed });
+  }
+  populateCategories();
+  return id;
+}
+
+function getOrCreateGallery({ categoryId, subcategory, folder, date }) {
+  const galleries = galleryConfig?.galleries || [];
+  const match = galleries.find(g => (g.category || '') === categoryId
+    && (g.subcategory || '') === subcategory
+    && (g.folder || '') === folder
+    && (g.date || '') === (date || ''));
+  if (match) return match;
+  const id = `gallery-${Date.now()}`;
+  const newGallery = {
+    id,
+    name: subcategory || '',
+    description: '',
+    images: [],
+    category: categoryId,
+    subcategory,
+    folder,
+    date: date || ''
+  };
+  galleries.push(newGallery);
+  return newGallery;
 }
 
 function updateSuggestions() {
@@ -488,6 +574,29 @@ function updateGalleryField(idx, field, value) {
   renderGalleryTable();
 }
 
+function renderImageList() {
+  if (!adminImageList) return;
+  if (!currentGallery || !(currentGallery.images || []).length) {
+    adminImageList.innerHTML = '<p class="admin-note">Keine Bilder in dieser Galerie.</p>';
+    return;
+  }
+  adminImageList.innerHTML = '';
+  currentGallery.images.forEach((img, idx) => {
+    const item = document.createElement('div');
+    item.className = 'admin-image-item';
+    const thumb = buildThumbUrl(resolveUrl(img.thumbnailUrl || img.url), 180, 120);
+    item.innerHTML = `
+      <img class="admin-image-thumb" src="${thumb}" alt="">
+      <div class="admin-image-meta">
+        <strong>${img.name || 'Bild'}</strong>
+        <span>${img.url ? img.url.split('/').slice(-1)[0] : ''}</span>
+      </div>
+      <button class="btn danger" data-action="delete-image" data-idx="${idx}">Bild löschen</button>
+    `;
+    adminImageList.appendChild(item);
+  });
+}
+
 function autoFillFromFolder(idx) {
   const gallery = (galleryConfig?.galleries || [])[idx];
   if (!gallery) return;
@@ -522,6 +631,7 @@ function loadGalleryFromSelect() {
   galleryFolderInput.value = currentGallery.folder || '';
   galleryDateInput.value = currentGallery.date || '';
   galleryPasswordInput.value = currentGallery.password || '';
+  renderImageList();
 }
 
 function ensureCategoryExists() {
@@ -571,6 +681,7 @@ function createGallery() {
   loadGalleryFromSelect();
   updateSuggestions();
   renderGalleryTable();
+  renderImageList();
 }
 
 function deleteCurrentGallery() {
@@ -582,6 +693,7 @@ function deleteCurrentGallery() {
   populateGallerySelect();
   updateSuggestions();
   renderGalleryTable();
+  renderImageList();
 }
 
 function renameCategory() {
@@ -611,17 +723,22 @@ function deleteCategory() {
 
 async function uploadFiles() {
   saveSettings();
+  const files = Array.from(imageFilesInput.files || []);
+  if (!files.length) {
+    alert('Bitte mindestens eine Datei auswählen.');
+    return;
+  }
+  openUploadModal(files);
+}
+
+async function uploadFilesWithFiles(files) {
+  saveSettings();
   if (!currentGallery) return;
   if (uploadStatus) uploadStatus.textContent = '';
   const cloudName = cloudNameInput.value.trim();
   const preset = uploadPresetInput.value.trim();
-  const files = Array.from(imageFilesInput.files || []);
   if (!cloudName || !preset) {
     alert('Bitte Cloud Name und Upload Preset angeben.');
-    return;
-  }
-  if (!files.length) {
-    alert('Bitte mindestens eine Datei auswählen.');
     return;
   }
 
@@ -661,6 +778,7 @@ async function uploadFiles() {
   }
 
   imageFilesInput.value = '';
+  renderImageList();
   alert('Upload abgeschlossen.');
 }
 
@@ -677,6 +795,7 @@ function addImageUrl() {
     source: 'url'
   });
   imageUrlInput.value = '';
+  renderImageList();
   alert('URL hinzugefügt.');
 }
 
@@ -859,6 +978,7 @@ async function init() {
   addUrlBtn.addEventListener('click', addImageUrl);
   downloadBtn.addEventListener('click', downloadJson);
   pushBtn.addEventListener('click', pushJsonToGitHub);
+  if (globalPushBtn) globalPushBtn.addEventListener('click', pushJsonToGitHub);
 
   adminLoginBtn.addEventListener('click', handleLogin);
   adminLoginInput.addEventListener('keypress', (e) => {
@@ -894,9 +1014,60 @@ async function init() {
       e.preventDefault();
       uploadDropzone.classList.remove('is-dragover');
       if (e.dataTransfer?.files?.length) {
-        imageFilesInput.files = e.dataTransfer.files;
-        uploadFiles();
+        openUploadModal(Array.from(e.dataTransfer.files));
       }
+    });
+  }
+
+  if (uploadCancelBtn) uploadCancelBtn.addEventListener('click', closeUploadModal);
+  if (uploadConfirmBtn) {
+    uploadConfirmBtn.addEventListener('click', async () => {
+      if (!pendingUploadFiles.length) {
+        closeUploadModal();
+        return;
+      }
+      const newCategoryName = uploadNewCategoryInput?.value || '';
+      const categoryId = newCategoryName.trim()
+        ? ensureCategoryByName(newCategoryName)
+        : (uploadCategorySelect?.value || galleryCategorySelect?.value || '');
+      const subValue = (uploadSubcategoryInput?.value || '').trim();
+      const folderValue = (uploadFolderInput?.value || '').trim();
+      const dateValue = uploadDateInput?.value || '';
+      if (!categoryId || !subValue) {
+        alert('Bitte mindestens Kategorie und Unterkategorie angeben.');
+        return;
+      }
+      const targetGallery = getOrCreateGallery({
+        categoryId,
+        subcategory: subValue,
+        folder: folderValue,
+        date: dateValue
+      });
+      populateGallerySelect();
+      const idx = (galleryConfig.galleries || []).indexOf(targetGallery);
+      if (idx >= 0) gallerySelect.value = String(idx);
+      loadGalleryFromSelect();
+      galleryCategorySelect.value = categoryId;
+      gallerySubcategoryInput.value = subValue;
+      galleryFolderInput.value = folderValue;
+      galleryDateInput.value = dateValue;
+      currentGallery = targetGallery;
+      closeUploadModal();
+      await uploadFilesWithFiles(pendingUploadFiles);
+    });
+  }
+
+  if (adminImageList) {
+    adminImageList.addEventListener('click', (event) => {
+      const btn = event.target.closest('button[data-action="delete-image"]');
+      if (!btn) return;
+      const idx = Number(btn.dataset.idx);
+      if (Number.isNaN(idx) || !currentGallery) return;
+      const ok = confirm('Bild wirklich löschen?');
+      if (!ok) return;
+      currentGallery.images.splice(idx, 1);
+      renderImageList();
+      renderGalleryTable();
     });
   }
 
