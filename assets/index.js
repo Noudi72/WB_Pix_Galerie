@@ -3,9 +3,28 @@ const categoryList = document.getElementById('category-list');
 const searchInput = document.getElementById('search-input');
 const emptyState = document.getElementById('empty-state');
 const countChip = document.getElementById('gallery-count-chip');
+const themeToggle = document.getElementById('theme-toggle');
 
 let galleryConfig = null;
 let selectedCategory = 'all';
+
+function applyTheme(theme) {
+  const isDark = theme === 'dark';
+  document.body.classList.toggle('dark-mode', isDark);
+  localStorage.setItem('wbg_theme', isDark ? 'dark' : 'light');
+  if (themeToggle) themeToggle.textContent = isDark ? 'Hell' : 'Dunkel';
+}
+
+function initTheme() {
+  const saved = localStorage.getItem('wbg_theme') || 'light';
+  applyTheme(saved);
+  if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+      const next = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
+      applyTheme(next);
+    });
+  }
+}
 
 function buildThumbUrl(url, width = 480, height = 320) {
   if (!url) return '';
@@ -106,4 +125,5 @@ async function init() {
 
 searchInput.addEventListener('input', renderGalleries);
 
+initTheme();
 init();

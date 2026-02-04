@@ -29,9 +29,28 @@ const ghRepoInput = document.getElementById('gh-repo');
 const ghBranchInput = document.getElementById('gh-branch');
 const ghPathInput = document.getElementById('gh-path');
 const ghTokenInput = document.getElementById('gh-token');
+const themeToggle = document.getElementById('theme-toggle');
 
 let galleryConfig = null;
 let currentGallery = null;
+
+function applyTheme(theme) {
+  const isDark = theme === 'dark';
+  document.body.classList.toggle('dark-mode', isDark);
+  localStorage.setItem('wbg_theme', isDark ? 'dark' : 'light');
+  if (themeToggle) themeToggle.textContent = isDark ? 'Hell' : 'Dunkel';
+}
+
+function initTheme() {
+  const saved = localStorage.getItem('wbg_theme') || 'light';
+  applyTheme(saved);
+  if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+      const next = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
+      applyTheme(next);
+    });
+  }
+}
 
 function getAdminPassword() {
   return localStorage.getItem('wbg_admin_password') || '';
@@ -274,6 +293,7 @@ async function pushJsonToGitHub() {
 }
 
 async function init() {
+  initTheme();
   loadSettings();
   cloudNameInput.addEventListener('change', saveSettings);
   uploadPresetInput.addEventListener('change', saveSettings);

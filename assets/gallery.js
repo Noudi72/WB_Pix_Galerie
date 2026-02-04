@@ -6,6 +6,7 @@ const countChip = document.getElementById('image-count-chip');
 const searchInput = document.getElementById('gallery-search');
 const filterAllBtn = document.getElementById('filter-all');
 const filterFavBtn = document.getElementById('filter-favorites');
+const themeToggle = document.getElementById('theme-toggle');
 
 const lightbox = document.getElementById('lightbox');
 const lightboxImg = document.getElementById('lightbox-image');
@@ -19,6 +20,24 @@ let filteredImages = [];
 let currentIndex = 0;
 let showFavoritesOnly = false;
 let favoriteIds = new Set();
+
+function applyTheme(theme) {
+  const isDark = theme === 'dark';
+  document.body.classList.toggle('dark-mode', isDark);
+  localStorage.setItem('wbg_theme', isDark ? 'dark' : 'light');
+  if (themeToggle) themeToggle.textContent = isDark ? 'Hell' : 'Dunkel';
+}
+
+function initTheme() {
+  const saved = localStorage.getItem('wbg_theme') || 'light';
+  applyTheme(saved);
+  if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+      const next = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
+      applyTheme(next);
+    });
+  }
+}
 
 function normalize(text) {
   return String(text || '').toLowerCase();
@@ -175,6 +194,7 @@ async function init() {
 }
 
 init();
+initTheme();
 
 filterAllBtn.addEventListener('click', () => {
   showFavoritesOnly = false;
