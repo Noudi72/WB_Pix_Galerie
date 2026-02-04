@@ -157,6 +157,11 @@ body.dark-mode .site-header {
   color: var(--muted);
 }
 
+.empty-state {
+  margin-top: 18px;
+  display: none;
+}
+
 .toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -233,6 +238,11 @@ body.dark-mode .site-header {
   width: 100%;
   aspect-ratio: 16/10;
   object-fit: cover;
+  background: var(--surface-2);
+}
+
+.card-placeholder {
+  height: 160px;
   background: var(--surface-2);
 }
 

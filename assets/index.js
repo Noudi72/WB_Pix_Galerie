@@ -101,7 +101,7 @@ function renderGalleries() {
     const folder = gallery.folder ? ` · ${gallery.folder}` : '';
     const date = gallery.date ? ` · ${gallery.date}` : '';
     card.innerHTML = `
-      ${preview ? `<img src="${preview}" alt="${gallery.name || 'Galerie'}" loading="lazy" decoding="async">` : '<div style="height: 160px; background: var(--surface-2);"></div>'}
+      ${preview ? `<img src="${preview}" alt="${gallery.name || 'Galerie'}" loading="lazy" decoding="async">` : '<div class="card-placeholder"></div>'}
       <div class="card-body">
         <div class="card-title">${gallery.name || 'Galerie'}</div>
         <div class="card-meta">${gallery.description || ''}${sub}${folder}${date}</div>
