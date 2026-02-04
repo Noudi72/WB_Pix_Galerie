@@ -30,7 +30,7 @@
   "galleries": [
     {
       "id": "noel",
-      "name": "EHCB vs ZSC",
+      "name": "Sport",
       "images": [
         {
           "id": "img_1768923083247_0",
@@ -303,7 +303,7 @@
           "publicId": "sport/eishockey/ehcb-vs-zsc/nymmwjdsava1jdqefg6b"
         }
       ],
-      "description": "Eishockey",
+      "description": "EHCB vs ZSC",
       "category": "sport",
       "folder": "EHCB vs ZSC",
       "subcategory": "Eishockey",
