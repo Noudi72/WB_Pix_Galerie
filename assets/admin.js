@@ -13,18 +13,78 @@ const saveGalleryBtn = document.getElementById('save-gallery-btn');
 const uploadImagesBtn = document.getElementById('upload-images-btn');
 const addUrlBtn = document.getElementById('add-url-btn');
 const downloadBtn = document.getElementById('download-json-btn');
+const pushBtn = document.getElementById('push-json-btn');
+
+const adminApp = document.getElementById('admin-app');
+const adminLogin = document.getElementById('admin-login');
+const adminLoginInput = document.getElementById('admin-login-password');
+const adminLoginBtn = document.getElementById('admin-login-btn');
+const adminLoginHint = document.getElementById('admin-login-hint');
+const adminCurrentPassword = document.getElementById('admin-current-password');
+const adminNewPassword = document.getElementById('admin-new-password');
+const adminChangePasswordBtn = document.getElementById('change-admin-password-btn');
+
+const ghOwnerInput = document.getElementById('gh-owner');
+const ghRepoInput = document.getElementById('gh-repo');
+const ghBranchInput = document.getElementById('gh-branch');
+const ghPathInput = document.getElementById('gh-path');
+const ghTokenInput = document.getElementById('gh-token');
 
 let galleryConfig = null;
 let currentGallery = null;
 
+function getAdminPassword() {
+  return localStorage.getItem('wbg_admin_password') || '';
+}
+
+function setAdminPassword(pwd) {
+  localStorage.setItem('wbg_admin_password', pwd);
+}
+
+function showAdminApp() {
+  adminLogin.style.display = 'none';
+  adminApp.style.display = 'block';
+}
+
+function showLogin() {
+  adminApp.style.display = 'none';
+  adminLogin.style.display = 'block';
+}
+
+function handleLogin() {
+  const saved = getAdminPassword();
+  if (!saved) {
+    adminLoginHint.textContent = 'Kein Passwort gesetzt. Bitte im Adminbereich ein neues Passwort speichern.';
+    showAdminApp();
+    return;
+  }
+  const input = adminLoginInput.value.trim();
+  if (input === saved) {
+    adminLoginInput.value = '';
+    showAdminApp();
+  } else {
+    adminLoginHint.textContent = 'Falsches Passwort.';
+  }
+}
+
 function loadSettings() {
   cloudNameInput.value = localStorage.getItem('wbg_cloud_name') || '';
   uploadPresetInput.value = localStorage.getItem('wbg_upload_preset') || '';
+  ghOwnerInput.value = localStorage.getItem('wbg_gh_owner') || 'Noudi72';
+  ghRepoInput.value = localStorage.getItem('wbg_gh_repo') || 'WB_Pix_Galerie';
+  ghBranchInput.value = localStorage.getItem('wbg_gh_branch') || 'main';
+  ghPathInput.value = localStorage.getItem('wbg_gh_path') || 'gallery.json';
+  ghTokenInput.value = localStorage.getItem('wbg_gh_token') || '';
 }
 
 function saveSettings() {
   localStorage.setItem('wbg_cloud_name', cloudNameInput.value.trim());
   localStorage.setItem('wbg_upload_preset', uploadPresetInput.value.trim());
+  localStorage.setItem('wbg_gh_owner', ghOwnerInput.value.trim());
+  localStorage.setItem('wbg_gh_repo', ghRepoInput.value.trim());
+  localStorage.setItem('wbg_gh_branch', ghBranchInput.value.trim());
+  localStorage.setItem('wbg_gh_path', ghPathInput.value.trim());
+  localStorage.setItem('wbg_gh_token', ghTokenInput.value.trim());
 }
 
 function buildThumbUrl(url, width = 520, height = 390) {
@@ -167,10 +227,61 @@ function downloadJson() {
   URL.revokeObjectURL(link.href);
 }
 
+async function pushJsonToGitHub() {
+  saveSettings();
+  const owner = ghOwnerInput.value.trim();
+  const repo = ghRepoInput.value.trim();
+  const branch = ghBranchInput.value.trim() || 'main';
+  const path = ghPathInput.value.trim() || 'gallery.json';
+  const token = ghTokenInput.value.trim();
+  if (!owner || !repo || !token) {
+    alert('Bitte Owner, Repo und Token angeben.');
+    return;
+  }
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(galleryConfig, null, 2))));
+  const apiBase = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+  let sha = null;
+  try {
+    const getRes = await fetch(`${apiBase}?ref=${encodeURIComponent(branch)}`, {
+      headers: { Authorization: `token ${token}` }
+    });
+    if (getRes.ok) {
+      const data = await getRes.json();
+      sha = data.sha;
+    }
+  } catch (_) {}
+
+  const putRes = await fetch(apiBase, {
+    method: 'PUT',
+    headers: {
+      Authorization: `token ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      message: 'Update gallery.json via admin',
+      content,
+      branch,
+      sha: sha || undefined
+    })
+  });
+
+  if (!putRes.ok) {
+    const err = await putRes.json().catch(() => ({}));
+    alert(`GitHub Push fehlgeschlagen: ${err.message || putRes.status}`);
+    return;
+  }
+  alert('gallery.json erfolgreich zu GitHub gepusht.');
+}
+
 async function init() {
   loadSettings();
   cloudNameInput.addEventListener('change', saveSettings);
   uploadPresetInput.addEventListener('change', saveSettings);
+  ghOwnerInput.addEventListener('change', saveSettings);
+  ghRepoInput.addEventListener('change', saveSettings);
+  ghBranchInput.addEventListener('change', saveSettings);
+  ghPathInput.addEventListener('change', saveSettings);
+  ghTokenInput.addEventListener('change', saveSettings);
 
   const res = await fetch('./gallery.json', { cache: 'no-store' });
   if (!res.ok) {
@@ -191,6 +302,36 @@ async function init() {
   uploadImagesBtn.addEventListener('click', uploadFiles);
   addUrlBtn.addEventListener('click', addImageUrl);
   downloadBtn.addEventListener('click', downloadJson);
+  pushBtn.addEventListener('click', pushJsonToGitHub);
+
+  adminLoginBtn.addEventListener('click', handleLogin);
+  adminLoginInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') handleLogin();
+  });
+  adminChangePasswordBtn.addEventListener('click', () => {
+    const current = adminCurrentPassword.value.trim();
+    const next = adminNewPassword.value.trim();
+    const saved = getAdminPassword();
+    if (saved && current !== saved) {
+      alert('Aktuelles Passwort ist falsch.');
+      return;
+    }
+    if (!next) {
+      alert('Neues Passwort darf nicht leer sein.');
+      return;
+    }
+    setAdminPassword(next);
+    adminCurrentPassword.value = '';
+    adminNewPassword.value = '';
+    alert('Passwort gespeichert.');
+  });
 }
 
 init();
+
+if (getAdminPassword()) {
+  showLogin();
+} else {
+  adminLoginHint.textContent = 'Kein Passwort gesetzt. Bitte ein neues Passwort speichern.';
+  showAdminApp();
+}

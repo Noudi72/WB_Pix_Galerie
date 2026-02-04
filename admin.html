@@ -16,7 +16,7 @@
     </div>
   </header>
 
-  <main class="container">
+  <main class="container" id="admin-app" style="display: none;">
     <h1 class="page-title">Admin</h1>
     <p class="muted">Bilder hochladen, Galerien pflegen und `gallery.json` aktualisieren.</p>
 
@@ -33,6 +33,24 @@
         </div>
       </div>
       <p class="admin-note">Diese Werte werden lokal gespeichert (LocalStorage).</p>
+    </section>
+
+    <section class="admin-section">
+      <h3>Admin Passwort</h3>
+      <div class="admin-grid">
+        <div class="admin-field">
+          <label for="admin-current-password">Aktuelles Passwort</label>
+          <input id="admin-current-password" type="password" placeholder="Aktuelles Passwort">
+        </div>
+        <div class="admin-field">
+          <label for="admin-new-password">Neues Passwort</label>
+          <input id="admin-new-password" type="password" placeholder="Neues Passwort">
+        </div>
+      </div>
+      <div class="admin-actions">
+        <button class="btn" id="change-admin-password-btn">Passwort ändern</button>
+      </div>
+      <p class="admin-note">Passwort wird lokal im Browser gespeichert.</p>
     </section>
 
     <section class="admin-section">
@@ -95,7 +113,52 @@
       <div class="admin-actions">
         <button class="btn" id="download-json-btn">gallery.json herunterladen</button>
       </div>
-      <p class="admin-note">Die Datei im Repo ersetzen und neu deployen (GitHub Pages).</p>
+      <p class="admin-note">Optional: Direkt zu GitHub pushen (Token erforderlich).</p>
+    </section>
+
+    <section class="admin-section">
+      <h3>GitHub Push</h3>
+      <div class="admin-grid">
+        <div class="admin-field">
+          <label for="gh-owner">Owner</label>
+          <input id="gh-owner" type="text" placeholder="Noudi72">
+        </div>
+        <div class="admin-field">
+          <label for="gh-repo">Repo</label>
+          <input id="gh-repo" type="text" placeholder="WB_Pix_Galerie">
+        </div>
+        <div class="admin-field">
+          <label for="gh-branch">Branch</label>
+          <input id="gh-branch" type="text" placeholder="main">
+        </div>
+        <div class="admin-field">
+          <label for="gh-path">Pfad</label>
+          <input id="gh-path" type="text" placeholder="gallery.json">
+        </div>
+        <div class="admin-field">
+          <label for="gh-token">GitHub Token</label>
+          <input id="gh-token" type="password" placeholder="ghp_... oder github_pat_...">
+        </div>
+      </div>
+      <div class="admin-actions">
+        <button class="btn" id="push-json-btn">gallery.json zu GitHub pushen</button>
+      </div>
+      <p class="admin-note">Token braucht Repo‑Rechte für Inhalte (Contents).</p>
+    </section>
+  </main>
+
+  <main class="container" id="admin-login">
+    <h1 class="page-title">Admin Login</h1>
+    <p class="muted">Bitte Admin‑Passwort eingeben.</p>
+    <section class="admin-section">
+      <div class="admin-field">
+        <label for="admin-login-password">Passwort</label>
+        <input id="admin-login-password" type="password" placeholder="Passwort">
+      </div>
+      <div class="admin-actions">
+        <button class="btn" id="admin-login-btn">Anmelden</button>
+      </div>
+      <p class="admin-note" id="admin-login-hint"></p>
     </section>
   </main>
 
