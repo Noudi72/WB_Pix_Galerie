@@ -423,6 +423,12 @@ body.dark-mode .site-header {
   overflow-y: auto;
 }
 
+.comment-status {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
 .comment-item {
   padding: 8px 10px;
   border-radius: 8px;

@@ -43,6 +43,8 @@ const uploadCancelBtn = document.getElementById('upload-cancel');
 const uploadConfirmBtn = document.getElementById('upload-confirm');
 
 const adminImageList = document.getElementById('admin-image-list');
+const clearGalleryImagesBtn = document.getElementById('clear-gallery-images-btn');
+const cleanGalleryImagesBtn = document.getElementById('clean-gallery-images-btn');
 
 const newGalleryBtn = document.getElementById('new-gallery-btn');
 const saveGalleryBtn = document.getElementById('save-gallery-btn');
@@ -597,6 +599,25 @@ function renderImageList() {
   });
 }
 
+function clearGalleryImages() {
+  if (!currentGallery) return;
+  const ok = confirm('Alle Bilder dieser Galerie wirklich löschen?');
+  if (!ok) return;
+  currentGallery.images = [];
+  renderImageList();
+  renderGalleryTable();
+}
+
+function cleanGalleryImages() {
+  if (!currentGallery) return;
+  const before = currentGallery.images?.length || 0;
+  currentGallery.images = (currentGallery.images || []).filter(img => img && (img.url || img.thumbnailUrl));
+  const after = currentGallery.images.length;
+  renderImageList();
+  renderGalleryTable();
+  alert(`Bereinigt: ${before - after} Einträge entfernt.`);
+}
+
 function autoFillFromFolder(idx) {
   const gallery = (galleryConfig?.galleries || [])[idx];
   if (!gallery) return;
@@ -666,14 +687,20 @@ function saveGallery() {
 }
 
 function createGallery() {
+  const subValue = gallerySubcategoryInput.value.trim();
+  const folderValue = galleryFolderInput.value.trim();
+  const dateValue = galleryDateInput.value || '';
+  const categoryValue = galleryCategorySelect.value || (galleryConfig.categories?.[0]?.id || 'all');
   const id = `gallery-${Date.now()}`;
-  const category = galleryCategorySelect.value || (galleryConfig.categories?.[0]?.id || 'all');
   const newGallery = {
     id,
-    name: 'Neue Galerie',
-    description: '',
+    name: subValue || 'Neue Galerie',
+    description: galleryDescInput.value.trim(),
     images: [],
-    category
+    category: categoryValue,
+    subcategory: subValue,
+    folder: folderValue,
+    date: dateValue
   };
   galleryConfig.galleries.push(newGallery);
   populateGallerySelect();
@@ -979,6 +1006,8 @@ async function init() {
   downloadBtn.addEventListener('click', downloadJson);
   pushBtn.addEventListener('click', pushJsonToGitHub);
   if (globalPushBtn) globalPushBtn.addEventListener('click', pushJsonToGitHub);
+  if (clearGalleryImagesBtn) clearGalleryImagesBtn.addEventListener('click', clearGalleryImages);
+  if (cleanGalleryImagesBtn) cleanGalleryImagesBtn.addEventListener('click', cleanGalleryImages);
 
   adminLoginBtn.addEventListener('click', handleLogin);
   adminLoginInput.addEventListener('keypress', (e) => {

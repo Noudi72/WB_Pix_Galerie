@@ -17,6 +17,7 @@ const commentInput = document.getElementById('comment-input');
 const commentSaveBtn = document.getElementById('comment-save');
 const commentList = document.getElementById('comment-list');
 const commentCount = document.getElementById('comment-count');
+const commentStatus = document.getElementById('comment-status');
 
 let galleryConfig = null;
 let currentGallery = null;
@@ -87,21 +88,58 @@ function saveFavorites(galleryId) {
   } catch (_) {}
 }
 
-function loadComments(galleryId) {
-  try {
-    const raw = localStorage.getItem(`wbg_comments:${galleryId}`);
-    if (!raw) return {};
-    const parsed = JSON.parse(raw);
-    return parsed && typeof parsed === 'object' ? parsed : {};
-  } catch (_) {
-    return {};
-  }
+function loadCommentsFromGallery() {
+  const map = {};
+  (currentGallery?.images || []).forEach((img, idx) => {
+    const imgId = getImageId(img, idx);
+    if (Array.isArray(img.comments)) {
+      map[imgId] = img.comments;
+    }
+  });
+  commentsById = map;
 }
 
-function saveComments(galleryId) {
+function getGitHubSettings() {
+  return {
+    owner: localStorage.getItem('wbg_gh_owner') || '',
+    repo: localStorage.getItem('wbg_gh_repo') || '',
+    branch: localStorage.getItem('wbg_gh_branch') || 'main',
+    path: localStorage.getItem('wbg_gh_path') || 'gallery.json',
+    token: localStorage.getItem('wbg_gh_token') || ''
+  };
+}
+
+async function pushGalleryJsonToGitHub() {
+  const { owner, repo, branch, path, token } = getGitHubSettings();
+  if (!owner || !repo || !token) return false;
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(galleryConfig, null, 2))));
+  const apiBase = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+  let sha = null;
   try {
-    localStorage.setItem(`wbg_comments:${galleryId}`, JSON.stringify(commentsById));
+    const getRes = await fetch(`${apiBase}?ref=${encodeURIComponent(branch)}`, {
+      headers: { Authorization: `token ${token}` }
+    });
+    if (getRes.ok) {
+      const data = await getRes.json();
+      sha = data.sha;
+    }
   } catch (_) {}
+
+  const putRes = await fetch(apiBase, {
+    method: 'PUT',
+    headers: {
+      Authorization: `token ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      message: 'Update gallery.json via comments',
+      content,
+      branch,
+      sha: sha || undefined
+    })
+  });
+
+  return putRes.ok;
 }
 
 function getImageId(img, idx) {
@@ -126,6 +164,7 @@ function renderComments(img, idx) {
     ? list.map(item => `<div class="comment-item">${escapeHtml(item.text)}</div>`).join('')
     : '<div class="comment-item">Noch keine Kommentare.</div>';
   commentInput.value = '';
+  if (commentStatus) commentStatus.textContent = '';
 }
 
 function renderImages(images = []) {
@@ -224,16 +263,27 @@ document.addEventListener('keydown', (e) => {
 });
 
 if (commentSaveBtn) {
-  commentSaveBtn.addEventListener('click', () => {
+  commentSaveBtn.addEventListener('click', async () => {
     if (!currentGallery || !filteredImages.length) return;
     const text = commentInput.value.trim();
     if (!text) return;
     const img = filteredImages[currentIndex];
     const imgId = getImageId(img, currentIndex);
     if (!Array.isArray(commentsById[imgId])) commentsById[imgId] = [];
-    commentsById[imgId].push({ text, ts: Date.now() });
-    saveComments(currentGallery.id || 'default');
+    const entry = { text, ts: Date.now() };
+    commentsById[imgId].push(entry);
+    if (!Array.isArray(img.comments)) img.comments = [];
+    img.comments.push(entry);
     renderComments(img, currentIndex);
+    if (commentStatus) {
+      commentStatus.textContent = 'Kommentar gespeichert…';
+    }
+    const pushed = await pushGalleryJsonToGitHub();
+    if (commentStatus) {
+      commentStatus.textContent = pushed
+        ? 'Kommentar gespeichert und zu GitHub gepusht.'
+        : 'Kommentar gespeichert (lokal). Für Sync bitte Admin‑Push.';
+    }
   });
 }
 
@@ -255,7 +305,7 @@ async function init() {
     const date = currentGallery.date ? ` · ${currentGallery.date}` : '';
     subtitleEl.textContent = `${currentGallery.description || ''}${sub}${folder}${date}`;
     favoriteIds = loadFavorites(currentGallery.id || 'default');
-    commentsById = loadComments(currentGallery.id || 'default');
+    loadCommentsFromGallery();
     renderImages(currentGallery.images || []);
   } catch (err) {
     emptyState.style.display = 'block';
