@@ -239,6 +239,35 @@ function updateTableSortState() {
   });
 }
 
+function normalizeToken(value) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9äöü]/gi, '')
+    .trim();
+}
+
+function normalizeFolderValue(gallery, count) {
+  const rawFolder = String(gallery.folder || '').trim();
+  if (!rawFolder) return '';
+  if (!count) {
+    const categoryLabel = getCategoryName(gallery.category);
+    const categoryId = gallery.category || '';
+    const normalizedFolder = normalizeToken(rawFolder);
+    const normalizedCategoryLabel = normalizeToken(categoryLabel);
+    const normalizedCategoryId = normalizeToken(categoryId);
+    const withoutPrefix = rawFolder.replace(/^\d+[_\s-]+/, '').trim();
+    const normalizedWithoutPrefix = normalizeToken(withoutPrefix);
+    const looksLikeCategory = normalizedFolder === normalizedCategoryLabel
+      || normalizedFolder === normalizedCategoryId
+      || normalizedWithoutPrefix === normalizedCategoryLabel;
+    if (looksLikeCategory) {
+      gallery.folder = '';
+      return '';
+    }
+  }
+  return rawFolder;
+}
+
 function buildCategoryOptions(selected) {
   const categories = galleryConfig?.categories || [];
   if (!categories.length) return '<option value="">—</option>';
@@ -378,10 +407,13 @@ function renderGalleryTable() {
   galleryTableBody.innerHTML = '';
   rows.forEach(({ gallery, idx }) => {
     const tr = document.createElement('tr');
-    const sub = gallery.subcategory || gallery.name || '';
-    const folder = gallery.folder || '';
-    const date = gallery.date || '';
     const count = gallery.images?.length || 0;
+    if (!gallery.subcategory && gallery.name) {
+      gallery.subcategory = gallery.name;
+    }
+    const sub = gallery.subcategory || '';
+    const folder = normalizeFolderValue(gallery, count);
+    const date = gallery.date || '';
     const hasPassword = Boolean(gallery.password);
     const passwordLabel = hasPassword ? 'Geschützt' : 'Öffentlich';
     const pathParts = [getCategoryName(gallery.category), sub, folder].filter(Boolean);
@@ -482,7 +514,11 @@ function loadGalleryFromSelect() {
   if (galleryNameInput) galleryNameInput.value = currentGallery.name || '';
   galleryDescInput.value = currentGallery.description || '';
   galleryCategorySelect.value = currentGallery.category || '';
-  gallerySubcategoryInput.value = currentGallery.subcategory || '';
+  const subValue = currentGallery.subcategory || currentGallery.name || '';
+  gallerySubcategoryInput.value = subValue;
+  if (!currentGallery.subcategory && subValue) {
+    currentGallery.subcategory = subValue;
+  }
   galleryFolderInput.value = currentGallery.folder || '';
   galleryDateInput.value = currentGallery.date || '';
   galleryPasswordInput.value = currentGallery.password || '';
