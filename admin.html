@@ -69,7 +69,27 @@
       </div>
       <div class="admin-actions">
         <button class="btn" id="new-gallery-btn">Neue Galerie</button>
+        <button class="btn" id="delete-gallery-btn">Galerie löschen</button>
       </div>
+    </section>
+
+    <section class="admin-section">
+      <h3>Kategorien verwalten</h3>
+      <div class="admin-grid">
+        <div class="admin-field">
+          <label for="category-select">Kategorie</label>
+          <select id="category-select"></select>
+        </div>
+        <div class="admin-field">
+          <label for="category-rename">Neuer Name</label>
+          <input id="category-rename" type="text" placeholder="z. B. Sport">
+        </div>
+      </div>
+      <div class="admin-actions">
+        <button class="btn" id="rename-category-btn">Kategorie umbenennen</button>
+        <button class="btn" id="delete-category-btn">Kategorie löschen</button>
+      </div>
+      <p class="admin-note">Beim Löschen werden Galerien auf „ohne Kategorie“ gesetzt.</p>
     </section>
 
     <section class="admin-section admin-wizard">
@@ -86,6 +106,9 @@
         <div class="wizard-step-panel" data-step="1">
           <h4>Schritt 1: Struktur & Daten</h4>
           <p class="admin-note">Kategorie → Unterkategorie → Galerie/Ordner → Datum festlegen.</p>
+          <div class="admin-actions" style="margin-bottom: 8px;">
+            <button class="btn" id="wizard-new-gallery-btn">Neue Galerie anlegen</button>
+          </div>
           <div class="admin-grid">
             <div class="admin-field">
               <label for="gallery-name">Name</label>

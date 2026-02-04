@@ -28,6 +28,13 @@ const uploadImagesBtn = document.getElementById('upload-images-btn');
 const addUrlBtn = document.getElementById('add-url-btn');
 const downloadBtn = document.getElementById('download-json-btn');
 const pushBtn = document.getElementById('push-json-btn');
+const deleteGalleryBtn = document.getElementById('delete-gallery-btn');
+const wizardNewGalleryBtn = document.getElementById('wizard-new-gallery-btn');
+
+const categorySelect = document.getElementById('category-select');
+const categoryRenameInput = document.getElementById('category-rename');
+const categoryRenameBtn = document.getElementById('rename-category-btn');
+const categoryDeleteBtn = document.getElementById('delete-category-btn');
 
 const adminApp = document.getElementById('admin-app');
 const adminLogin = document.getElementById('admin-login');
@@ -184,6 +191,16 @@ function populateCategories() {
     opt.textContent = cat.name;
     galleryCategorySelect.appendChild(opt);
   });
+
+  if (categorySelect) {
+    categorySelect.innerHTML = '';
+    categories.forEach((cat) => {
+      const opt = document.createElement('option');
+      opt.value = cat.id;
+      opt.textContent = cat.name;
+      categorySelect.appendChild(opt);
+    });
+  }
 }
 
 function populateGallerySelect() {
@@ -274,6 +291,38 @@ function createGallery() {
   populateGallerySelect();
   gallerySelect.value = String(galleryConfig.galleries.length - 1);
   loadGalleryFromSelect();
+}
+
+function deleteCurrentGallery() {
+  if (!currentGallery) return;
+  const ok = confirm(`Galerie "${currentGallery.name || 'Galerie'}" wirklich löschen?`);
+  if (!ok) return;
+  const idx = galleryConfig.galleries.indexOf(currentGallery);
+  if (idx >= 0) galleryConfig.galleries.splice(idx, 1);
+  populateGallerySelect();
+}
+
+function renameCategory() {
+  const id = categorySelect?.value;
+  const newName = categoryRenameInput?.value.trim();
+  if (!id || !newName) return;
+  const cat = (galleryConfig.categories || []).find(c => c.id === id);
+  if (!cat) return;
+  cat.name = newName;
+  populateCategories();
+  categoryRenameInput.value = '';
+}
+
+function deleteCategory() {
+  const id = categorySelect?.value;
+  if (!id) return;
+  const ok = confirm('Kategorie wirklich löschen?');
+  if (!ok) return;
+  galleryConfig.categories = (galleryConfig.categories || []).filter(c => c.id !== id);
+  (galleryConfig.galleries || []).forEach(g => {
+    if (g.category === id) delete g.category;
+  });
+  populateCategories();
 }
 
 async function uploadFiles() {
@@ -461,6 +510,10 @@ async function init() {
   });
   saveGalleryBtn.addEventListener('click', saveGallery);
   newGalleryBtn.addEventListener('click', createGallery);
+  if (wizardNewGalleryBtn) wizardNewGalleryBtn.addEventListener('click', createGallery);
+  if (deleteGalleryBtn) deleteGalleryBtn.addEventListener('click', deleteCurrentGallery);
+  if (categoryRenameBtn) categoryRenameBtn.addEventListener('click', renameCategory);
+  if (categoryDeleteBtn) categoryDeleteBtn.addEventListener('click', deleteCategory);
   uploadImagesBtn.addEventListener('click', uploadFiles);
   addUrlBtn.addEventListener('click', addImageUrl);
   downloadBtn.addEventListener('click', downloadJson);
