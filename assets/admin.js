@@ -27,6 +27,7 @@ const folderDatalist = document.getElementById('folder-suggestions');
 const galleryTable = document.getElementById('gallery-table');
 const galleryTableBody = galleryTable?.querySelector('tbody');
 const galleryTableSearch = document.getElementById('gallery-table-search');
+const galleryTablePasswordFilter = document.getElementById('gallery-table-password');
 const galleryTableStatus = document.getElementById('gallery-table-status');
 const galleryTableSortButtons = galleryTable?.querySelectorAll('.table-sort') || [];
 
@@ -64,7 +65,7 @@ let galleryConfig = null;
 let currentGallery = null;
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 let wizardStep = 1;
-const gallerySort = { key: 'name', dir: 'asc' };
+let gallerySort = [{ key: 'name', dir: 'asc' }];
 async function downscaleImage(file) {
   const img = await createImageBitmap(file);
   const maxSide = Number(resizeMaxSide?.value || 4000);
@@ -221,12 +222,15 @@ function getCategoryName(categoryId) {
 function updateTableSortState() {
   galleryTableSortButtons.forEach((btn) => {
     const key = btn.dataset.sort;
-    const isActive = key === gallerySort.key;
+    const index = gallerySort.findIndex(item => item.key === key);
+    const isActive = index >= 0;
     btn.classList.toggle('is-active', isActive);
     if (isActive) {
-      btn.setAttribute('data-dir', gallerySort.dir);
+      btn.setAttribute('data-dir', gallerySort[index].dir);
+      btn.setAttribute('data-order', String(index + 1));
     } else {
       btn.removeAttribute('data-dir');
+      btn.removeAttribute('data-order');
     }
   });
 }
@@ -290,6 +294,7 @@ function renderGalleryTable() {
   if (!galleryTableBody) return;
   const galleries = galleryConfig?.galleries || [];
   const query = (galleryTableSearch?.value || '').trim().toLowerCase();
+  const passwordFilter = galleryTablePasswordFilter?.value || 'all';
 
   let rows = galleries.map((gallery, idx) => ({
     gallery,
@@ -310,38 +315,51 @@ function renderGalleryTable() {
     });
   }
 
+  if (passwordFilter !== 'all') {
+    rows = rows.filter(({ gallery }) => {
+      const hasPassword = Boolean(gallery.password);
+      return passwordFilter === 'protected' ? hasPassword : !hasPassword;
+    });
+  }
+
   const compareText = (a, b) => (a || '').localeCompare(b || '', 'de');
   const compareNum = (a, b) => (a || 0) - (b || 0);
   const compareBool = (a, b) => Number(Boolean(a)) - Number(Boolean(b));
   rows.sort((a, b) => {
     const ga = a.gallery;
     const gb = b.gallery;
-    let result = 0;
-    switch (gallerySort.key) {
-      case 'date':
-        result = compareText(ga.date, gb.date);
-        break;
-      case 'category':
-        result = compareText(getCategoryName(ga.category), getCategoryName(gb.category));
-        break;
-      case 'subcategory':
-        result = compareText(ga.subcategory, gb.subcategory);
-        break;
-      case 'folder':
-        result = compareText(ga.folder, gb.folder);
-        break;
-      case 'images':
-        result = compareNum(ga.images?.length, gb.images?.length);
-        break;
-      case 'password':
-        result = compareBool(ga.password, gb.password);
-        break;
-      case 'name':
-      default:
-        result = compareText(ga.name, gb.name);
-        break;
+    const sortList = gallerySort.length ? gallerySort : [{ key: 'name', dir: 'asc' }];
+    for (const sort of sortList) {
+      let result = 0;
+      switch (sort.key) {
+        case 'date':
+          result = compareText(ga.date, gb.date);
+          break;
+        case 'category':
+          result = compareText(getCategoryName(ga.category), getCategoryName(gb.category));
+          break;
+        case 'subcategory':
+          result = compareText(ga.subcategory, gb.subcategory);
+          break;
+        case 'folder':
+          result = compareText(ga.folder, gb.folder);
+          break;
+        case 'images':
+          result = compareNum(ga.images?.length, gb.images?.length);
+          break;
+        case 'password':
+          result = compareBool(ga.password, gb.password);
+          break;
+        case 'name':
+        default:
+          result = compareText(ga.name, gb.name);
+          break;
+      }
+      if (result !== 0) {
+        return sort.dir === 'asc' ? result : -result;
+      }
     }
-    return gallerySort.dir === 'asc' ? result : -result;
+    return 0;
   });
 
   galleryTableBody.innerHTML = '';
@@ -350,7 +368,7 @@ function renderGalleryTable() {
     const metaCategory = getCategoryName(gallery.category) || '—';
     const sub = gallery.subcategory || '—';
     const folder = gallery.folder || '—';
-    const date = gallery.date || '—';
+    const date = gallery.date || '';
     const count = gallery.images?.length || 0;
     const hasPassword = Boolean(gallery.password);
     const passwordLabel = hasPassword ? 'Geschützt' : 'Öffentlich';
@@ -359,7 +377,7 @@ function renderGalleryTable() {
       <td>${metaCategory}</td>
       <td>${sub}</td>
       <td>${folder}</td>
-      <td>${date}</td>
+      <td><input class="table-input" data-field="date" data-idx="${idx}" type="date" value="${date}"></td>
       <td>${count}</td>
       <td>${passwordLabel}</td>
       <td class="table-action">
@@ -390,6 +408,16 @@ function deleteGalleryByIndex(idx) {
   galleries.splice(idx, 1);
   populateGallerySelect();
   updateSuggestions();
+  renderGalleryTable();
+}
+
+function updateGalleryField(idx, field, value) {
+  const gallery = (galleryConfig?.galleries || [])[idx];
+  if (!gallery) return;
+  gallery[field] = value || '';
+  if (currentGallery === gallery && field === 'date') {
+    galleryDateInput.value = value || '';
+  }
   renderGalleryTable();
 }
 
@@ -683,16 +711,28 @@ async function init() {
   if (categoryRenameBtn) categoryRenameBtn.addEventListener('click', renameCategory);
   if (categoryDeleteBtn) categoryDeleteBtn.addEventListener('click', deleteCategory);
   if (galleryTableSearch) galleryTableSearch.addEventListener('input', renderGalleryTable);
+  if (galleryTablePasswordFilter) galleryTablePasswordFilter.addEventListener('change', renderGalleryTable);
   if (galleryTableSortButtons.length) {
     galleryTableSortButtons.forEach((btn) => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', (event) => {
         const key = btn.dataset.sort;
         if (!key) return;
-        if (gallerySort.key === key) {
-          gallerySort.dir = gallerySort.dir === 'asc' ? 'desc' : 'asc';
+        const existingIndex = gallerySort.findIndex(item => item.key === key);
+        if (event.shiftKey) {
+          if (existingIndex >= 0) {
+            gallerySort[existingIndex].dir = gallerySort[existingIndex].dir === 'asc' ? 'desc' : 'asc';
+          } else {
+            gallerySort = [
+              ...gallerySort,
+              { key, dir: key === 'date' || key === 'images' ? 'desc' : 'asc' }
+            ];
+          }
         } else {
-          gallerySort.key = key;
-          gallerySort.dir = key === 'date' || key === 'images' ? 'desc' : 'asc';
+          if (existingIndex >= 0 && gallerySort.length === 1) {
+            gallerySort = [{ key, dir: gallerySort[existingIndex].dir === 'asc' ? 'desc' : 'asc' }];
+          } else {
+            gallerySort = [{ key, dir: key === 'date' || key === 'images' ? 'desc' : 'asc' }];
+          }
         }
         updateTableSortState();
         renderGalleryTable();
@@ -711,6 +751,15 @@ async function init() {
       } else if (action === 'delete') {
         deleteGalleryByIndex(idx);
       }
+    });
+    galleryTableBody.addEventListener('change', (event) => {
+      const input = event.target.closest('input[data-field]');
+      if (!input) return;
+      const idx = Number(input.dataset.idx);
+      if (Number.isNaN(idx)) return;
+      const field = input.dataset.field;
+      if (!field) return;
+      updateGalleryField(idx, field, input.value);
     });
   }
   uploadImagesBtn.addEventListener('click', uploadFiles);

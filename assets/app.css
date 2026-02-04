@@ -308,6 +308,19 @@ body.dark-mode .site-header {
   align-items: center;
 }
 
+.filter-row-gap {
+  margin-bottom: 14px;
+}
+
+.gallery-search-narrow {
+  max-width: 320px;
+}
+
+.gallery-empty {
+  margin-top: 18px;
+  display: none;
+}
+
 .filter-chip {
   padding: 6px 12px;
   border-radius: 999px;
@@ -504,6 +517,24 @@ body.dark-mode .site-header {
   padding: 0;
 }
 
+.admin-table .table-sort::before {
+  content: attr(data-order);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(212, 165, 116, 0.2);
+  color: var(--text);
+  font-size: 0.65rem;
+  opacity: 0;
+}
+
+.admin-table .table-sort.is-active::before {
+  opacity: 1;
+}
+
 .admin-table .table-sort::after {
   content: '↕';
   font-size: 0.75rem;
@@ -522,6 +553,17 @@ body.dark-mode .site-header {
 
 .admin-table tr:hover td {
   background: rgba(212, 165, 116, 0.08);
+}
+
+.admin-table .table-input {
+  width: 100%;
+  min-width: 140px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 8px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.85rem;
 }
 
 .admin-table .table-action {
