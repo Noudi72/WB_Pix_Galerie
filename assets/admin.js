@@ -13,6 +13,7 @@ const imageFilesInput = document.getElementById('image-files');
 const imageUrlInput = document.getElementById('image-url');
 const uploadDropzone = document.getElementById('upload-dropzone');
 const uploadStatus = document.getElementById('upload-status');
+const resizeBeforeUpload = document.getElementById('resize-before-upload');
 
 const newGalleryBtn = document.getElementById('new-gallery-btn');
 const saveGalleryBtn = document.getElementById('save-gallery-btn');
@@ -39,6 +40,27 @@ const themeToggle = document.getElementById('theme-toggle');
 
 let galleryConfig = null;
 let currentGallery = null;
+const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+async function downscaleImage(file) {
+  const img = await createImageBitmap(file);
+  const maxSide = 4000;
+  const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+  const targetW = Math.round(img.width * scale);
+  const targetH = Math.round(img.height * scale);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = targetW;
+  canvas.height = targetH;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(img, 0, 0, targetW, targetH);
+
+  const blob = await new Promise((resolve) => {
+    canvas.toBlob(resolve, 'image/jpeg', 0.88);
+  });
+  if (!blob) return file;
+  return new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' });
+}
+
 
 function applyTheme(theme) {
   const isDark = theme === 'dark';
@@ -220,8 +242,13 @@ async function uploadFiles() {
 
   const folderPath = buildCloudinaryFolder();
   for (const file of files) {
+    let uploadFile = file;
+    if (resizeBeforeUpload?.checked && file.size > MAX_UPLOAD_BYTES) {
+      if (uploadStatus) uploadStatus.textContent = `Skaliere ${file.name}...`;
+      uploadFile = await downscaleImage(file);
+    }
     const form = new FormData();
-    form.append('file', file);
+    form.append('file', uploadFile);
     form.append('upload_preset', preset);
     if (folderPath) form.append('folder', folderPath);
     const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/upload`, {
