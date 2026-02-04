@@ -65,7 +65,11 @@ let galleryConfig = null;
 let currentGallery = null;
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 let wizardStep = 1;
-let gallerySort = [{ key: 'name', dir: 'asc' }];
+let gallerySort = [
+  { key: 'category', dir: 'asc' },
+  { key: 'subcategory', dir: 'asc' },
+  { key: 'folder', dir: 'asc' }
+];
 async function downscaleImage(file) {
   const img = await createImageBitmap(file);
   const maxSide = Number(resizeMaxSide?.value || 4000);
@@ -235,6 +239,15 @@ function updateTableSortState() {
   });
 }
 
+function buildCategoryOptions(selected) {
+  const categories = galleryConfig?.categories || [];
+  if (!categories.length) return '<option value="">—</option>';
+  return categories.map((cat) => {
+    const isSelected = cat.id === selected ? ' selected' : '';
+    return `<option value="${cat.id}"${isSelected}>${cat.name}</option>`;
+  }).join('');
+}
+
 function updateSuggestions() {
   if (!subcategoryDatalist || !folderDatalist) return;
   const subSet = new Set();
@@ -365,18 +378,21 @@ function renderGalleryTable() {
   galleryTableBody.innerHTML = '';
   rows.forEach(({ gallery, idx }) => {
     const tr = document.createElement('tr');
-    const metaCategory = getCategoryName(gallery.category) || '—';
-    const sub = gallery.subcategory || '—';
-    const folder = gallery.folder || '—';
+    const sub = gallery.subcategory || '';
+    const folder = gallery.folder || '';
     const date = gallery.date || '';
     const count = gallery.images?.length || 0;
     const hasPassword = Boolean(gallery.password);
     const passwordLabel = hasPassword ? 'Geschützt' : 'Öffentlich';
     tr.innerHTML = `
       <td>${gallery.name || `Galerie ${idx + 1}`}</td>
-      <td>${metaCategory}</td>
-      <td>${sub}</td>
-      <td>${folder}</td>
+      <td>
+        <select class="table-select" data-field="category" data-idx="${idx}">
+          ${buildCategoryOptions(gallery.category)}
+        </select>
+      </td>
+      <td><input class="table-input" data-field="subcategory" data-idx="${idx}" type="text" value="${sub}" placeholder="z. B. Eishockey"></td>
+      <td><input class="table-input" data-field="folder" data-idx="${idx}" type="text" value="${folder}" placeholder="z. B. EHCB vs HCD"></td>
       <td><input class="table-input" data-field="date" data-idx="${idx}" type="date" value="${date}"></td>
       <td>${count}</td>
       <td>${passwordLabel}</td>
@@ -396,7 +412,14 @@ function renderGalleryTable() {
 function selectGalleryByIndex(idx, { focusWizard = false } = {}) {
   gallerySelect.value = String(idx);
   loadGalleryFromSelect();
-  if (focusWizard && wizardStep !== 1) goWizardStep(1);
+  if (focusWizard) {
+    if (wizardStep !== 1) goWizardStep(1);
+    const wizardSection = document.querySelector('.admin-wizard');
+    if (wizardSection) {
+      wizardSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    if (galleryNameInput) galleryNameInput.focus({ preventScroll: true });
+  }
 }
 
 function deleteGalleryByIndex(idx) {
@@ -415,9 +438,13 @@ function updateGalleryField(idx, field, value) {
   const gallery = (galleryConfig?.galleries || [])[idx];
   if (!gallery) return;
   gallery[field] = value || '';
-  if (currentGallery === gallery && field === 'date') {
-    galleryDateInput.value = value || '';
+  if (currentGallery === gallery) {
+    if (field === 'date') galleryDateInput.value = value || '';
+    if (field === 'subcategory') gallerySubcategoryInput.value = value || '';
+    if (field === 'folder') galleryFolderInput.value = value || '';
+    if (field === 'category') galleryCategorySelect.value = value || '';
   }
+  if (field === 'subcategory' || field === 'folder') updateSuggestions();
   renderGalleryTable();
 }
 
@@ -753,13 +780,13 @@ async function init() {
       }
     });
     galleryTableBody.addEventListener('change', (event) => {
-      const input = event.target.closest('input[data-field]');
-      if (!input) return;
-      const idx = Number(input.dataset.idx);
+      const fieldEl = event.target.closest('[data-field]');
+      if (!fieldEl) return;
+      const idx = Number(fieldEl.dataset.idx);
       if (Number.isNaN(idx)) return;
-      const field = input.dataset.field;
+      const field = fieldEl.dataset.field;
       if (!field) return;
-      updateGalleryField(idx, field, input.value);
+      updateGalleryField(idx, field, fieldEl.value);
     });
   }
   uploadImagesBtn.addEventListener('click', uploadFiles);

@@ -576,6 +576,17 @@ body.dark-mode .site-header {
   font-size: 0.85rem;
 }
 
+.admin-table .table-select {
+  width: 100%;
+  min-width: 140px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 8px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.85rem;
+}
+
 .admin-table .table-action {
   white-space: nowrap;
 }
