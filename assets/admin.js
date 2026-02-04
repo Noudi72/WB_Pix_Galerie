@@ -21,6 +21,14 @@ const wizardPrev = document.getElementById('wizard-prev');
 const wizardNext = document.getElementById('wizard-next');
 const wizardSteps = document.querySelectorAll('.wizard-step');
 const wizardPanels = document.querySelectorAll('.wizard-step-panel');
+const subcategoryDatalist = document.getElementById('subcategory-suggestions');
+const folderDatalist = document.getElementById('folder-suggestions');
+
+const galleryTable = document.getElementById('gallery-table');
+const galleryTableBody = galleryTable?.querySelector('tbody');
+const galleryTableSearch = document.getElementById('gallery-table-search');
+const galleryTableStatus = document.getElementById('gallery-table-status');
+const galleryTableSortButtons = galleryTable?.querySelectorAll('.table-sort') || [];
 
 const newGalleryBtn = document.getElementById('new-gallery-btn');
 const saveGalleryBtn = document.getElementById('save-gallery-btn');
@@ -56,6 +64,7 @@ let galleryConfig = null;
 let currentGallery = null;
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 let wizardStep = 1;
+const gallerySort = { key: 'name', dir: 'asc' };
 async function downscaleImage(file) {
   const img = await createImageBitmap(file);
   const maxSide = Number(resizeMaxSide?.value || 4000);
@@ -103,7 +112,7 @@ function initTheme() {
 function renderWizard() {
   wizardPanels.forEach((panel) => {
     const step = Number(panel.dataset.step);
-    panel.style.display = step === wizardStep ? '' : 'none';
+    panel.classList.toggle('is-active', step === wizardStep);
   });
   wizardSteps.forEach((badge, idx) => {
     badge.classList.toggle('active', idx + 1 === wizardStep);
@@ -126,13 +135,13 @@ function setAdminPassword(pwd) {
 }
 
 function showAdminApp() {
-  adminLogin.style.display = 'none';
-  adminApp.style.display = 'block';
+  adminLogin.classList.add('is-hidden');
+  adminApp.classList.remove('is-hidden');
 }
 
 function showLogin() {
-  adminApp.style.display = 'none';
-  adminLogin.style.display = 'block';
+  adminApp.classList.add('is-hidden');
+  adminLogin.classList.remove('is-hidden');
 }
 
 function handleLogin() {
@@ -203,6 +212,47 @@ function populateCategories() {
   }
 }
 
+function getCategoryName(categoryId) {
+  if (!categoryId) return '';
+  const cat = (galleryConfig?.categories || []).find(c => c.id === categoryId);
+  return cat?.name || categoryId;
+}
+
+function updateTableSortState() {
+  galleryTableSortButtons.forEach((btn) => {
+    const key = btn.dataset.sort;
+    const isActive = key === gallerySort.key;
+    btn.classList.toggle('is-active', isActive);
+    if (isActive) {
+      btn.setAttribute('data-dir', gallerySort.dir);
+    } else {
+      btn.removeAttribute('data-dir');
+    }
+  });
+}
+
+function updateSuggestions() {
+  if (!subcategoryDatalist || !folderDatalist) return;
+  const subSet = new Set();
+  const folderSet = new Set();
+  (galleryConfig?.galleries || []).forEach((g) => {
+    if (g.subcategory) subSet.add(g.subcategory);
+    if (g.folder) folderSet.add(g.folder);
+  });
+  subcategoryDatalist.innerHTML = '';
+  Array.from(subSet).sort((a, b) => a.localeCompare(b, 'de')).forEach((value) => {
+    const opt = document.createElement('option');
+    opt.value = value;
+    subcategoryDatalist.appendChild(opt);
+  });
+  folderDatalist.innerHTML = '';
+  Array.from(folderSet).sort((a, b) => a.localeCompare(b, 'de')).forEach((value) => {
+    const opt = document.createElement('option');
+    opt.value = value;
+    folderDatalist.appendChild(opt);
+  });
+}
+
 function populateGallerySelect() {
   gallerySelect.innerHTML = '';
   const galleries = galleryConfig?.galleries || [];
@@ -234,6 +284,113 @@ function populateGallerySelect() {
   gallerySelect.disabled = false;
   if (!gallerySelect.value) gallerySelect.value = options[0].value;
   loadGalleryFromSelect();
+}
+
+function renderGalleryTable() {
+  if (!galleryTableBody) return;
+  const galleries = galleryConfig?.galleries || [];
+  const query = (galleryTableSearch?.value || '').trim().toLowerCase();
+
+  let rows = galleries.map((gallery, idx) => ({
+    gallery,
+    idx
+  }));
+
+  if (query) {
+    rows = rows.filter(({ gallery }) => {
+      const meta = [
+        gallery.name,
+        gallery.description,
+        gallery.subcategory,
+        gallery.folder,
+        gallery.date,
+        getCategoryName(gallery.category)
+      ].filter(Boolean).join(' ').toLowerCase();
+      return meta.includes(query);
+    });
+  }
+
+  const compareText = (a, b) => (a || '').localeCompare(b || '', 'de');
+  const compareNum = (a, b) => (a || 0) - (b || 0);
+  const compareBool = (a, b) => Number(Boolean(a)) - Number(Boolean(b));
+  rows.sort((a, b) => {
+    const ga = a.gallery;
+    const gb = b.gallery;
+    let result = 0;
+    switch (gallerySort.key) {
+      case 'date':
+        result = compareText(ga.date, gb.date);
+        break;
+      case 'category':
+        result = compareText(getCategoryName(ga.category), getCategoryName(gb.category));
+        break;
+      case 'subcategory':
+        result = compareText(ga.subcategory, gb.subcategory);
+        break;
+      case 'folder':
+        result = compareText(ga.folder, gb.folder);
+        break;
+      case 'images':
+        result = compareNum(ga.images?.length, gb.images?.length);
+        break;
+      case 'password':
+        result = compareBool(ga.password, gb.password);
+        break;
+      case 'name':
+      default:
+        result = compareText(ga.name, gb.name);
+        break;
+    }
+    return gallerySort.dir === 'asc' ? result : -result;
+  });
+
+  galleryTableBody.innerHTML = '';
+  rows.forEach(({ gallery, idx }) => {
+    const tr = document.createElement('tr');
+    const metaCategory = getCategoryName(gallery.category) || '—';
+    const sub = gallery.subcategory || '—';
+    const folder = gallery.folder || '—';
+    const date = gallery.date || '—';
+    const count = gallery.images?.length || 0;
+    const hasPassword = Boolean(gallery.password);
+    const passwordLabel = hasPassword ? 'Geschützt' : 'Öffentlich';
+    tr.innerHTML = `
+      <td>${gallery.name || `Galerie ${idx + 1}`}</td>
+      <td>${metaCategory}</td>
+      <td>${sub}</td>
+      <td>${folder}</td>
+      <td>${date}</td>
+      <td>${count}</td>
+      <td>${passwordLabel}</td>
+      <td class="table-action">
+        <button class="btn" data-action="edit" data-idx="${idx}">Bearbeiten</button>
+        <button class="btn" data-action="delete" data-idx="${idx}">Löschen</button>
+      </td>
+    `;
+    galleryTableBody.appendChild(tr);
+  });
+
+  if (galleryTableStatus) {
+    galleryTableStatus.textContent = rows.length ? `${rows.length} Galerien angezeigt.` : 'Keine Galerien gefunden.';
+  }
+}
+
+function selectGalleryByIndex(idx, { focusWizard = false } = {}) {
+  gallerySelect.value = String(idx);
+  loadGalleryFromSelect();
+  if (focusWizard && wizardStep !== 1) goWizardStep(1);
+}
+
+function deleteGalleryByIndex(idx) {
+  const galleries = galleryConfig?.galleries || [];
+  const gallery = galleries[idx];
+  if (!gallery) return;
+  const ok = confirm(`Galerie "${gallery.name || 'Galerie'}" wirklich löschen?`);
+  if (!ok) return;
+  galleries.splice(idx, 1);
+  populateGallerySelect();
+  updateSuggestions();
+  renderGalleryTable();
 }
 
 function loadGalleryFromSelect() {
@@ -275,6 +432,8 @@ function saveGallery() {
   if (pwd) currentGallery.password = pwd;
   else delete currentGallery.password;
   populateGallerySelect();
+  updateSuggestions();
+  renderGalleryTable();
 }
 
 function createGallery() {
@@ -291,6 +450,8 @@ function createGallery() {
   populateGallerySelect();
   gallerySelect.value = String(galleryConfig.galleries.length - 1);
   loadGalleryFromSelect();
+  updateSuggestions();
+  renderGalleryTable();
 }
 
 function deleteCurrentGallery() {
@@ -300,6 +461,8 @@ function deleteCurrentGallery() {
   const idx = galleryConfig.galleries.indexOf(currentGallery);
   if (idx >= 0) galleryConfig.galleries.splice(idx, 1);
   populateGallerySelect();
+  updateSuggestions();
+  renderGalleryTable();
 }
 
 function renameCategory() {
@@ -311,6 +474,7 @@ function renameCategory() {
   cat.name = newName;
   populateCategories();
   categoryRenameInput.value = '';
+  renderGalleryTable();
 }
 
 function deleteCategory() {
@@ -323,6 +487,7 @@ function deleteCategory() {
     if (g.category === id) delete g.category;
   });
   populateCategories();
+  renderGalleryTable();
 }
 
 async function uploadFiles() {
@@ -496,6 +661,9 @@ async function init() {
   populateCategories();
   populateGallerySelect();
   loadGalleryFromSelect();
+  updateSuggestions();
+  updateTableSortState();
+  renderGalleryTable();
 
   gallerySelect.addEventListener('change', loadGalleryFromSelect);
   if (gallerySearchInput) {
@@ -514,6 +682,37 @@ async function init() {
   if (deleteGalleryBtn) deleteGalleryBtn.addEventListener('click', deleteCurrentGallery);
   if (categoryRenameBtn) categoryRenameBtn.addEventListener('click', renameCategory);
   if (categoryDeleteBtn) categoryDeleteBtn.addEventListener('click', deleteCategory);
+  if (galleryTableSearch) galleryTableSearch.addEventListener('input', renderGalleryTable);
+  if (galleryTableSortButtons.length) {
+    galleryTableSortButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const key = btn.dataset.sort;
+        if (!key) return;
+        if (gallerySort.key === key) {
+          gallerySort.dir = gallerySort.dir === 'asc' ? 'desc' : 'asc';
+        } else {
+          gallerySort.key = key;
+          gallerySort.dir = key === 'date' || key === 'images' ? 'desc' : 'asc';
+        }
+        updateTableSortState();
+        renderGalleryTable();
+      });
+    });
+  }
+  if (galleryTableBody) {
+    galleryTableBody.addEventListener('click', (event) => {
+      const btn = event.target.closest('button[data-action]');
+      if (!btn) return;
+      const idx = Number(btn.dataset.idx);
+      if (Number.isNaN(idx)) return;
+      const action = btn.dataset.action;
+      if (action === 'edit') {
+        selectGalleryByIndex(idx, { focusWizard: true });
+      } else if (action === 'delete') {
+        deleteGalleryByIndex(idx);
+      }
+    });
+  }
   uploadImagesBtn.addEventListener('click', uploadFiles);
   addUrlBtn.addEventListener('click', addImageUrl);
   downloadBtn.addEventListener('click', downloadJson);

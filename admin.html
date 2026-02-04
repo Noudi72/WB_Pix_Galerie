@@ -18,7 +18,7 @@
     </div>
   </header>
 
-  <main class="container" id="admin-app" style="display: none;">
+  <main class="container is-hidden" id="admin-app">
     <h1 class="page-title">Admin</h1>
     <p class="muted">Bilder hochladen, Galerien pflegen und `gallery.json` aktualisieren.</p>
 
@@ -74,6 +74,35 @@
     </section>
 
     <section class="admin-section">
+      <h3>Galerien Übersicht</h3>
+      <div class="admin-grid">
+        <div class="admin-field">
+          <label for="gallery-table-search">Suchen</label>
+          <input id="gallery-table-search" type="text" placeholder="z. B. Eishockey, 2026-02-04">
+        </div>
+      </div>
+      <div class="admin-table-wrap">
+        <table class="admin-table" id="gallery-table">
+          <thead>
+            <tr>
+              <th><button class="table-sort is-active" data-sort="name" type="button">Name</button></th>
+              <th><button class="table-sort" data-sort="category" type="button">Kategorie</button></th>
+              <th><button class="table-sort" data-sort="subcategory" type="button">Unterkategorie</button></th>
+              <th><button class="table-sort" data-sort="folder" type="button">Ordner</button></th>
+              <th><button class="table-sort" data-sort="date" type="button">Datum</button></th>
+              <th><button class="table-sort" data-sort="images" type="button">Bilder</button></th>
+              <th><button class="table-sort" data-sort="password" type="button">Passwort</button></th>
+              <th>Aktion</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p class="admin-note" id="gallery-table-status"></p>
+      <p class="admin-note">Sortierung per Klick auf die Tabellen‑Header.</p>
+    </section>
+
+    <section class="admin-section">
       <h3>Kategorien verwalten</h3>
       <div class="admin-grid">
         <div class="admin-field">
@@ -106,7 +135,7 @@
         <div class="wizard-step-panel" data-step="1">
           <h4>Schritt 1: Struktur & Daten</h4>
           <p class="admin-note">Kategorie → Unterkategorie → Galerie/Ordner → Datum festlegen.</p>
-          <div class="admin-actions" style="margin-bottom: 8px;">
+          <div class="admin-actions wizard-inline-actions">
             <button class="btn" id="wizard-new-gallery-btn">Neue Galerie anlegen</button>
           </div>
           <div class="admin-grid">
@@ -116,11 +145,11 @@
             </div>
             <div class="admin-field">
               <label for="gallery-subcategory">Unterkategorie (z. B. Eishockey)</label>
-              <input id="gallery-subcategory" type="text" placeholder="Unterkategorie">
+              <input id="gallery-subcategory" type="text" placeholder="Unterkategorie" list="subcategory-suggestions">
             </div>
             <div class="admin-field">
               <label for="gallery-folder">Ordner / Spiel (z. B. EHCB vs ZSC)</label>
-              <input id="gallery-folder" type="text" placeholder="Ordnername">
+              <input id="gallery-folder" type="text" placeholder="Ordnername" list="folder-suggestions">
             </div>
             <div class="admin-field">
               <label for="gallery-date">Datum (z. B. 2026-02-04)</label>
@@ -146,9 +175,11 @@
           <div class="admin-actions">
             <button class="btn" id="save-gallery-btn">Galerie speichern</button>
           </div>
+          <datalist id="subcategory-suggestions"></datalist>
+          <datalist id="folder-suggestions"></datalist>
         </div>
 
-        <div class="wizard-step-panel" data-step="2" style="display:none;">
+        <div class="wizard-step-panel" data-step="2">
           <h4>Schritt 2: Bilder hochladen</h4>
           <p class="admin-note">Drag & Drop oder Datei auswählen. Dateien werden in Cloudinary abgelegt.</p>
           <div class="admin-dropzone" id="upload-dropzone">
@@ -194,13 +225,13 @@
           <p class="admin-note" id="upload-status"></p>
         </div>
 
-        <div class="wizard-step-panel" data-step="3" style="display:none;">
+        <div class="wizard-step-panel" data-step="3">
           <h4>Schritt 3: Speichern & Push</h4>
           <p class="admin-note">gallery.json herunterladen oder direkt zu GitHub pushen.</p>
           <div class="admin-actions">
             <button class="btn" id="download-json-btn">gallery.json herunterladen</button>
           </div>
-          <div class="admin-grid" style="margin-top: 12px;">
+          <div class="admin-grid wizard-grid-spacer">
             <div class="admin-field">
               <label for="gh-owner">Owner</label>
               <input id="gh-owner" type="text" placeholder="Noudi72">
@@ -235,129 +266,6 @@
       </div>
     </section>
 
-    <section class="admin-section legacy-section">
-      <h3>Galerie bearbeiten</h3>
-      <div class="admin-grid">
-        <div class="admin-field">
-          <label for="gallery-name">Name</label>
-          <input id="gallery-name" type="text">
-        </div>
-        <div class="admin-field">
-          <label for="gallery-subcategory">Unterkategorie (z. B. Eishockey)</label>
-          <input id="gallery-subcategory" type="text" placeholder="Unterkategorie">
-        </div>
-        <div class="admin-field">
-          <label for="gallery-folder">Ordner / Spiel (z. B. EHCB vs ZSC)</label>
-          <input id="gallery-folder" type="text" placeholder="Ordnername">
-        </div>
-        <div class="admin-field">
-          <label for="gallery-date">Datum (z. B. 2026-02-04)</label>
-          <input id="gallery-date" type="date">
-        </div>
-        <div class="admin-field">
-          <label for="gallery-description">Beschreibung</label>
-          <input id="gallery-description" type="text">
-        </div>
-        <div class="admin-field">
-          <label for="gallery-category">Kategorie</label>
-          <select id="gallery-category"></select>
-        </div>
-        <div class="admin-field">
-          <label for="new-category">Neue Kategorie</label>
-          <input id="new-category" type="text" placeholder="z. B. Sport">
-        </div>
-        <div class="admin-field">
-          <label for="gallery-password">Passwort (optional)</label>
-          <input id="gallery-password" type="text" placeholder="leer lassen = öffentlich">
-        </div>
-      </div>
-      <div class="admin-actions">
-        <button class="btn" id="save-gallery-btn">Galerie speichern</button>
-      </div>
-    </section>
-
-    <section class="admin-section legacy-section">
-      <h3>Bilder hinzufügen</h3>
-      <div class="admin-dropzone" id="upload-dropzone">
-        Dateien hierher ziehen & ablegen (Drag & Drop)
-      </div>
-      <div class="admin-grid">
-        <div class="admin-field">
-          <label for="image-files">Dateien auswählen</label>
-          <input id="image-files" type="file" multiple accept="image/*">
-        </div>
-        <div class="admin-field">
-          <label for="image-url">Bild-URL manuell hinzufügen</label>
-          <input id="image-url" type="url" placeholder="https://...">
-        </div>
-        <div class="admin-field">
-          <label>
-            <input id="resize-before-upload" type="checkbox" checked>
-            Bilder vor Upload verkleinern (empfohlen)
-          </label>
-        </div>
-        <div class="admin-field">
-          <label for="resize-max-side">Maximale Kantenlänge</label>
-          <select id="resize-max-side">
-            <option value="3000">3000 px</option>
-            <option value="4000" selected>4000 px</option>
-            <option value="5000">5000 px</option>
-          </select>
-        </div>
-        <div class="admin-field">
-          <label for="resize-quality">Qualität</label>
-          <select id="resize-quality">
-            <option value="0.8">80%</option>
-            <option value="0.88" selected>88%</option>
-            <option value="0.92">92%</option>
-          </select>
-        </div>
-      </div>
-      <div class="admin-actions">
-        <button class="btn" id="upload-images-btn">Hochladen</button>
-        <button class="btn" id="add-url-btn">URL hinzufügen</button>
-      </div>
-      <p class="admin-note">Uploads nutzen Cloudinary (Unsigned Upload Preset). Ohne Preset kannst du per URL hinzufügen.</p>
-      <p class="admin-note" id="upload-status"></p>
-    </section>
-
-    <section class="admin-section legacy-section">
-      <h3>Export</h3>
-      <div class="admin-actions">
-        <button class="btn" id="download-json-btn">gallery.json herunterladen</button>
-      </div>
-      <p class="admin-note">Optional: Direkt zu GitHub pushen (Token erforderlich).</p>
-    </section>
-
-    <section class="admin-section legacy-section">
-      <h3>GitHub Push</h3>
-      <div class="admin-grid">
-        <div class="admin-field">
-          <label for="gh-owner">Owner</label>
-          <input id="gh-owner" type="text" placeholder="Noudi72">
-        </div>
-        <div class="admin-field">
-          <label for="gh-repo">Repo</label>
-          <input id="gh-repo" type="text" placeholder="WB_Pix_Galerie">
-        </div>
-        <div class="admin-field">
-          <label for="gh-branch">Branch</label>
-          <input id="gh-branch" type="text" placeholder="main">
-        </div>
-        <div class="admin-field">
-          <label for="gh-path">Pfad</label>
-          <input id="gh-path" type="text" placeholder="gallery.json">
-        </div>
-        <div class="admin-field">
-          <label for="gh-token">GitHub Token</label>
-          <input id="gh-token" type="password" placeholder="ghp_... oder github_pat_...">
-        </div>
-      </div>
-      <div class="admin-actions">
-        <button class="btn" id="push-json-btn">gallery.json zu GitHub pushen</button>
-      </div>
-      <p class="admin-note">Token braucht Repo‑Rechte für Inhalte (Contents).</p>
-    </section>
   </main>
 
   <main class="container" id="admin-login">
