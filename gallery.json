@@ -80,7 +80,13 @@
           "uploadDate": "2026-01-20T15:31:23.247Z",
           "width": 1664,
           "height": 2496,
-          "source": "cloudinary"
+          "source": "cloudinary",
+          "comments": [
+            {
+              "text": "Looking hot, bitte noch etwas heller machen.",
+              "ts": 1770229064822
+            }
+          ]
         },
         {
           "id": "sport/eishockey/ehcb-vs-zsc/nxyamwrmes3ngukcsuc1",
