@@ -10,9 +10,13 @@ let selectedCategory = 'all';
 
 function applyTheme(theme) {
   const isDark = theme === 'dark';
+  document.documentElement.classList.toggle('dark-mode', isDark);
   document.body.classList.toggle('dark-mode', isDark);
   localStorage.setItem('wbg_theme', isDark ? 'dark' : 'light');
-  if (themeToggle) themeToggle.textContent = isDark ? 'Hell' : 'Dunkel';
+  if (themeToggle) {
+    themeToggle.textContent = isDark ? 'Hell' : 'Dunkel';
+    themeToggle.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+  }
 }
 
 function initTheme() {

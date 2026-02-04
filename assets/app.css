@@ -16,6 +16,7 @@
   --radius-sm: 8px;
 }
 
+html.dark-mode,
 body.dark-mode {
   color-scheme: dark;
   --bg: #141312;
