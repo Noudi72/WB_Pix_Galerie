@@ -31,6 +31,7 @@ const galleryTablePasswordFilter = document.getElementById('gallery-table-passwo
 const galleryTableStatus = document.getElementById('gallery-table-status');
 const galleryTableSortButtons = galleryTable?.querySelectorAll('.table-sort') || [];
 const globalPushBtn = document.getElementById('push-json-global-btn');
+const applyPrivateFixBtn = document.getElementById('apply-private-fix-btn');
 
 const uploadModal = document.getElementById('upload-modal');
 const uploadCategorySelect = document.getElementById('upload-category');
@@ -266,6 +267,12 @@ function normalizeToken(value) {
     .toLowerCase()
     .replace(/[^a-z0-9äöü]/gi, '')
     .trim();
+}
+
+function tokenIncludes(value, query) {
+  const token = normalizeToken(value);
+  const q = normalizeToken(query);
+  return token.includes(q);
 }
 
 function normalizeFolderValue(gallery, count) {
@@ -597,6 +604,49 @@ function renderImageList() {
     `;
     adminImageList.appendChild(item);
   });
+}
+
+function applyPrivateFix() {
+  if (!galleryConfig) return;
+  const galleries = galleryConfig.galleries || [];
+  const hits = galleries.filter((g) => {
+    const id = g.id || '';
+    const name = g.name || '';
+    const sub = g.subcategory || '';
+    const folder = g.folder || '';
+    const byFields = tokenIncludes(id, 'noel') || tokenIncludes(name, 'noel') || tokenIncludes(sub, 'noel') || tokenIncludes(folder, 'noel')
+      || tokenIncludes(id, 'privat') || tokenIncludes(name, 'privat') || tokenIncludes(sub, 'privat') || tokenIncludes(folder, 'privat');
+    if (byFields) return true;
+    return (g.images || []).some((img) => {
+      const imgId = img.publicId || img.id || '';
+      const url = img.url || img.thumbnailUrl || '';
+      return tokenIncludes(imgId, 'noel')
+        || tokenIncludes(url, '/noel')
+        || tokenIncludes(imgId, 'privat')
+        || tokenIncludes(url, '/privat');
+    });
+  });
+
+  if (!hits.length) {
+    alert('Keine privaten Galerien gefunden.');
+    return;
+  }
+
+  const ok = confirm(`Privat‑Fix auf ${hits.length} Galerie(n) anwenden?`);
+  if (!ok) return;
+
+  const privateCategoryId = ensureCategoryByName('Privat');
+  hits.forEach((g) => {
+    g.category = privateCategoryId;
+    g.subcategory = 'shootings';
+    g.folder = g.folder || 'noël';
+    g.name = g.subcategory;
+  });
+  populateGallerySelect();
+  updateSuggestions();
+  renderGalleryTable();
+  renderImageList();
+  alert('Privat‑Fix angewendet. Bitte Änderungen zu GitHub pushen.');
 }
 
 function clearGalleryImages() {
@@ -1006,6 +1056,7 @@ async function init() {
   downloadBtn.addEventListener('click', downloadJson);
   pushBtn.addEventListener('click', pushJsonToGitHub);
   if (globalPushBtn) globalPushBtn.addEventListener('click', pushJsonToGitHub);
+  if (applyPrivateFixBtn) applyPrivateFixBtn.addEventListener('click', applyPrivateFix);
   if (clearGalleryImagesBtn) clearGalleryImagesBtn.addEventListener('click', clearGalleryImages);
   if (cleanGalleryImagesBtn) cleanGalleryImagesBtn.addEventListener('click', cleanGalleryImages);
 
