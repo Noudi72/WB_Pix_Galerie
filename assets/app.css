@@ -591,6 +591,16 @@ body.dark-mode .site-header {
   white-space: nowrap;
 }
 
+.admin-table .table-path {
+  display: inline-block;
+  max-width: 240px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .admin-note {
   font-size: 0.85rem;
   color: var(--muted);

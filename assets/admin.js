@@ -384,6 +384,8 @@ function renderGalleryTable() {
     const count = gallery.images?.length || 0;
     const hasPassword = Boolean(gallery.password);
     const passwordLabel = hasPassword ? 'Geschützt' : 'Öffentlich';
+    const pathParts = [getCategoryName(gallery.category), sub, folder].filter(Boolean);
+    const pathLabel = pathParts.length ? pathParts.join(' / ') : '—';
     tr.innerHTML = `
       <td>${gallery.name || `Galerie ${idx + 1}`}</td>
       <td>
@@ -393,10 +395,12 @@ function renderGalleryTable() {
       </td>
       <td><input class="table-input" data-field="subcategory" data-idx="${idx}" type="text" value="${sub}" placeholder="z. B. Eishockey"></td>
       <td><input class="table-input" data-field="folder" data-idx="${idx}" type="text" value="${folder}" placeholder="z. B. EHCB vs HCD"></td>
+      <td><span class="table-path">${pathLabel}</span></td>
       <td><input class="table-input" data-field="date" data-idx="${idx}" type="date" value="${date}"></td>
       <td>${count}</td>
       <td>${passwordLabel}</td>
       <td class="table-action">
+        <button class="btn" data-action="auto" data-idx="${idx}">Auto</button>
         <button class="btn" data-action="edit" data-idx="${idx}">Bearbeiten</button>
         <button class="btn" data-action="delete" data-idx="${idx}">Löschen</button>
       </td>
@@ -445,6 +449,25 @@ function updateGalleryField(idx, field, value) {
     if (field === 'category') galleryCategorySelect.value = value || '';
   }
   if (field === 'subcategory' || field === 'folder') updateSuggestions();
+  renderGalleryTable();
+}
+
+function autoFillFromFolder(idx) {
+  const gallery = (galleryConfig?.galleries || [])[idx];
+  if (!gallery) return;
+  const folderValue = String(gallery.folder || '').trim();
+  if (!folderValue) return;
+  const separatorMatch = folderValue.match(/\s*(.+?)\s*(?:\/|—|–|-|:)\s*(.+)/);
+  if (!separatorMatch) return;
+  const candidateSub = separatorMatch[1]?.trim();
+  const candidateFolder = separatorMatch[2]?.trim();
+  if (!gallery.subcategory && candidateSub) gallery.subcategory = candidateSub;
+  if (candidateFolder) gallery.folder = candidateFolder;
+  if (currentGallery === gallery) {
+    gallerySubcategoryInput.value = gallery.subcategory || '';
+    galleryFolderInput.value = gallery.folder || '';
+  }
+  updateSuggestions();
   renderGalleryTable();
 }
 
@@ -773,7 +796,9 @@ async function init() {
       const idx = Number(btn.dataset.idx);
       if (Number.isNaN(idx)) return;
       const action = btn.dataset.action;
-      if (action === 'edit') {
+      if (action === 'auto') {
+        autoFillFromFolder(idx);
+      } else if (action === 'edit') {
         selectGalleryByIndex(idx, { focusWizard: true });
       } else if (action === 'delete') {
         deleteGalleryByIndex(idx);
