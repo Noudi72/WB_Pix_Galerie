@@ -443,6 +443,52 @@ body.dark-mode .site-header {
   color: var(--muted);
 }
 
+.admin-wizard {
+  border: 2px solid rgba(212, 165, 116, 0.35);
+}
+
+.wizard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.wizard-steps {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.wizard-step {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.wizard-step.active {
+  border-color: var(--accent);
+  background: rgba(212, 165, 116, 0.25);
+}
+
+.wizard-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.legacy-section {
+  display: none;
+}
+
 @media (max-width: 768px) {
   .container {
     padding: 14px;

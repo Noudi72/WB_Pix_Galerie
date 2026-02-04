@@ -17,6 +17,10 @@ const uploadStatus = document.getElementById('upload-status');
 const resizeBeforeUpload = document.getElementById('resize-before-upload');
 const resizeMaxSide = document.getElementById('resize-max-side');
 const resizeQuality = document.getElementById('resize-quality');
+const wizardPrev = document.getElementById('wizard-prev');
+const wizardNext = document.getElementById('wizard-next');
+const wizardSteps = document.querySelectorAll('.wizard-step');
+const wizardPanels = document.querySelectorAll('.wizard-step-panel');
 
 const newGalleryBtn = document.getElementById('new-gallery-btn');
 const saveGalleryBtn = document.getElementById('save-gallery-btn');
@@ -44,6 +48,7 @@ const themeToggle = document.getElementById('theme-toggle');
 let galleryConfig = null;
 let currentGallery = null;
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+let wizardStep = 1;
 async function downscaleImage(file) {
   const img = await createImageBitmap(file);
   const maxSide = Number(resizeMaxSide?.value || 4000);
@@ -86,6 +91,23 @@ function initTheme() {
       applyTheme(next);
     });
   }
+}
+
+function renderWizard() {
+  wizardPanels.forEach((panel) => {
+    const step = Number(panel.dataset.step);
+    panel.style.display = step === wizardStep ? '' : 'none';
+  });
+  wizardSteps.forEach((badge, idx) => {
+    badge.classList.toggle('active', idx + 1 === wizardStep);
+  });
+  if (wizardPrev) wizardPrev.disabled = wizardStep === 1;
+  if (wizardNext) wizardNext.textContent = wizardStep === 3 ? 'Fertig' : 'Weiter';
+}
+
+function goWizardStep(nextStep) {
+  wizardStep = Math.min(3, Math.max(1, nextStep));
+  renderWizard();
 }
 
 function getAdminPassword() {
@@ -432,6 +454,11 @@ async function init() {
       populateGallerySelect();
     });
   }
+  if (wizardPrev) wizardPrev.addEventListener('click', () => goWizardStep(wizardStep - 1));
+  if (wizardNext) wizardNext.addEventListener('click', () => {
+    if (wizardStep === 1) saveGallery();
+    goWizardStep(wizardStep + 1);
+  });
   saveGalleryBtn.addEventListener('click', saveGallery);
   newGalleryBtn.addEventListener('click', createGallery);
   uploadImagesBtn.addEventListener('click', uploadFiles);
@@ -478,6 +505,8 @@ async function init() {
       }
     });
   }
+
+  renderWizard();
 }
 
 init();
