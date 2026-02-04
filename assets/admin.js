@@ -4,9 +4,15 @@ const gallerySelect = document.getElementById('gallery-select');
 const galleryNameInput = document.getElementById('gallery-name');
 const galleryDescInput = document.getElementById('gallery-description');
 const galleryCategorySelect = document.getElementById('gallery-category');
+const gallerySubcategoryInput = document.getElementById('gallery-subcategory');
+const galleryFolderInput = document.getElementById('gallery-folder');
+const galleryDateInput = document.getElementById('gallery-date');
+const newCategoryInput = document.getElementById('new-category');
 const galleryPasswordInput = document.getElementById('gallery-password');
 const imageFilesInput = document.getElementById('image-files');
 const imageUrlInput = document.getElementById('image-url');
+const uploadDropzone = document.getElementById('upload-dropzone');
+const uploadStatus = document.getElementById('upload-status');
 
 const newGalleryBtn = document.getElementById('new-gallery-btn');
 const saveGalleryBtn = document.getElementById('save-gallery-btn');
@@ -146,14 +152,34 @@ function loadGalleryFromSelect() {
   galleryNameInput.value = currentGallery.name || '';
   galleryDescInput.value = currentGallery.description || '';
   galleryCategorySelect.value = currentGallery.category || '';
+  gallerySubcategoryInput.value = currentGallery.subcategory || '';
+  galleryFolderInput.value = currentGallery.folder || '';
+  galleryDateInput.value = currentGallery.date || '';
   galleryPasswordInput.value = currentGallery.password || '';
+}
+
+function ensureCategoryExists() {
+  const name = newCategoryInput.value.trim();
+  if (!name) return;
+  const id = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+  const exists = (galleryConfig.categories || []).some(c => c.id === id);
+  if (!exists) {
+    galleryConfig.categories.push({ id, name });
+  }
+  newCategoryInput.value = '';
+  populateCategories();
+  galleryCategorySelect.value = id;
 }
 
 function saveGallery() {
   if (!currentGallery) return;
+  ensureCategoryExists();
   currentGallery.name = galleryNameInput.value.trim();
   currentGallery.description = galleryDescInput.value.trim();
   currentGallery.category = galleryCategorySelect.value;
+  currentGallery.subcategory = gallerySubcategoryInput.value.trim();
+  currentGallery.folder = galleryFolderInput.value.trim();
+  currentGallery.date = galleryDateInput.value || '';
   const pwd = galleryPasswordInput.value.trim();
   if (pwd) currentGallery.password = pwd;
   else delete currentGallery.password;
@@ -179,6 +205,7 @@ function createGallery() {
 async function uploadFiles() {
   saveSettings();
   if (!currentGallery) return;
+  if (uploadStatus) uploadStatus.textContent = '';
   const cloudName = cloudNameInput.value.trim();
   const preset = uploadPresetInput.value.trim();
   const files = Array.from(imageFilesInput.files || []);
@@ -191,16 +218,19 @@ async function uploadFiles() {
     return;
   }
 
+  const folderPath = buildCloudinaryFolder();
   for (const file of files) {
     const form = new FormData();
     form.append('file', file);
     form.append('upload_preset', preset);
+    if (folderPath) form.append('folder', folderPath);
     const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/upload`, {
       method: 'POST',
       body: form
     });
     if (!res.ok) {
-      alert(`Upload fehlgeschlagen: ${file.name}`);
+      const err = await res.json().catch(() => ({}));
+      alert(`Upload fehlgeschlagen: ${file.name}\n${err?.error?.message || res.status}`);
       continue;
     }
     const data = await res.json();
@@ -296,6 +326,23 @@ async function pushJsonToGitHub() {
   alert('gallery.json erfolgreich zu GitHub gepusht.');
 }
 
+function slugify(text) {
+  return String(text || '')
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-');
+}
+
+function buildCloudinaryFolder() {
+  const category = galleryCategorySelect.value || 'galerie';
+  const sub = slugify(gallerySubcategoryInput.value || '');
+  const folder = slugify(galleryFolderInput.value || '');
+  const parts = [category, sub, folder].filter(Boolean);
+  return parts.join('/');
+}
+
 async function init() {
   initTheme();
   loadSettings();
@@ -349,6 +396,24 @@ async function init() {
     adminNewPassword.value = '';
     alert('Passwort gespeichert.');
   });
+
+  if (uploadDropzone) {
+    uploadDropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadDropzone.classList.add('is-dragover');
+    });
+    uploadDropzone.addEventListener('dragleave', () => {
+      uploadDropzone.classList.remove('is-dragover');
+    });
+    uploadDropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadDropzone.classList.remove('is-dragover');
+      if (e.dataTransfer?.files?.length) {
+        imageFilesInput.files = e.dataTransfer.files;
+        uploadFiles();
+      }
+    });
+  }
 }
 
 init();

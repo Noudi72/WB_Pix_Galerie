@@ -74,12 +74,28 @@
           <input id="gallery-name" type="text">
         </div>
         <div class="admin-field">
+          <label for="gallery-subcategory">Unterkategorie (z. B. Eishockey)</label>
+          <input id="gallery-subcategory" type="text" placeholder="Unterkategorie">
+        </div>
+        <div class="admin-field">
+          <label for="gallery-folder">Ordner / Spiel (z. B. EHCB vs ZSC)</label>
+          <input id="gallery-folder" type="text" placeholder="Ordnername">
+        </div>
+        <div class="admin-field">
+          <label for="gallery-date">Datum (z. B. 2026-02-04)</label>
+          <input id="gallery-date" type="date">
+        </div>
+        <div class="admin-field">
           <label for="gallery-description">Beschreibung</label>
           <input id="gallery-description" type="text">
         </div>
         <div class="admin-field">
           <label for="gallery-category">Kategorie</label>
           <select id="gallery-category"></select>
+        </div>
+        <div class="admin-field">
+          <label for="new-category">Neue Kategorie</label>
+          <input id="new-category" type="text" placeholder="z. B. Sport">
         </div>
         <div class="admin-field">
           <label for="gallery-password">Passwort (optional)</label>
@@ -93,6 +109,9 @@
 
     <section class="admin-section">
       <h3>Bilder hinzufügen</h3>
+      <div class="admin-dropzone" id="upload-dropzone">
+        Dateien hierher ziehen & ablegen (Drag & Drop)
+      </div>
       <div class="admin-grid">
         <div class="admin-field">
           <label for="image-files">Dateien auswählen</label>
@@ -108,6 +127,7 @@
         <button class="btn" id="add-url-btn">URL hinzufügen</button>
       </div>
       <p class="admin-note">Uploads nutzen Cloudinary (Unsigned Upload Preset). Ohne Preset kannst du per URL hinzufügen.</p>
+      <p class="admin-note" id="upload-status"></p>
     </section>
 
     <section class="admin-section">

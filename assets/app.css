@@ -383,6 +383,22 @@ body.dark-mode .site-header {
   box-shadow: var(--shadow);
 }
 
+.admin-dropzone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  text-align: center;
+  margin-bottom: 12px;
+  color: var(--muted);
+  background: var(--surface-2);
+}
+
+.admin-dropzone.is-dragover {
+  border-color: var(--accent);
+  color: var(--text);
+  background: rgba(212, 165, 116, 0.12);
+}
+
 .admin-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));

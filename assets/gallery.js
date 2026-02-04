@@ -187,7 +187,10 @@ async function init() {
     if (!currentGallery) throw new Error('Keine Galerie gefunden');
 
     titleEl.textContent = currentGallery.name || 'Galerie';
-    subtitleEl.textContent = currentGallery.description || '';
+    const sub = currentGallery.subcategory ? ` · ${currentGallery.subcategory}` : '';
+    const folder = currentGallery.folder ? ` · ${currentGallery.folder}` : '';
+    const date = currentGallery.date ? ` · ${currentGallery.date}` : '';
+    subtitleEl.textContent = `${currentGallery.description || ''}${sub}${folder}${date}`;
     favoriteIds = loadFavorites(currentGallery.id || 'default');
     renderImages(currentGallery.images || []);
   } catch (err) {

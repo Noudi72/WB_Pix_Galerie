@@ -97,11 +97,14 @@ function renderGalleries() {
     card.className = 'card';
     const previewRaw = (gallery.images && gallery.images[0]) ? gallery.images[0].thumbnailUrl || gallery.images[0].url : '';
     const preview = buildThumbUrl(previewRaw);
+    const sub = gallery.subcategory ? ` · ${gallery.subcategory}` : '';
+    const folder = gallery.folder ? ` · ${gallery.folder}` : '';
+    const date = gallery.date ? ` · ${gallery.date}` : '';
     card.innerHTML = `
       ${preview ? `<img src="${preview}" alt="${gallery.name || 'Galerie'}" loading="lazy" decoding="async">` : '<div style="height: 160px; background: var(--surface-2);"></div>'}
       <div class="card-body">
         <div class="card-title">${gallery.name || 'Galerie'}</div>
-        <div class="card-meta">${gallery.description || ''}</div>
+        <div class="card-meta">${gallery.description || ''}${sub}${folder}${date}</div>
       </div>
     `;
     card.addEventListener('click', () => {
