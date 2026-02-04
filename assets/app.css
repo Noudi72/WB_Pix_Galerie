@@ -578,6 +578,10 @@ body.dark-mode .site-header {
   z-index: 10000;
 }
 
+.modal.is-hidden {
+  display: none;
+}
+
 .modal-content {
   width: min(900px, 92vw);
   background: var(--surface);

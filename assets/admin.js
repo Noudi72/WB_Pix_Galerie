@@ -1100,6 +1100,11 @@ async function init() {
   }
 
   if (uploadCancelBtn) uploadCancelBtn.addEventListener('click', closeUploadModal);
+  if (uploadModal) {
+    uploadModal.addEventListener('click', (event) => {
+      if (event.target === uploadModal) closeUploadModal();
+    });
+  }
   if (uploadConfirmBtn) {
     uploadConfirmBtn.addEventListener('click', async () => {
       if (!pendingUploadFiles.length) {
