@@ -67,7 +67,9 @@
           "width": 4000,
           "height": 2668,
           "source": "cloudinary",
-          "publicId": "sport/eishockey/ehcb-vs-zsc/du7azlea0cl3ceruft0f"
+          "publicId": "sport/eishockey/ehcb-vs-zsc/du7azlea0cl3ceruft0f",
+          "liked": true,
+          "likeTs": 1770315712072
         },
         {
           "id": "sport/eishockey/ehcb-vs-zsc/uc43tdipgscl8f5ogwhf",
@@ -177,7 +179,9 @@
           "width": 4000,
           "height": 2668,
           "source": "cloudinary",
-          "publicId": "sport/eishockey/ehcb-vs-zsc/mc2e3e4unke1z7alhfvs"
+          "publicId": "sport/eishockey/ehcb-vs-zsc/mc2e3e4unke1z7alhfvs",
+          "liked": true,
+          "likeTs": 1770315721724
         },
         {
           "id": "sport/eishockey/ehcb-vs-zsc/i0ltwnh8chw4hwweqhrh",
