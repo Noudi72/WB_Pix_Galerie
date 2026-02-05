@@ -105,6 +105,16 @@ function renderGalleries() {
     return hasImages && showOnHomepage;
   });
 
+  // Manuelle Reihenfolge (falls vorhanden) beibehalten
+  const hasOrder = items.some(g => typeof g.order === 'number');
+  if (hasOrder) {
+    items.sort((a, b) => {
+      const ao = typeof a.order === 'number' ? a.order : Number.MAX_SAFE_INTEGER;
+      const bo = typeof b.order === 'number' ? b.order : Number.MAX_SAFE_INTEGER;
+      return ao - bo;
+    });
+  }
+
   galleryGrid.innerHTML = '';
   countChip.textContent = `${items.length} Galerien`;
 

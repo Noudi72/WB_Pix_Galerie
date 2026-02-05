@@ -94,6 +94,33 @@ let pendingUploadFiles = [];
 let dragGalleryId = null;
 let mouseDragActive = false;
 let hoverGalleryId = null;
+
+function ensureGalleryOrder() {
+  const galleries = galleryConfig?.galleries || [];
+  let nextOrder = 1;
+  galleries.forEach((g) => {
+    if (typeof g.order !== 'number' || Number.isNaN(g.order)) {
+      g.order = nextOrder;
+    }
+    nextOrder += 1;
+  });
+}
+
+function sortGalleriesByOrder() {
+  if (!galleryConfig?.galleries?.length) return;
+  galleryConfig.galleries.sort((a, b) => {
+    const ao = typeof a.order === 'number' ? a.order : Number.MAX_SAFE_INTEGER;
+    const bo = typeof b.order === 'number' ? b.order : Number.MAX_SAFE_INTEGER;
+    return ao - bo;
+  });
+}
+
+function persistOrderFromArray() {
+  const galleries = galleryConfig?.galleries || [];
+  galleries.forEach((g, idx) => {
+    g.order = idx + 1;
+  });
+}
 async function downscaleImage(file) {
   const img = await createImageBitmap(file);
   const maxSide = Number(resizeMaxSide?.value || 4000);
@@ -631,6 +658,7 @@ function moveGalleryById(galleryId, direction) {
   galleries[idx] = galleries[newIdx];
   galleries[newIdx] = temp;
   
+  persistOrderFromArray();
   // WICHTIG: Sortierung zurücksetzen, damit manuelle Reihenfolge sichtbar wird
   gallerySort = [];
   updateTableSortState();
@@ -652,6 +680,7 @@ function reorderGalleryById(sourceId, targetId) {
   const insertIdx = fromIdx < toIdx ? toIdx - 1 : toIdx;
   galleries.splice(insertIdx, 0, moved);
 
+  persistOrderFromArray();
   gallerySort = [];
   updateTableSortState();
   populateGallerySelect();
@@ -1218,6 +1247,8 @@ async function init() {
       g.id = `${base || 'gallery'}-${idx}`;
     }
   });
+  ensureGalleryOrder();
+  sortGalleriesByOrder();
 
   populateCategories();
   populateGallerySelect();
@@ -1403,6 +1434,19 @@ async function init() {
   pushBtn.addEventListener('click', pushJsonToGitHub);
   if (globalPushBtn) globalPushBtn.addEventListener('click', pushJsonToGitHub);
   if (saveOrderBtn) saveOrderBtn.addEventListener('click', async () => {
+    const owner = ghOwnerInput.value.trim();
+    const repo = ghRepoInput.value.trim();
+    const token = ghTokenInput.value.trim();
+    if (!owner || !repo || !token) {
+      if (galleryOrderStatus) {
+        galleryOrderStatus.textContent = 'Bitte Owner, Repo und Token in Schritt 3 eintragen.';
+      }
+      goWizardStep(3);
+      const wizardSection = document.querySelector('.admin-wizard');
+      if (wizardSection) wizardSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      alert('Bitte Owner, Repo und Token in Schritt 3 eintragen.');
+      return;
+    }
     if (galleryOrderStatus) galleryOrderStatus.textContent = 'Speichere Reihenfolge zu GitHub…';
     const ok = await pushJsonToGitHub();
     if (galleryOrderStatus) {
