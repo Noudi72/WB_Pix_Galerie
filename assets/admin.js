@@ -51,6 +51,9 @@ const uploadConfirmBtn = document.getElementById('upload-confirm');
 const adminImageList = document.getElementById('admin-image-list');
 const clearGalleryImagesBtn = document.getElementById('clear-gallery-images-btn');
 const cleanGalleryImagesBtn = document.getElementById('clean-gallery-images-btn');
+const bestShotsList = document.getElementById('best-shots-list');
+const bestShotsEmpty = document.getElementById('best-shots-empty');
+const clearBestShotsBtn = document.getElementById('clear-best-shots-btn');
 
 const newGalleryBtn = document.getElementById('new-gallery-btn');
 const saveGalleryBtn = document.getElementById('save-gallery-btn');
@@ -761,9 +764,68 @@ function renderImageList() {
         <strong>${img.name || 'Bild'}</strong>
         <span>${img.url ? img.url.split('/').slice(-1)[0] : ''}</span>
       </div>
-      <button class="btn danger" data-action="delete-image" data-idx="${idx}">Bild löschen</button>
+      <div class="admin-actions">
+        <button class="btn" data-action="best-shot" data-idx="${idx}">Best Shot</button>
+        <button class="btn danger" data-action="delete-image" data-idx="${idx}">Bild löschen</button>
+      </div>
     `;
     adminImageList.appendChild(item);
+  });
+}
+
+function getBestShots() {
+  if (!galleryConfig) return [];
+  if (!Array.isArray(galleryConfig.bestShots)) galleryConfig.bestShots = [];
+  return galleryConfig.bestShots;
+}
+
+function addBestShot(img) {
+  if (!currentGallery || !img) return;
+  const shots = getBestShots();
+  const imageId = img.publicId || img.id || img.name || '';
+  const exists = shots.some((s) => s.galleryId === currentGallery.id && s.imageId === imageId);
+  if (exists) return;
+  shots.push({
+    galleryId: currentGallery.id,
+    imageId,
+    url: img.url || img.thumbnailUrl || ''
+  });
+  renderBestShots();
+}
+
+function removeBestShot(idx) {
+  const shots = getBestShots();
+  shots.splice(idx, 1);
+  renderBestShots();
+}
+
+function renderBestShots() {
+  if (!bestShotsList) return;
+  const shots = getBestShots();
+  bestShotsList.innerHTML = '';
+  if (!shots.length) {
+    if (bestShotsEmpty) bestShotsEmpty.classList.remove('is-hidden');
+    return;
+  }
+  if (bestShotsEmpty) bestShotsEmpty.classList.add('is-hidden');
+  shots.forEach((shot, idx) => {
+    const gallery = (galleryConfig?.galleries || []).find(g => g.id === shot.galleryId);
+    const images = gallery?.images || [];
+    const img = images.find(i => (i.publicId || i.id || i.name) === shot.imageId) || null;
+    const thumb = buildThumbUrl(resolveUrl(img?.thumbnailUrl || img?.url || shot.url), 180, 120);
+    const title = gallery?.name || gallery?.subcategory || 'Galerie';
+    const meta = img?.name || shot.imageId || '';
+    const item = document.createElement('div');
+    item.className = 'best-shots-item';
+    item.innerHTML = `
+      <img class="best-shots-thumb" src="${thumb}" alt="">
+      <div class="best-shots-meta">
+        <strong>${title}</strong>
+        <span>${meta}</span>
+      </div>
+      <button class="btn danger" data-action="remove-best-shot" data-idx="${idx}">Entfernen</button>
+    `;
+    bestShotsList.appendChild(item);
   });
 }
 
@@ -1317,6 +1379,7 @@ async function init() {
   galleryConfig = await res.json();
   galleryConfig.galleries = galleryConfig.galleries || [];
   galleryConfig.categories = galleryConfig.categories || [];
+  if (!Array.isArray(galleryConfig.bestShots)) galleryConfig.bestShots = [];
   galleryConfig.galleries.forEach((g, idx) => {
     if (!g.id) {
       const base = slugify(g.subcategory || g.name || `gallery-${idx}`);
@@ -1341,6 +1404,7 @@ async function init() {
   updateSuggestions();
   updateTableSortState();
   renderGalleryTable();
+  renderBestShots();
 
   if (gallerySelect) gallerySelect.addEventListener('change', loadGalleryFromSelect);
   if (gallerySearchInput) {
@@ -1638,6 +1702,14 @@ async function init() {
 
   if (adminImageList) {
     adminImageList.addEventListener('click', (event) => {
+      const bestBtn = event.target.closest('button[data-action="best-shot"]');
+      if (bestBtn && currentGallery) {
+        const idx = Number(bestBtn.dataset.idx);
+        if (!Number.isNaN(idx)) {
+          addBestShot(currentGallery.images[idx]);
+        }
+        return;
+      }
       const btn = event.target.closest('button[data-action="delete-image"]');
       if (!btn) return;
       const idx = Number(btn.dataset.idx);
@@ -1647,6 +1719,27 @@ async function init() {
       currentGallery.images.splice(idx, 1);
       renderImageList();
       renderGalleryTable();
+    });
+  }
+
+  if (bestShotsList) {
+    bestShotsList.addEventListener('click', (event) => {
+      const btn = event.target.closest('button[data-action="remove-best-shot"]');
+      if (!btn) return;
+      const idx = Number(btn.dataset.idx);
+      if (Number.isNaN(idx)) return;
+      removeBestShot(idx);
+    });
+  }
+
+  if (clearBestShotsBtn) {
+    clearBestShotsBtn.addEventListener('click', () => {
+      const shots = getBestShots();
+      if (!shots.length) return;
+      const ok = confirm('Alle Best Shots wirklich löschen?');
+      if (!ok) return;
+      galleryConfig.bestShots = [];
+      renderBestShots();
     });
   }
 
