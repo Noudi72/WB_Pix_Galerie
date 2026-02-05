@@ -90,6 +90,7 @@ let gallerySort = [
   { key: 'folder', dir: 'asc' }
 ];
 let pendingUploadFiles = [];
+let dragGalleryId = null;
 async function downscaleImage(file) {
   const img = await createImageBitmap(file);
   const maxSide = Number(resizeMaxSide?.value || 4000);
@@ -532,6 +533,8 @@ function renderGalleryTable() {
   galleryTableBody.innerHTML = '';
   rows.forEach(({ gallery, idx }) => {
     const tr = document.createElement('tr');
+    tr.dataset.galleryId = gallery.id || String(idx);
+    tr.draggable = true;
     const count = gallery.images?.length || 0;
     if (!gallery.subcategory && gallery.name) {
       gallery.subcategory = gallery.name;
@@ -541,6 +544,7 @@ function renderGalleryTable() {
     const date = gallery.date || '';
     const hasPassword = Boolean(gallery.password);
     const passwordLabel = hasPassword ? 'Geschützt' : 'Öffentlich';
+    const showOnHomepage = gallery.showOnHomepage !== false;
     const pathParts = [getCategoryName(gallery.category), sub, folder].filter(Boolean);
     const pathLabel = pathParts.length ? pathParts.join(' / ') : '—';
     tr.innerHTML = `
@@ -555,9 +559,10 @@ function renderGalleryTable() {
       <td><input class="table-input" data-field="date" data-idx="${idx}" type="date" value="${date}"></td>
       <td>${count}</td>
       <td>${passwordLabel}</td>
+      <td><input class="table-check" data-field="showOnHomepage" data-idx="${idx}" type="checkbox" ${showOnHomepage ? 'checked' : ''}></td>
       <td class="table-action">
-        <button class="btn" data-action="move-up" data-idx="${idx}" data-gallery-id="${gallery.id}" title="Nach oben">↑</button>
-        <button class="btn" data-action="move-down" data-idx="${idx}" data-gallery-id="${gallery.id}" title="Nach unten">↓</button>
+        <button class="btn" data-action="move-up" data-idx="${idx}" data-gallery-id="${gallery.id || String(idx)}" title="Nach oben">↑</button>
+        <button class="btn" data-action="move-down" data-idx="${idx}" data-gallery-id="${gallery.id || String(idx)}" title="Nach unten">↓</button>
         <button class="btn" data-action="auto" data-idx="${idx}">Auto</button>
         <button class="btn" data-action="edit" data-idx="${idx}">Bearbeiten</button>
         <button class="btn" data-action="delete" data-idx="${idx}">Löschen</button>
@@ -633,10 +638,33 @@ function moveGalleryById(galleryId, direction) {
   }
 }
 
+function reorderGalleryById(sourceId, targetId) {
+  const galleries = galleryConfig?.galleries || [];
+  const fromIdx = galleries.findIndex(g => g.id === sourceId);
+  const toIdx = galleries.findIndex(g => g.id === targetId);
+  if (fromIdx === -1 || toIdx === -1 || fromIdx === toIdx) return;
+
+  const [moved] = galleries.splice(fromIdx, 1);
+  const insertIdx = fromIdx < toIdx ? toIdx - 1 : toIdx;
+  galleries.splice(insertIdx, 0, moved);
+
+  gallerySort = [];
+  updateTableSortState();
+  populateGallerySelect();
+  renderGalleryTable();
+  if (galleryOrderStatus) {
+    galleryOrderStatus.textContent = 'Reihenfolge geändert. Bitte oben auf "Reihenfolge speichern" klicken.';
+  }
+}
+
 function updateGalleryField(idx, field, value) {
   const gallery = (galleryConfig?.galleries || [])[idx];
   if (!gallery) return;
-  gallery[field] = value || '';
+  if (field === 'showOnHomepage') {
+    gallery.showOnHomepage = Boolean(value);
+  } else {
+    gallery[field] = value || '';
+  }
   if (currentGallery === gallery) {
     if (field === 'date') galleryDateInput.value = value || '';
     if (field === 'subcategory') gallerySubcategoryInput.value = value || '';
@@ -1119,7 +1147,14 @@ async function pushJsonToGitHub() {
     );
     return true;
   } catch (err) {
-    alert(`GitHub Push fehlgeschlagen:\n${err?.message || err}`);
+    const message = err?.message || String(err);
+    const isNetwork = message.includes('Load failed')
+      || message.includes('NetworkError')
+      || message.includes('Failed to fetch');
+    const extra = isNetwork
+      ? '\n\nHinweis: Der Browser blockiert gerade die Verbindung zu api.github.com.\nBitte prüfen:\n- Token noch gültig?\n- Internet/Firewall/Adblocker?\n- Seite neu laden (Cmd+Shift+R)'
+      : '';
+    alert(`GitHub Push fehlgeschlagen:\n${message}${extra}`);
     return false;
   }
 }
@@ -1162,6 +1197,12 @@ async function init() {
   galleryConfig = await res.json();
   galleryConfig.galleries = galleryConfig.galleries || [];
   galleryConfig.categories = galleryConfig.categories || [];
+  galleryConfig.galleries.forEach((g, idx) => {
+    if (!g.id) {
+      const base = slugify(g.subcategory || g.name || `gallery-${idx}`);
+      g.id = `${base || 'gallery'}-${idx}`;
+    }
+  });
 
   populateCategories();
   populateGallerySelect();
@@ -1257,6 +1298,49 @@ async function init() {
         deleteGalleryByIndex(idx);
       }
     });
+    galleryTableBody.addEventListener('dragstart', (event) => {
+      const row = event.target.closest('tr');
+      if (!row) return;
+      dragGalleryId = row.dataset.galleryId || null;
+      if (!dragGalleryId) return;
+      gallerySort = [];
+      updateTableSortState();
+      row.classList.add('is-dragging');
+      if (event.dataTransfer) {
+        event.dataTransfer.effectAllowed = 'move';
+      }
+    });
+    galleryTableBody.addEventListener('dragover', (event) => {
+      const row = event.target.closest('tr');
+      if (!row || !dragGalleryId) return;
+      if (row.dataset.galleryId === dragGalleryId) return;
+      event.preventDefault();
+      row.classList.add('is-dragover');
+    });
+    galleryTableBody.addEventListener('dragleave', (event) => {
+      const row = event.target.closest('tr');
+      if (!row) return;
+      row.classList.remove('is-dragover');
+    });
+    galleryTableBody.addEventListener('drop', (event) => {
+      const row = event.target.closest('tr');
+      if (!row || !dragGalleryId) return;
+      event.preventDefault();
+      const targetId = row.dataset.galleryId;
+      row.classList.remove('is-dragover');
+      const sourceId = dragGalleryId;
+      dragGalleryId = null;
+      if (!targetId || sourceId === targetId) return;
+      reorderGalleryById(sourceId, targetId);
+    });
+    galleryTableBody.addEventListener('dragend', (event) => {
+      const row = event.target.closest('tr');
+      if (row) row.classList.remove('is-dragging');
+      Array.from(galleryTableBody.querySelectorAll('tr.is-dragover')).forEach(el => {
+        el.classList.remove('is-dragover');
+      });
+      dragGalleryId = null;
+    });
     galleryTableBody.addEventListener('change', (event) => {
       const fieldEl = event.target.closest('[data-field]');
       if (!fieldEl) return;
@@ -1264,7 +1348,8 @@ async function init() {
       if (Number.isNaN(idx)) return;
       const field = fieldEl.dataset.field;
       if (!field) return;
-      updateGalleryField(idx, field, fieldEl.value);
+      const value = fieldEl.type === 'checkbox' ? fieldEl.checked : fieldEl.value;
+      updateGalleryField(idx, field, value);
     });
   }
   uploadImagesBtn.addEventListener('click', uploadFiles);

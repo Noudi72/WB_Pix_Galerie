@@ -98,6 +98,13 @@ function renderGalleries() {
     });
   }
 
+  // Nur Galerien mit Bildern anzeigen (und optional ausgeblendet)
+  items = items.filter((g) => {
+    const hasImages = (g.images || []).length > 0;
+    const showOnHomepage = g.showOnHomepage !== false;
+    return hasImages && showOnHomepage;
+  });
+
   galleryGrid.innerHTML = '';
   countChip.textContent = `${items.length} Galerien`;
 
