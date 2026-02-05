@@ -1,6 +1,6 @@
 {
   "version": "3.0",
-  "generated": "2026-02-05T17:43:48.383Z",
+  "generated": "2026-02-05T18:04:59.677Z",
   "categories": [
     {
       "id": "sport",
@@ -1024,6 +1024,74 @@
       "folder": "",
       "subcategory": "Firmenfeiern",
       "order": 23
+    },
+    {
+      "id": "gallery-1770314538010",
+      "name": "Shooting",
+      "description": "",
+      "images": [
+        {
+          "id": "privat/shooting/noel/aezkujxaed2zbt22utmr",
+          "name": "NG_bw_1.jpg",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1770314667/privat/shooting/noel/aezkujxaed2zbt22utmr.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_fill,w_520,h_390,q_auto,f_auto/privat/shooting/noel/aezkujxaed2zbt22utmr.jpg",
+          "uploadDate": "2026-02-05T18:04:28.453Z",
+          "width": 1024,
+          "height": 1536,
+          "source": "cloudinary",
+          "publicId": "privat/shooting/noel/aezkujxaed2zbt22utmr"
+        },
+        {
+          "id": "privat/shooting/noel/gj87qstonmekrsnnzlfb",
+          "name": "NG_bw_2.jpg",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1770314668/privat/shooting/noel/gj87qstonmekrsnnzlfb.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_fill,w_520,h_390,q_auto,f_auto/privat/shooting/noel/gj87qstonmekrsnnzlfb.jpg",
+          "uploadDate": "2026-02-05T18:04:29.273Z",
+          "width": 682,
+          "height": 1023,
+          "source": "cloudinary",
+          "publicId": "privat/shooting/noel/gj87qstonmekrsnnzlfb"
+        },
+        {
+          "id": "privat/shooting/noel/bznk8fjbdtwfjbwcfjgr",
+          "name": "NG_bw_3.jpg",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1770314669/privat/shooting/noel/bznk8fjbdtwfjbwcfjgr.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_fill,w_520,h_390,q_auto,f_auto/privat/shooting/noel/bznk8fjbdtwfjbwcfjgr.jpg",
+          "uploadDate": "2026-02-05T18:04:29.915Z",
+          "width": 1024,
+          "height": 1536,
+          "source": "cloudinary",
+          "publicId": "privat/shooting/noel/bznk8fjbdtwfjbwcfjgr"
+        },
+        {
+          "id": "privat/shooting/noel/r5eu9vxpeehfvegt8x3l",
+          "name": "NG_bw.jpg",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1770314670/privat/shooting/noel/r5eu9vxpeehfvegt8x3l.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_fill,w_520,h_390,q_auto,f_auto/privat/shooting/noel/r5eu9vxpeehfvegt8x3l.jpg",
+          "uploadDate": "2026-02-05T18:04:30.924Z",
+          "width": 682,
+          "height": 1023,
+          "source": "cloudinary",
+          "publicId": "privat/shooting/noel/r5eu9vxpeehfvegt8x3l"
+        },
+        {
+          "id": "privat/shooting/noel/pvbaxn8bvuy02xkisorm",
+          "name": "NG_dramatic color.jpg",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1770314671/privat/shooting/noel/pvbaxn8bvuy02xkisorm.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_fill,w_520,h_390,q_auto,f_auto/privat/shooting/noel/pvbaxn8bvuy02xkisorm.jpg",
+          "uploadDate": "2026-02-05T18:04:32.306Z",
+          "width": 1664,
+          "height": 2496,
+          "source": "cloudinary",
+          "publicId": "privat/shooting/noel/pvbaxn8bvuy02xkisorm"
+        }
+      ],
+      "category": "privat",
+      "subcategory": "Shooting",
+      "folder": "Noël",
+      "date": "",
+      "order": 24,
+      "password": "Noudi72"
     }
   ],
   "portfolio": [
