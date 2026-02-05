@@ -599,20 +599,33 @@ function deleteGalleryByIndex(idx) {
 }
 
 function moveGalleryById(galleryId, direction) {
+  console.log('moveGalleryById called:', { galleryId, direction });
   const galleries = galleryConfig?.galleries || [];
   const idx = galleries.findIndex(g => g.id === galleryId);
-  if (idx === -1) return;
+  console.log('Found gallery at index:', idx);
+  
+  if (idx === -1) {
+    console.warn('Gallery not found:', galleryId);
+    return;
+  }
   
   const newIdx = idx + direction;
-  if (newIdx < 0 || newIdx >= galleries.length) return;
+  console.log('Moving to index:', newIdx);
+  
+  if (newIdx < 0 || newIdx >= galleries.length) {
+    console.warn('Cannot move: out of bounds');
+    return;
+  }
   
   // Tausche die Galerien
   const temp = galleries[idx];
   galleries[idx] = galleries[newIdx];
   galleries[newIdx] = temp;
+  console.log('Galleries swapped successfully');
   
   populateGallerySelect();
   renderGalleryTable();
+  alert(`Galerie verschoben! Jetzt zu Schritt 3 → "Fertig" klicken um zu speichern.`);
 }
 
 function updateGalleryField(idx, field, value) {
@@ -1220,8 +1233,13 @@ async function init() {
       const action = btn.dataset.action;
       
       if (action === 'move-up' || action === 'move-down') {
+        console.log('Move button clicked:', action);
         const galleryId = btn.dataset.galleryId;
-        if (!galleryId) return;
+        console.log('Gallery ID:', galleryId);
+        if (!galleryId) {
+          console.error('No gallery ID found on button!');
+          return;
+        }
         const direction = action === 'move-up' ? -1 : 1;
         moveGalleryById(galleryId, direction);
         return;
