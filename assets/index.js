@@ -13,6 +13,9 @@ const portfolioRightImage = document.getElementById('portfolio-right-image');
 const portfolioRightPrev = document.getElementById('portfolio-right-prev');
 const portfolioRightNext = document.getElementById('portfolio-right-next');
 const portfolioRightMedia = document.getElementById('portfolio-right-media');
+const portfolioLightbox = document.getElementById('portfolio-lightbox');
+const portfolioLightboxImg = document.getElementById('portfolio-lightbox-image');
+const portfolioLightboxClose = document.getElementById('portfolio-lightbox-close');
 
 let galleryConfig = null;
 let selectedCategory = 'all';
@@ -151,7 +154,7 @@ function setupPortfolioSlider({ items, imageEl, prevBtn, nextBtn, mediaEl, inter
     if (mediaEl) {
       mediaEl.onclick = () => {
         if (item.galleryId) {
-          window.location.href = `./gallery.html?id=${encodeURIComponent(item.galleryId)}`;
+          openPortfolioLightbox(item.src);
         }
       };
     }
@@ -183,6 +186,19 @@ function setupPortfolioSlider({ items, imageEl, prevBtn, nextBtn, mediaEl, inter
   resetTimer();
 
   return { next, prev, resetTimer };
+}
+
+function openPortfolioLightbox(src) {
+  if (!portfolioLightbox || !portfolioLightboxImg) return;
+  portfolioLightboxImg.src = src;
+  portfolioLightbox.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePortfolioLightbox() {
+  if (!portfolioLightbox) return;
+  portfolioLightbox.classList.remove('active');
+  document.body.style.overflow = '';
 }
 
 
@@ -299,3 +315,16 @@ searchInput.addEventListener('input', renderGalleries);
 
 initTheme();
 init();
+
+if (portfolioLightboxClose) {
+  portfolioLightboxClose.addEventListener('click', closePortfolioLightbox);
+}
+if (portfolioLightbox) {
+  portfolioLightbox.addEventListener('click', (e) => {
+    if (e.target === portfolioLightbox) closePortfolioLightbox();
+  });
+}
+document.addEventListener('keydown', (e) => {
+  if (!portfolioLightbox || !portfolioLightbox.classList.contains('active')) return;
+  if (e.key === 'Escape') closePortfolioLightbox();
+});
