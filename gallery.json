@@ -1,6 +1,6 @@
 {
   "version": "3.0",
-  "generated": "2026-02-05T18:05:07.431Z",
+  "generated": "2026-02-05T18:14:30.513Z",
   "categories": [
     {
       "id": "sport",
@@ -261,13 +261,13 @@
       "category": "sport",
       "folder": "EHCB vs ZSC",
       "subcategory": "Eishockey",
-      "date": "2025-11-14",
+      "date": "2025-11-16",
       "order": 1
     },
     {
       "id": "gallery-1770293679078",
       "name": "Eishockey",
-      "description": "EHCB vs HCD",
+      "description": "Home Game",
       "images": [
         {
           "id": "sport/eishockey/ehcb-vs-hcd/enzx6g362xjomlymiret",
