@@ -1,6 +1,6 @@
 {
   "version": "3.0",
-  "generated": "2026-02-04T10:17:23.982Z",
+  "generated": "2026-02-05T16:56:50.120Z",
   "categories": [
     {
       "id": "sport",
@@ -32,247 +32,6 @@
     }
   ],
   "galleries": [
-    {
-      "id": "noel",
-      "name": "Shootings",
-      "images": [
-        {
-          "id": "img_1768923083247_0",
-          "name": "NG_bw_1",
-          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768923070/ffhuvqg6yr0ldjtnbzyz.jpg",
-          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768923070/ffhuvqg6yr0ldjtnbzyz.jpg",
-          "uploadDate": "2026-01-20T15:31:23.247Z",
-          "width": 1024,
-          "height": 1536,
-          "source": "cloudinary"
-        },
-        {
-          "id": "img_1768923083247_1",
-          "name": "NG_bw_2",
-          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768923070/g6qvlvjf9oyaftujnwcu.jpg",
-          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768923070/g6qvlvjf9oyaftujnwcu.jpg",
-          "uploadDate": "2026-01-20T15:31:23.247Z",
-          "width": 682,
-          "height": 1023,
-          "source": "cloudinary"
-        },
-        {
-          "id": "img_1768923083247_2",
-          "name": "NG_bw_3",
-          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768923070/defazfjsthgxqyjn7wcc.jpg",
-          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768923070/defazfjsthgxqyjn7wcc.jpg",
-          "uploadDate": "2026-01-20T15:31:23.247Z",
-          "width": 1024,
-          "height": 1536,
-          "source": "cloudinary"
-        },
-        {
-          "id": "img_1768923083247_3",
-          "name": "NG_bw",
-          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768923070/o9saddceog4tigggtujx.jpg",
-          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768923070/o9saddceog4tigggtujx.jpg",
-          "uploadDate": "2026-01-20T15:31:23.247Z",
-          "width": 682,
-          "height": 1023,
-          "source": "cloudinary"
-        }
-      ],
-      "description": "Shooting Portrait",
-      "category": "privat",
-      "folder": "Noël",
-      "subcategory": "Shootings",
-      "date": "2025-11-14",
-      "password": "Noudi72"
-    },
-    {
-      "id": "sport-street-inlinehockey",
-      "name": "Street-Inlinehockey",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "sport",
-      "folder": "",
-      "subcategory": "Street-Inlinehockey"
-    },
-    {
-      "id": "sport-motorsport",
-      "name": "Motorsport",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "sport",
-      "folder": "",
-      "subcategory": "Motorsport"
-    },
-    {
-      "id": "sport-wintersport",
-      "name": "Wintersport",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "sport",
-      "folder": "",
-      "subcategory": "Wintersport"
-    },
-    {
-      "id": "landschaft-berge-alpen",
-      "name": "Berge & Alpen",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "landschaft",
-      "folder": "",
-      "subcategory": "Berge & Alpen"
-    },
-    {
-      "id": "landschaft-kueste-meer",
-      "name": "Küste & Meer",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "landschaft",
-      "folder": "",
-      "subcategory": "Küste & Meer"
-    },
-    {
-      "id": "landschaft-wald-forst",
-      "name": "Wald & Forst",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "landschaft",
-      "folder": "",
-      "subcategory": "Wald & Forst"
-    },
-    {
-      "id": "landschaft-nacht",
-      "name": "Nachtfotografie",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "landschaft",
-      "folder": "",
-      "subcategory": "Nachtfotografie"
-    },
-    {
-      "id": "portrait-business",
-      "name": "Business & Corporate",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "portrait",
-      "folder": "",
-      "subcategory": "Business & Corporate"
-    },
-    {
-      "id": "portrait-lifestyle",
-      "name": "Lifestyle & Street",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "portrait",
-      "folder": "",
-      "subcategory": "Lifestyle & Street"
-    },
-    {
-      "id": "portrait-familie",
-      "name": "Familie & Kinder",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "portrait",
-      "folder": "",
-      "subcategory": "Familie & Kinder"
-    },
-    {
-      "id": "portrait-studio",
-      "name": "Studio",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "portrait",
-      "folder": "",
-      "subcategory": "Studio"
-    },
-    {
-      "id": "tiere-wildlife",
-      "name": "Wildlife & Wildtiere",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "tiere",
-      "folder": "",
-      "subcategory": "Wildlife & Wildtiere"
-    },
-    {
-      "id": "tiere-haustiere",
-      "name": "Haustiere",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "tiere",
-      "folder": "",
-      "subcategory": "Haustiere"
-    },
-    {
-      "id": "tiere-zoo",
-      "name": "Zoo & Vogelpark",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "tiere",
-      "folder": "",
-      "subcategory": "Zoo & Vogelpark"
-    },
-    {
-      "id": "tiere-makro",
-      "name": "Makro & Insekten",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "tiere",
-      "folder": "",
-      "subcategory": "Makro & Insekten"
-    },
-    {
-      "id": "architektur-urban",
-      "name": "Urban & Stadt",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "architektur",
-      "folder": "",
-      "subcategory": "Urban & Stadt"
-    },
-    {
-      "id": "architektur-lost",
-      "name": "Lost Places",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "architektur",
-      "folder": "",
-      "subcategory": "Lost Places"
-    },
-    {
-      "id": "architektur-innen",
-      "name": "Innenarchitektur",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "architektur",
-      "folder": "",
-      "subcategory": "Innenarchitektur"
-    },
-    {
-      "id": "events-konzerte",
-      "name": "Konzerte",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "events",
-      "folder": "",
-      "subcategory": "Konzerte"
-    },
-    {
-      "id": "events-hochzeiten",
-      "name": "Hochzeiten",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "events",
-      "folder": "",
-      "subcategory": "Hochzeiten"
-    },
-    {
-      "id": "events-firmenfeiern",
-      "name": "Firmenfeiern",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "events",
-      "folder": "",
-      "subcategory": "Firmenfeiern"
-    },
     {
       "id": "gallery-1770293679078",
       "name": "Eishockey",
@@ -822,6 +581,247 @@
       "subcategory": "Eishockey",
       "folder": "EHCB vs HCD",
       "date": "2025-11-14"
+    },
+    {
+      "id": "noel",
+      "name": "Shootings",
+      "images": [
+        {
+          "id": "img_1768923083247_0",
+          "name": "NG_bw_1",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768923070/ffhuvqg6yr0ldjtnbzyz.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768923070/ffhuvqg6yr0ldjtnbzyz.jpg",
+          "uploadDate": "2026-01-20T15:31:23.247Z",
+          "width": 1024,
+          "height": 1536,
+          "source": "cloudinary"
+        },
+        {
+          "id": "img_1768923083247_1",
+          "name": "NG_bw_2",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768923070/g6qvlvjf9oyaftujnwcu.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768923070/g6qvlvjf9oyaftujnwcu.jpg",
+          "uploadDate": "2026-01-20T15:31:23.247Z",
+          "width": 682,
+          "height": 1023,
+          "source": "cloudinary"
+        },
+        {
+          "id": "img_1768923083247_2",
+          "name": "NG_bw_3",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768923070/defazfjsthgxqyjn7wcc.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768923070/defazfjsthgxqyjn7wcc.jpg",
+          "uploadDate": "2026-01-20T15:31:23.247Z",
+          "width": 1024,
+          "height": 1536,
+          "source": "cloudinary"
+        },
+        {
+          "id": "img_1768923083247_3",
+          "name": "NG_bw",
+          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1768923070/o9saddceog4tigggtujx.jpg",
+          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_limit,h_60,w_90/v1768923070/o9saddceog4tigggtujx.jpg",
+          "uploadDate": "2026-01-20T15:31:23.247Z",
+          "width": 682,
+          "height": 1023,
+          "source": "cloudinary"
+        }
+      ],
+      "description": "Shooting Portrait",
+      "category": "privat",
+      "folder": "Noël",
+      "subcategory": "Shootings",
+      "date": "2025-11-14",
+      "password": "Noudi72"
+    },
+    {
+      "id": "sport-street-inlinehockey",
+      "name": "Street-Inlinehockey",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "sport",
+      "folder": "",
+      "subcategory": "Street-Inlinehockey"
+    },
+    {
+      "id": "sport-motorsport",
+      "name": "Motorsport",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "sport",
+      "folder": "",
+      "subcategory": "Motorsport"
+    },
+    {
+      "id": "sport-wintersport",
+      "name": "Wintersport",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "sport",
+      "folder": "",
+      "subcategory": "Wintersport"
+    },
+    {
+      "id": "landschaft-berge-alpen",
+      "name": "Berge & Alpen",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "landschaft",
+      "folder": "",
+      "subcategory": "Berge & Alpen"
+    },
+    {
+      "id": "landschaft-kueste-meer",
+      "name": "Küste & Meer",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "landschaft",
+      "folder": "",
+      "subcategory": "Küste & Meer"
+    },
+    {
+      "id": "landschaft-wald-forst",
+      "name": "Wald & Forst",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "landschaft",
+      "folder": "",
+      "subcategory": "Wald & Forst"
+    },
+    {
+      "id": "landschaft-nacht",
+      "name": "Nachtfotografie",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "landschaft",
+      "folder": "",
+      "subcategory": "Nachtfotografie"
+    },
+    {
+      "id": "portrait-business",
+      "name": "Business & Corporate",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "portrait",
+      "folder": "",
+      "subcategory": "Business & Corporate"
+    },
+    {
+      "id": "portrait-lifestyle",
+      "name": "Lifestyle & Street",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "portrait",
+      "folder": "",
+      "subcategory": "Lifestyle & Street"
+    },
+    {
+      "id": "portrait-familie",
+      "name": "Familie & Kinder",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "portrait",
+      "folder": "",
+      "subcategory": "Familie & Kinder"
+    },
+    {
+      "id": "portrait-studio",
+      "name": "Studio",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "portrait",
+      "folder": "",
+      "subcategory": "Studio"
+    },
+    {
+      "id": "tiere-wildlife",
+      "name": "Wildlife & Wildtiere",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "tiere",
+      "folder": "",
+      "subcategory": "Wildlife & Wildtiere"
+    },
+    {
+      "id": "tiere-haustiere",
+      "name": "Haustiere",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "tiere",
+      "folder": "",
+      "subcategory": "Haustiere"
+    },
+    {
+      "id": "tiere-zoo",
+      "name": "Zoo & Vogelpark",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "tiere",
+      "folder": "",
+      "subcategory": "Zoo & Vogelpark"
+    },
+    {
+      "id": "tiere-makro",
+      "name": "Makro & Insekten",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "tiere",
+      "folder": "",
+      "subcategory": "Makro & Insekten"
+    },
+    {
+      "id": "architektur-urban",
+      "name": "Urban & Stadt",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "architektur",
+      "folder": "",
+      "subcategory": "Urban & Stadt"
+    },
+    {
+      "id": "architektur-lost",
+      "name": "Lost Places",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "architektur",
+      "folder": "",
+      "subcategory": "Lost Places"
+    },
+    {
+      "id": "architektur-innen",
+      "name": "Innenarchitektur",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "architektur",
+      "folder": "",
+      "subcategory": "Innenarchitektur"
+    },
+    {
+      "id": "events-konzerte",
+      "name": "Konzerte",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "events",
+      "folder": "",
+      "subcategory": "Konzerte"
+    },
+    {
+      "id": "events-hochzeiten",
+      "name": "Hochzeiten",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "events",
+      "folder": "",
+      "subcategory": "Hochzeiten"
+    },
+    {
+      "id": "events-firmenfeiern",
+      "name": "Firmenfeiern",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "events",
+      "folder": "",
+      "subcategory": "Firmenfeiern"
     }
   ],
   "portfolio": [
