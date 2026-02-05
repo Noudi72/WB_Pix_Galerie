@@ -34,7 +34,7 @@ function buildThumbUrl(url, width = 480, height = 320) {
   if (!url) return '';
   if (!url.includes('res.cloudinary.com') || !url.includes('/upload/')) return url;
   if (url.includes('/upload/c_')) return url;
-  const transform = `c_fill,w_${width},h_${height},q_auto,f_auto`;
+  const transform = `c_fill,w_${width},h_${height},q_auto:good,f_auto`;
   return url.replace(/\/upload\/([^/]+\/)?/, `/upload/${transform}/`);
 }
 
@@ -96,7 +96,7 @@ function renderGalleries() {
   items.forEach((gallery) => {
     const card = document.createElement('div');
     card.className = 'card';
-    const previewRaw = (gallery.images && gallery.images[0]) ? gallery.images[0].thumbnailUrl || gallery.images[0].url : '';
+    const previewRaw = (gallery.images && gallery.images[0]) ? gallery.images[0].url || gallery.images[0].thumbnailUrl : '';
     const preview = buildThumbUrl(previewRaw);
     const sub = gallery.subcategory ? ` · ${gallery.subcategory}` : '';
     const folder = gallery.folder ? ` · ${gallery.folder}` : '';

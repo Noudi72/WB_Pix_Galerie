@@ -85,7 +85,7 @@ function buildThumbUrl(url, width = 520, height = 390) {
   if (!url) return '';
   if (!url.includes('res.cloudinary.com') || !url.includes('/upload/')) return url;
   if (url.includes('/upload/c_')) return url;
-  const transform = `c_fill,w_${width},h_${height},q_auto,f_auto`;
+  const transform = `c_fill,w_${width},h_${height},q_auto:good,f_auto`;
   return url.replace(/\/upload\/([^/]+\/)?/, `/upload/${transform}/`);
 }
 
@@ -242,9 +242,8 @@ function renderImages(images = []) {
   images.forEach((img, idx) => {
     const item = document.createElement('div');
     item.className = 'gallery-item';
-    const thumbSrc = img.thumbnailUrl ? resolveUrl(img.thumbnailUrl) : '';
     const fullSrc = resolveUrl(img.url || img.thumbnailUrl);
-    const src = thumbSrc || buildThumbUrl(fullSrc);
+    const src = buildThumbUrl(fullSrc);
     const imgId = getImageId(img, idx);
     const isFav = favoriteIds.has(imgId);
     item.innerHTML = `
