@@ -567,8 +567,6 @@ function renderGalleryTable() {
       <td>${passwordLabel}</td>
       <td><input class="table-check" data-field="showOnHomepage" data-idx="${idx}" type="checkbox" ${showOnHomepage ? 'checked' : ''}></td>
       <td class="table-action">
-        <button class="btn" data-action="move-up" data-idx="${idx}" data-gallery-id="${galleryIdValue}" title="Nach oben">↑</button>
-        <button class="btn" data-action="move-down" data-idx="${idx}" data-gallery-id="${galleryIdValue}" title="Nach unten">↓</button>
         <button class="btn" data-action="auto" data-idx="${idx}">Auto</button>
         <button class="btn" data-action="edit" data-idx="${idx}">Bearbeiten</button>
         <button class="btn" data-action="delete" data-idx="${idx}">Löschen</button>
@@ -1295,14 +1293,6 @@ async function init() {
       const btn = event.target.closest('button[data-action]');
       if (!btn) return;
       const action = btn.dataset.action;
-      
-      if (action === 'move-up' || action === 'move-down') {
-        const galleryId = btn.dataset.galleryId;
-        if (!galleryId) return;
-        const direction = action === 'move-up' ? -1 : 1;
-        moveGalleryById(galleryId, direction);
-        return;
-      }
       
       const idx = Number(btn.dataset.idx);
       if (Number.isNaN(idx)) return;
