@@ -33,6 +33,7 @@ const galleryOrderStatus = document.getElementById('gallery-order-status');
 const galleryTableSortButtons = galleryTable?.querySelectorAll('.table-sort') || [];
 const globalPushBtn = document.getElementById('push-json-global-btn');
 const saveOrderBtn = document.getElementById('save-order-btn');
+const downloadInlineBtn = document.getElementById('download-json-inline-btn');
 const applyPrivateFixBtn = document.getElementById('apply-private-fix-btn');
 
 const uploadModal = document.getElementById('upload-modal');
@@ -1093,8 +1094,7 @@ async function pushJsonToGitHub() {
     const fetchSha = async () => {
       const getRes = await fetch(`${apiBase}?ref=${encodeURIComponent(branch)}&_=${Date.now()}`, {
         headers: {
-          Authorization: `token ${token}`,
-          'Cache-Control': 'no-cache'
+          Authorization: `token ${token}`
         }
       });
       if (!getRes.ok) return null;
@@ -1312,6 +1312,7 @@ async function init() {
       updateTableSortState();
       if (event.dataTransfer) {
         event.dataTransfer.effectAllowed = 'move';
+        event.dataTransfer.setData('text/plain', dragGalleryId);
       }
     });
     galleryTableBody.addEventListener('dragover', (event) => {
@@ -1370,6 +1371,7 @@ async function init() {
         : 'Speichern fehlgeschlagen. Bitte nochmals versuchen.';
     }
   });
+  if (downloadInlineBtn) downloadInlineBtn.addEventListener('click', downloadJson);
   if (applyPrivateFixBtn) applyPrivateFixBtn.addEventListener('click', applyPrivateFix);
   if (clearGalleryImagesBtn) clearGalleryImagesBtn.addEventListener('click', clearGalleryImages);
   if (cleanGalleryImagesBtn) cleanGalleryImagesBtn.addEventListener('click', cleanGalleryImages);
