@@ -551,8 +551,8 @@ function renderGalleryTable() {
       <td>${count}</td>
       <td>${passwordLabel}</td>
       <td class="table-action">
-        <button class="btn" data-action="move-up" data-idx="${idx}" title="Nach oben">↑</button>
-        <button class="btn" data-action="move-down" data-idx="${idx}" title="Nach unten">↓</button>
+        <button class="btn" data-action="move-up" data-idx="${idx}" data-gallery-id="${gallery.id}" title="Nach oben">↑</button>
+        <button class="btn" data-action="move-down" data-idx="${idx}" data-gallery-id="${gallery.id}" title="Nach unten">↓</button>
         <button class="btn" data-action="auto" data-idx="${idx}">Auto</button>
         <button class="btn" data-action="edit" data-idx="${idx}">Bearbeiten</button>
         <button class="btn" data-action="delete" data-idx="${idx}">Löschen</button>
@@ -598,13 +598,19 @@ function deleteGalleryByIndex(idx) {
   renderGalleryTable();
 }
 
-function moveGallery(idx, direction) {
+function moveGalleryById(galleryId, direction) {
   const galleries = galleryConfig?.galleries || [];
+  const idx = galleries.findIndex(g => g.id === galleryId);
+  if (idx === -1) return;
+  
   const newIdx = idx + direction;
   if (newIdx < 0 || newIdx >= galleries.length) return;
+  
+  // Tausche die Galerien
   const temp = galleries[idx];
   galleries[idx] = galleries[newIdx];
   galleries[newIdx] = temp;
+  
   populateGallerySelect();
   renderGalleryTable();
 }
@@ -1211,14 +1217,20 @@ async function init() {
     galleryTableBody.addEventListener('click', (event) => {
       const btn = event.target.closest('button[data-action]');
       if (!btn) return;
+      const action = btn.dataset.action;
+      
+      if (action === 'move-up' || action === 'move-down') {
+        const galleryId = btn.dataset.galleryId;
+        if (!galleryId) return;
+        const direction = action === 'move-up' ? -1 : 1;
+        moveGalleryById(galleryId, direction);
+        return;
+      }
+      
       const idx = Number(btn.dataset.idx);
       if (Number.isNaN(idx)) return;
-      const action = btn.dataset.action;
-      if (action === 'move-up') {
-        moveGallery(idx, -1);
-      } else if (action === 'move-down') {
-        moveGallery(idx, 1);
-      } else if (action === 'auto') {
+      
+      if (action === 'auto') {
         autoFillFromFolder(idx);
       } else if (action === 'edit') {
         selectGalleryByIndex(idx, { focusWizard: true });
