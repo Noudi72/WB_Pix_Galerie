@@ -78,7 +78,12 @@ function resolveManualPortfolioItems() {
     entries.forEach((entry) => {
       if (!entry) return;
       if (entry.url) {
-        items.push({ src: buildThumbUrl(entry.url, 1200, 675), galleryId: entry.galleryId || '' });
+        const fullSrc = entry.url;
+        items.push({
+          thumbSrc: buildThumbUrl(fullSrc, 1200, 675),
+          fullSrc,
+          galleryId: entry.galleryId || ''
+        });
         return;
       }
       const gallery = galleries.find(g => g.id === entry.galleryId) || galleries.find(g => g.name === entry.galleryName);
@@ -86,7 +91,12 @@ function resolveManualPortfolioItems() {
       const images = gallery.images || [];
       const img = images.find(i => (i.id || i.publicId || i.name) === entry.imageId) || images[0];
       if (!img) return;
-      items.push({ src: buildThumbUrl(img.url || img.thumbnailUrl, 1200, 675), galleryId: gallery.id || '' });
+      const fullSrc = img.url || img.thumbnailUrl;
+      items.push({
+        thumbSrc: buildThumbUrl(fullSrc, 1200, 675),
+        fullSrc,
+        galleryId: gallery.id || ''
+      });
     });
     return items;
   };
@@ -127,9 +137,11 @@ function collectPortfolioItems() {
     if (!images.length) return;
     if (gallery.showOnHomepage === false) return;
     const img = images[0];
-    const src = buildThumbUrl(img.url || img.thumbnailUrl, 1200, 675);
+    const fullSrc = img.url || img.thumbnailUrl;
+    const thumbSrc = buildThumbUrl(fullSrc, 1200, 675);
     items.push({
-      src,
+      thumbSrc,
+      fullSrc,
       galleryId: gallery.id || ''
     });
   });
@@ -145,7 +157,7 @@ function setupPortfolioSlider({ items, imageEl, prevBtn, nextBtn, mediaEl, inter
     const item = items[index];
     if (imageEl) {
       imageEl.classList.remove('is-visible');
-      imageEl.src = item.src;
+      imageEl.src = item.thumbSrc || item.fullSrc || '';
       imageEl.alt = 'Portfolio';
       imageEl.onload = () => {
         imageEl.classList.add('is-visible');
@@ -153,7 +165,7 @@ function setupPortfolioSlider({ items, imageEl, prevBtn, nextBtn, mediaEl, inter
     }
     if (mediaEl) {
       mediaEl.onclick = () => {
-        openPortfolioLightbox(item.src);
+        openPortfolioLightbox(item.fullSrc || item.thumbSrc || '');
       };
     }
   };
