@@ -333,10 +333,10 @@ function openUploadModal(files) {
   uploadModal.classList.remove('is-hidden');
 }
 
-function closeUploadModal() {
+function closeUploadModal({ reset = true } = {}) {
   if (!uploadModal) return;
   uploadModal.classList.add('is-hidden');
-  pendingUploadFiles = [];
+  if (reset) pendingUploadFiles = [];
 }
 
 function ensureCategoryByName(name) {
@@ -1002,7 +1002,15 @@ async function init() {
   }
   if (wizardPrev) wizardPrev.addEventListener('click', () => goWizardStep(wizardStep - 1));
   if (wizardNext) wizardNext.addEventListener('click', () => {
-    if (wizardStep === 1) saveGallery();
+    if (wizardStep === 1) {
+      saveGallery();
+      goWizardStep(wizardStep + 1);
+      return;
+    }
+    if (wizardStep === 3) {
+      pushJsonToGitHub();
+      return;
+    }
     goWizardStep(wizardStep + 1);
   });
   saveGalleryBtn.addEventListener('click', saveGallery);
@@ -1126,6 +1134,7 @@ async function init() {
         closeUploadModal();
         return;
       }
+      const filesToUpload = pendingUploadFiles.slice();
       const newCategoryName = uploadNewCategoryInput?.value || '';
       const categoryId = newCategoryName.trim()
         ? ensureCategoryByName(newCategoryName)
@@ -1152,8 +1161,9 @@ async function init() {
       galleryFolderInput.value = folderValue;
       galleryDateInput.value = dateValue;
       currentGallery = targetGallery;
-      closeUploadModal();
-      await uploadFilesWithFiles(pendingUploadFiles);
+      closeUploadModal({ reset: false });
+      await uploadFilesWithFiles(filesToUpload);
+      pendingUploadFiles = [];
     });
   }
 
