@@ -65,6 +65,57 @@ function normalize(text) {
   return String(text || '').toLowerCase();
 }
 
+function resolveManualPortfolioItems() {
+  const left = Array.isArray(galleryConfig?.bestShotsLeft) ? galleryConfig.bestShotsLeft : [];
+  const right = Array.isArray(galleryConfig?.bestShotsRight) ? galleryConfig.bestShotsRight : [];
+  if (!left.length && !right.length) return null;
+  const galleries = galleryConfig?.galleries || [];
+  const resolveEntries = (entries) => {
+    const items = [];
+    entries.forEach((entry) => {
+      if (!entry) return;
+      if (entry.url) {
+        items.push({ src: buildThumbUrl(entry.url, 1200, 675), galleryId: entry.galleryId || '' });
+        return;
+      }
+      const gallery = galleries.find(g => g.id === entry.galleryId) || galleries.find(g => g.name === entry.galleryName);
+      if (!gallery) return;
+      const images = gallery.images || [];
+      const img = images.find(i => (i.id || i.publicId || i.name) === entry.imageId) || images[0];
+      if (!img) return;
+      items.push({ src: buildThumbUrl(img.url || img.thumbnailUrl, 1200, 675), galleryId: gallery.id || '' });
+    });
+    return items;
+  };
+  return { left: resolveEntries(left), right: resolveEntries(right) };
+}
+
+function renderPortfolio() {
+  if (!portfolioSection) return;
+  const manual = resolveManualPortfolioItems();
+  const items = manual ? null : collectPortfolioItems();
+  const leftItems = manual ? manual.left : items;
+  const rightItems = manual ? manual.right : items;
+  if (!leftItems.length || !rightItems.length) {
+    portfolioSection.classList.add('is-hidden');
+    return;
+  }
+  setupPortfolioSlider({
+    items: leftItems,
+    imageEl: portfolioLeftImage,
+    prevBtn: portfolioLeftPrev,
+    nextBtn: portfolioLeftNext,
+    mediaEl: portfolioLeftMedia
+  });
+  setupPortfolioSlider({
+    items: rightItems,
+    imageEl: portfolioRightImage,
+    prevBtn: portfolioRightPrev,
+    nextBtn: portfolioRightNext,
+    mediaEl: portfolioRightMedia
+  });
+}
+
 function collectPortfolioItems() {
   const galleries = galleryConfig?.galleries || [];
   const items = [];
@@ -80,27 +131,6 @@ function collectPortfolioItems() {
     });
   });
   return items.slice(0, 12);
-}
-
-function resolveManualPortfolioItems() {
-  const manual = Array.isArray(galleryConfig?.bestShots) ? galleryConfig.bestShots : [];
-  if (!manual.length) return null;
-  const galleries = galleryConfig?.galleries || [];
-  const items = [];
-  manual.forEach((entry) => {
-    if (!entry) return;
-    if (entry.url) {
-      items.push({ src: buildThumbUrl(entry.url, 1200, 675), galleryId: entry.galleryId || '' });
-      return;
-    }
-    const gallery = galleries.find(g => g.id === entry.galleryId) || galleries.find(g => g.name === entry.galleryName);
-    if (!gallery) return;
-    const images = gallery.images || [];
-    const img = images.find(i => (i.id || i.publicId || i.name) === entry.imageId) || images[0];
-    if (!img) return;
-    items.push({ src: buildThumbUrl(img.url || img.thumbnailUrl, 1200, 675), galleryId: gallery.id || '' });
-  });
-  return items.length ? items : null;
 }
 
 function setupPortfolioSlider({ items, imageEl, prevBtn, nextBtn, mediaEl, intervalMs = 6000 }) {
@@ -155,31 +185,6 @@ function setupPortfolioSlider({ items, imageEl, prevBtn, nextBtn, mediaEl, inter
   return { next, prev, resetTimer };
 }
 
-function renderPortfolio() {
-  if (!portfolioSection) return;
-  const items = resolveManualPortfolioItems() || collectPortfolioItems();
-  if (items.length < 2) {
-    portfolioSection.classList.add('is-hidden');
-    return;
-  }
-  const midpoint = Math.ceil(items.length / 2);
-  const leftItems = items.slice(0, midpoint);
-  const rightItems = items.slice(midpoint);
-  setupPortfolioSlider({
-    items: leftItems,
-    imageEl: portfolioLeftImage,
-    prevBtn: portfolioLeftPrev,
-    nextBtn: portfolioLeftNext,
-    mediaEl: portfolioLeftMedia
-  });
-  setupPortfolioSlider({
-    items: rightItems.length ? rightItems : leftItems,
-    imageEl: portfolioRightImage,
-    prevBtn: portfolioRightPrev,
-    nextBtn: portfolioRightNext,
-    mediaEl: portfolioRightMedia
-  });
-}
 
 function renderCategories(categories = []) {
   categoryList.innerHTML = '';

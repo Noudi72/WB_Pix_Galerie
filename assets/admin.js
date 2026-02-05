@@ -51,8 +51,12 @@ const uploadConfirmBtn = document.getElementById('upload-confirm');
 const adminImageList = document.getElementById('admin-image-list');
 const clearGalleryImagesBtn = document.getElementById('clear-gallery-images-btn');
 const cleanGalleryImagesBtn = document.getElementById('clean-gallery-images-btn');
-const bestShotsList = document.getElementById('best-shots-list');
-const bestShotsEmpty = document.getElementById('best-shots-empty');
+const bestShotsListLeft = document.getElementById('best-shots-list-left');
+const bestShotsListRight = document.getElementById('best-shots-list-right');
+const bestShotsEmptyLeft = document.getElementById('best-shots-empty-left');
+const bestShotsEmptyRight = document.getElementById('best-shots-empty-right');
+const bestShotsDropLeft = document.getElementById('best-shots-drop-left');
+const bestShotsDropRight = document.getElementById('best-shots-drop-right');
 const clearBestShotsBtn = document.getElementById('clear-best-shots-btn');
 
 const newGalleryBtn = document.getElementById('new-gallery-btn');
@@ -757,6 +761,8 @@ function renderImageList() {
   currentGallery.images.forEach((img, idx) => {
     const item = document.createElement('div');
     item.className = 'admin-image-item';
+    item.draggable = true;
+    item.dataset.imageIdx = String(idx);
     const thumb = buildThumbUrl(resolveUrl(img.thumbnailUrl || img.url), 180, 120);
     item.innerHTML = `
       <img class="admin-image-thumb" src="${thumb}" alt="">
@@ -765,7 +771,8 @@ function renderImageList() {
         <span>${img.url ? img.url.split('/').slice(-1)[0] : ''}</span>
       </div>
       <div class="admin-actions">
-        <button class="btn" data-action="best-shot" data-idx="${idx}">Best Shot</button>
+        <button class="btn" data-action="best-shot-left" data-idx="${idx}">Best Shot links</button>
+        <button class="btn" data-action="best-shot-right" data-idx="${idx}">Best Shot rechts</button>
         <button class="btn danger" data-action="delete-image" data-idx="${idx}">Bild löschen</button>
       </div>
     `;
@@ -773,15 +780,16 @@ function renderImageList() {
   });
 }
 
-function getBestShots() {
+function getBestShots(side) {
   if (!galleryConfig) return [];
-  if (!Array.isArray(galleryConfig.bestShots)) galleryConfig.bestShots = [];
-  return galleryConfig.bestShots;
+  if (!Array.isArray(galleryConfig.bestShotsLeft)) galleryConfig.bestShotsLeft = [];
+  if (!Array.isArray(galleryConfig.bestShotsRight)) galleryConfig.bestShotsRight = [];
+  return side === 'right' ? galleryConfig.bestShotsRight : galleryConfig.bestShotsLeft;
 }
 
-function addBestShot(img) {
+function addBestShot(side, img) {
   if (!currentGallery || !img) return;
-  const shots = getBestShots();
+  const shots = getBestShots(side);
   const imageId = img.publicId || img.id || img.name || '';
   const exists = shots.some((s) => s.galleryId === currentGallery.id && s.imageId === imageId);
   if (exists) return;
@@ -793,40 +801,44 @@ function addBestShot(img) {
   renderBestShots();
 }
 
-function removeBestShot(idx) {
-  const shots = getBestShots();
+function removeBestShot(side, idx) {
+  const shots = getBestShots(side);
   shots.splice(idx, 1);
   renderBestShots();
 }
 
 function renderBestShots() {
-  if (!bestShotsList) return;
-  const shots = getBestShots();
-  bestShotsList.innerHTML = '';
-  if (!shots.length) {
-    if (bestShotsEmpty) bestShotsEmpty.classList.remove('is-hidden');
-    return;
-  }
-  if (bestShotsEmpty) bestShotsEmpty.classList.add('is-hidden');
-  shots.forEach((shot, idx) => {
-    const gallery = (galleryConfig?.galleries || []).find(g => g.id === shot.galleryId);
-    const images = gallery?.images || [];
-    const img = images.find(i => (i.publicId || i.id || i.name) === shot.imageId) || null;
-    const thumb = buildThumbUrl(resolveUrl(img?.thumbnailUrl || img?.url || shot.url), 180, 120);
-    const title = gallery?.name || gallery?.subcategory || 'Galerie';
-    const meta = img?.name || shot.imageId || '';
-    const item = document.createElement('div');
-    item.className = 'best-shots-item';
-    item.innerHTML = `
-      <img class="best-shots-thumb" src="${thumb}" alt="">
-      <div class="best-shots-meta">
-        <strong>${title}</strong>
-        <span>${meta}</span>
-      </div>
-      <button class="btn danger" data-action="remove-best-shot" data-idx="${idx}">Entfernen</button>
-    `;
-    bestShotsList.appendChild(item);
-  });
+  const renderSide = (side, listEl, emptyEl) => {
+    if (!listEl) return;
+    const shots = getBestShots(side);
+    listEl.innerHTML = '';
+    if (!shots.length) {
+      if (emptyEl) emptyEl.classList.remove('is-hidden');
+      return;
+    }
+    if (emptyEl) emptyEl.classList.add('is-hidden');
+    shots.forEach((shot, idx) => {
+      const gallery = (galleryConfig?.galleries || []).find(g => g.id === shot.galleryId);
+      const images = gallery?.images || [];
+      const img = images.find(i => (i.publicId || i.id || i.name) === shot.imageId) || null;
+      const thumb = buildThumbUrl(resolveUrl(img?.thumbnailUrl || img?.url || shot.url), 180, 120);
+      const title = gallery?.name || gallery?.subcategory || 'Galerie';
+      const meta = img?.name || shot.imageId || '';
+      const item = document.createElement('div');
+      item.className = 'best-shots-item';
+      item.innerHTML = `
+        <img class="best-shots-thumb" src="${thumb}" alt="">
+        <div class="best-shots-meta">
+          <strong>${title}</strong>
+          <span>${meta}</span>
+        </div>
+        <button class="btn danger" data-action="remove-best-shot" data-idx="${idx}" data-side="${side}">Entfernen</button>
+      `;
+      listEl.appendChild(item);
+    });
+  };
+  renderSide('left', bestShotsListLeft, bestShotsEmptyLeft);
+  renderSide('right', bestShotsListRight, bestShotsEmptyRight);
 }
 
 function applyPrivateFix() {
@@ -1379,7 +1391,14 @@ async function init() {
   galleryConfig = await res.json();
   galleryConfig.galleries = galleryConfig.galleries || [];
   galleryConfig.categories = galleryConfig.categories || [];
-  if (!Array.isArray(galleryConfig.bestShots)) galleryConfig.bestShots = [];
+  if (Array.isArray(galleryConfig.bestShots) && !galleryConfig.bestShotsLeft && !galleryConfig.bestShotsRight) {
+    const midpoint = Math.ceil(galleryConfig.bestShots.length / 2);
+    galleryConfig.bestShotsLeft = galleryConfig.bestShots.slice(0, midpoint);
+    galleryConfig.bestShotsRight = galleryConfig.bestShots.slice(midpoint);
+    delete galleryConfig.bestShots;
+  }
+  if (!Array.isArray(galleryConfig.bestShotsLeft)) galleryConfig.bestShotsLeft = [];
+  if (!Array.isArray(galleryConfig.bestShotsRight)) galleryConfig.bestShotsRight = [];
   galleryConfig.galleries.forEach((g, idx) => {
     if (!g.id) {
       const base = slugify(g.subcategory || g.name || `gallery-${idx}`);
@@ -1702,11 +1721,19 @@ async function init() {
 
   if (adminImageList) {
     adminImageList.addEventListener('click', (event) => {
-      const bestBtn = event.target.closest('button[data-action="best-shot"]');
-      if (bestBtn && currentGallery) {
-        const idx = Number(bestBtn.dataset.idx);
+      const bestLeftBtn = event.target.closest('button[data-action="best-shot-left"]');
+      if (bestLeftBtn && currentGallery) {
+        const idx = Number(bestLeftBtn.dataset.idx);
         if (!Number.isNaN(idx)) {
-          addBestShot(currentGallery.images[idx]);
+          addBestShot('left', currentGallery.images[idx]);
+        }
+        return;
+      }
+      const bestRightBtn = event.target.closest('button[data-action="best-shot-right"]');
+      if (bestRightBtn && currentGallery) {
+        const idx = Number(bestRightBtn.dataset.idx);
+        if (!Number.isNaN(idx)) {
+          addBestShot('right', currentGallery.images[idx]);
         }
         return;
       }
@@ -1722,26 +1749,78 @@ async function init() {
     });
   }
 
-  if (bestShotsList) {
-    bestShotsList.addEventListener('click', (event) => {
+  if (bestShotsListLeft || bestShotsListRight) {
+    const handler = (event) => {
       const btn = event.target.closest('button[data-action="remove-best-shot"]');
       if (!btn) return;
       const idx = Number(btn.dataset.idx);
+      const side = btn.dataset.side || 'left';
       if (Number.isNaN(idx)) return;
-      removeBestShot(idx);
-    });
+      removeBestShot(side, idx);
+    };
+    if (bestShotsListLeft) bestShotsListLeft.addEventListener('click', handler);
+    if (bestShotsListRight) bestShotsListRight.addEventListener('click', handler);
   }
 
   if (clearBestShotsBtn) {
     clearBestShotsBtn.addEventListener('click', () => {
-      const shots = getBestShots();
-      if (!shots.length) return;
+      const left = getBestShots('left');
+      const right = getBestShots('right');
+      if (!left.length && !right.length) return;
       const ok = confirm('Alle Best Shots wirklich löschen?');
       if (!ok) return;
-      galleryConfig.bestShots = [];
+      galleryConfig.bestShotsLeft = [];
+      galleryConfig.bestShotsRight = [];
       renderBestShots();
     });
   }
+
+  if (adminImageList) {
+    adminImageList.addEventListener('dragstart', (event) => {
+      const item = event.target.closest('.admin-image-item');
+      if (!item || !currentGallery) return;
+      const idx = Number(item.dataset.imageIdx);
+      if (Number.isNaN(idx)) return;
+      const img = currentGallery.images[idx];
+      const payload = JSON.stringify({
+        galleryId: currentGallery.id,
+        imageId: img.publicId || img.id || img.name || '',
+        url: img.url || img.thumbnailUrl || ''
+      });
+      if (event.dataTransfer) {
+        event.dataTransfer.setData('application/json', payload);
+        event.dataTransfer.effectAllowed = 'copy';
+      }
+    });
+  }
+
+  const setupBestShotDrop = (dropEl, side) => {
+    if (!dropEl) return;
+    dropEl.addEventListener('dragover', (event) => {
+      event.preventDefault();
+      dropEl.classList.add('is-dragover');
+    });
+    dropEl.addEventListener('dragleave', () => dropEl.classList.remove('is-dragover'));
+    dropEl.addEventListener('drop', (event) => {
+      event.preventDefault();
+      dropEl.classList.remove('is-dragover');
+      const data = event.dataTransfer?.getData('application/json');
+      if (!data) return;
+      try {
+        const parsed = JSON.parse(data);
+        const gallery = (galleryConfig?.galleries || []).find(g => g.id === parsed.galleryId);
+        const img = (gallery?.images || []).find(i => (i.publicId || i.id || i.name) === parsed.imageId);
+        if (img) {
+          currentGallery = gallery;
+          addBestShot(side, img);
+        }
+      } catch (_) {
+        // ignore
+      }
+    });
+  };
+  setupBestShotDrop(bestShotsDropLeft, 'left');
+  setupBestShotDrop(bestShotsDropRight, 'right');
 
   renderWizard();
 }

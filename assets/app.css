@@ -604,6 +604,28 @@ body.dark-mode .site-header {
   gap: 12px;
 }
 
+.best-shots-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.best-shots-dropzone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  text-align: center;
+  background: var(--surface-2);
+  color: var(--muted);
+}
+
+.best-shots-dropzone.is-dragover {
+  border-color: var(--accent);
+  color: var(--text);
+  background: rgba(212, 165, 116, 0.12);
+}
+
 .best-shots-item {
   display: grid;
   grid-template-columns: 72px 1fr auto;

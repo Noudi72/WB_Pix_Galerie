@@ -110,12 +110,24 @@
 
     <section class="admin-section">
       <h3>Portfolio Best Shots</h3>
-      <p class="admin-note">Wähle Bilder aus einer Galerie (Schritt 2) und markiere sie als Best Shot. Danach zu GitHub pushen.</p>
+      <p class="admin-note">Bilder aus Schritt 2 per Drag&Drop in eine der beiden Portfolios ziehen und danach zu GitHub pushen.</p>
       <div class="admin-actions">
         <button class="btn danger" id="clear-best-shots-btn">Best Shots leeren</button>
       </div>
-      <p class="admin-note" id="best-shots-empty">Noch keine Best Shots ausgewählt.</p>
-      <div class="best-shots-list" id="best-shots-list"></div>
+      <div class="best-shots-grid">
+        <div>
+          <h4>Portfolio links</h4>
+          <div class="best-shots-dropzone" id="best-shots-drop-left">Bilder hier ablegen</div>
+          <p class="admin-note" id="best-shots-empty-left">Noch keine Best Shots.</p>
+          <div class="best-shots-list" id="best-shots-list-left"></div>
+        </div>
+        <div>
+          <h4>Portfolio rechts</h4>
+          <div class="best-shots-dropzone" id="best-shots-drop-right">Bilder hier ablegen</div>
+          <p class="admin-note" id="best-shots-empty-right">Noch keine Best Shots.</p>
+          <div class="best-shots-list" id="best-shots-list-right"></div>
+        </div>
+      </div>
     </section>
 
     <section class="admin-section admin-wizard">
