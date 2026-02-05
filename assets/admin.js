@@ -1898,6 +1898,10 @@ async function init() {
         // ignore
       }
     });
+    dropEl.addEventListener('click', () => {
+      if (side === 'left' && bestShotsFileLeft) bestShotsFileLeft.click();
+      if (side === 'right' && bestShotsFileRight) bestShotsFileRight.click();
+    });
   };
   setupBestShotDrop(bestShotsDropLeft, 'left');
   setupBestShotDrop(bestShotsDropRight, 'right');
