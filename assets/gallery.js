@@ -20,7 +20,6 @@ const commentList = document.getElementById('comment-list');
 const commentCount = document.getElementById('comment-count');
 const commentStatus = document.getElementById('comment-status');
 const downloadLikesBtn = document.getElementById('download-likes-btn');
-const saveLikesBtn = document.getElementById('save-likes-btn');
 const likesStatus = document.getElementById('likes-status');
 
 let galleryConfig = null;
@@ -30,6 +29,7 @@ let currentIndex = 0;
 let showFavoritesOnly = false;
 let favoriteIds = new Set();
 let commentsById = {};
+let likesSaveTimer = null;
 
 function applyTheme(theme) {
   const isDark = theme === 'dark';
@@ -266,6 +266,19 @@ function syncLikesToGallery() {
   });
 }
 
+async function autoSaveLikes() {
+  if (!currentGallery) return;
+  const { token, owner, repo } = getGitHubSettings();
+  if (!token || !owner || !repo) return;
+  if (likesStatus) likesStatus.textContent = 'Likes speichern…';
+  const ok = await pushGalleryJsonToGitHub();
+  if (likesStatus) {
+    likesStatus.textContent = ok
+      ? 'Likes gespeichert.'
+      : 'Likes konnten nicht gespeichert werden.';
+  }
+}
+
 async function downloadImageFile(img, idx) {
   const src = resolveUrl(img.url || img.thumbnailUrl);
   if (!src) return;
@@ -282,7 +295,7 @@ async function downloadImageFile(img, idx) {
   }
 }
 
-async function downloadLikedImages() {
+async function downloadLikedZip() {
   if (!currentGallery) return;
   const liked = (currentGallery.images || []).filter((img, idx) => {
     const imgId = getImageId(img, idx);
@@ -292,18 +305,30 @@ async function downloadLikedImages() {
     alert('Keine Likes vorhanden.');
     return;
   }
-  if (likesStatus) {
-    likesStatus.textContent = `Lade ${liked.length} gelikte Bilder…`;
+  if (!window.JSZip) {
+    alert('ZIP Download nicht verfügbar.');
+    return;
   }
+  const zip = new window.JSZip();
+  if (likesStatus) likesStatus.textContent = `ZIP wird erstellt (${liked.length})…`;
   for (let i = 0; i < liked.length; i += 1) {
-    await downloadImageFile(liked[i], i);
-    if (likesStatus) {
-      likesStatus.textContent = `Download ${i + 1}/${liked.length}…`;
+    const img = liked[i];
+    const src = resolveUrl(img.url || img.thumbnailUrl);
+    try {
+      const res = await fetch(src);
+      if (!res.ok) throw new Error('Download fehlgeschlagen');
+      const blob = await res.blob();
+      const ext = blob.type === 'image/png' ? '.png' : '.jpg';
+      const name = (img.name || `bild-${i + 1}`).replace(/[^\w-]+/g, '_');
+      zip.file(`${name}${ext}`, blob);
+      if (likesStatus) likesStatus.textContent = `ZIP: ${i + 1}/${liked.length}…`;
+    } catch (_) {
+      // skip failed image
     }
   }
-  if (likesStatus) {
-    likesStatus.textContent = 'Download abgeschlossen.';
-  }
+  const zipBlob = await zip.generateAsync({ type: 'blob' });
+  downloadBlob(zipBlob, 'likes.zip');
+  if (likesStatus) likesStatus.textContent = 'ZIP heruntergeladen.';
 }
 
 function renderComments(img, idx) {
@@ -363,6 +388,8 @@ function renderImages(images = []) {
         }
         saveFavorites(currentGallery?.id || 'default');
     syncLikesToGallery();
+    if (likesSaveTimer) clearTimeout(likesSaveTimer);
+    likesSaveTimer = setTimeout(autoSaveLikes, 800);
         applySearch();
       });
     }
@@ -461,21 +488,7 @@ if (downloadImageBtn) {
 }
 
 if (downloadLikesBtn) {
-  downloadLikesBtn.addEventListener('click', downloadLikedImages);
-}
-
-if (saveLikesBtn) {
-  saveLikesBtn.addEventListener('click', async () => {
-    if (!currentGallery) return;
-    syncLikesToGallery();
-    if (likesStatus) likesStatus.textContent = 'Speichere Likes zu GitHub…';
-    const ok = await pushGalleryJsonToGitHub();
-    if (likesStatus) {
-      likesStatus.textContent = ok
-        ? 'Likes gespeichert. Jetzt sind sie auf anderen PCs sichtbar.'
-        : 'Speichern fehlgeschlagen (Token nötig).';
-    }
-  });
+  downloadLikesBtn.addEventListener('click', downloadLikedZip);
 }
 
 searchInput.addEventListener('input', applySearch);

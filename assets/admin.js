@@ -36,7 +36,6 @@ const galleryOrderStatus = document.getElementById('gallery-order-status');
 const galleryTableSortButtons = galleryTable?.querySelectorAll('.table-sort') || [];
 const globalPushBtn = document.getElementById('push-json-global-btn');
 const saveOrderBtn = document.getElementById('save-order-btn');
-const downloadInlineBtn = document.getElementById('download-json-inline-btn');
 const applyPrivateFixBtn = document.getElementById('apply-private-fix-btn');
 
 const uploadModal = document.getElementById('upload-modal');
@@ -1504,7 +1503,7 @@ async function init() {
   }
   uploadImagesBtn.addEventListener('click', uploadFiles);
   addUrlBtn.addEventListener('click', addImageUrl);
-  downloadBtn.addEventListener('click', downloadJson);
+  if (downloadBtn) downloadBtn.addEventListener('click', downloadJson);
   pushBtn.addEventListener('click', pushJsonToGitHub);
   if (globalPushBtn) globalPushBtn.addEventListener('click', pushJsonToGitHub);
   if (saveOrderBtn) saveOrderBtn.addEventListener('click', async () => {
@@ -1529,7 +1528,6 @@ async function init() {
         : 'Speichern fehlgeschlagen. Bitte nochmals versuchen.';
     }
   });
-  if (downloadInlineBtn) downloadInlineBtn.addEventListener('click', downloadJson);
   if (applyPrivateFixBtn) applyPrivateFixBtn.addEventListener('click', applyPrivateFix);
   if (clearGalleryImagesBtn) clearGalleryImagesBtn.addEventListener('click', clearGalleryImages);
   if (cleanGalleryImagesBtn) cleanGalleryImagesBtn.addEventListener('click', cleanGalleryImages);
