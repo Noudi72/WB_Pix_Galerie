@@ -1058,59 +1058,60 @@ async function pushJsonToGitHub() {
     const json = JSON.stringify(galleryConfig, null, 2);
     const content = btoa(unescape(encodeURIComponent(json)));
     const apiBase = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-    
-    // IMMER aktuellen SHA vor dem Push holen
-    let sha = null;
-    try {
+
+    const fetchSha = async () => {
       const getRes = await fetch(`${apiBase}?ref=${encodeURIComponent(branch)}&_=${Date.now()}`, {
-        headers: { 
+        headers: {
           Authorization: `token ${token}`,
           'Cache-Control': 'no-cache'
         }
       });
-      if (getRes.ok) {
-        const data = await getRes.json();
-        sha = data.sha;
-      }
-    } catch (err) {
-      console.warn('SHA abrufen fehlgeschlagen:', err);
-    }
+      if (!getRes.ok) return null;
+      const data = await getRes.json();
+      return data.sha || null;
+    };
 
-    const putRes = await fetch(apiBase, {
-      method: 'PUT',
-      headers: {
-        Authorization: `token ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        message: 'Update gallery.json via admin',
-        content,
-        branch,
-        ...(sha ? { sha } : {})
-      })
-    });
+    const tryPut = async (sha) => {
+      return await fetch(apiBase, {
+        method: 'PUT',
+        headers: {
+          Authorization: `token ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: 'Update gallery.json via admin',
+          content,
+          branch,
+          ...(sha ? { sha } : {})
+        })
+      });
+    };
+
+    // 1) Erster Versuch mit aktuellem SHA
+    let sha = await fetchSha();
+    let putRes = await tryPut(sha);
+
+    // 2) Wenn SHA-Conflict: EINMAL neu holen und erneut versuchen (ohne Endlosschleife)
+    if (!putRes.ok) {
+      const err = await putRes.json().catch(() => ({}));
+      const message = err.message || `HTTP ${putRes.status}`;
+      const isShaConflict = message.includes('does not match') || message.includes('sha');
+      if (isShaConflict) {
+        sha = await fetchSha();
+        putRes = await tryPut(sha);
+      }
+    }
 
     if (!putRes.ok) {
       const err = await putRes.json().catch(() => ({}));
       const message = err.message || `HTTP ${putRes.status}`;
-      
-      // Bei SHA-Conflict: Benutzer informieren und Lösung anbieten
-      if (message.includes('does not match') || message.includes('sha')) {
-        const retry = confirm(
-          'Die Datei auf GitHub wurde zwischenzeitlich geändert.\n\n' +
-          'Möchtest du trotzdem pushen? (überschreibt GitHub-Version)'
-        );
-        if (!retry) {
-          alert('Push abgebrochen. Bitte Seite neu laden (Cmd+Shift+R) und erneut versuchen.');
-          return false;
-        }
-        // Nochmal SHA holen und erneut versuchen
-        return await pushJsonToGitHub();
-      }
-      
-      alert(`GitHub Push fehlgeschlagen:\n${message}`);
+      alert(
+        `GitHub Push fehlgeschlagen:\n${message}\n\n` +
+        'Bitte Seite neu laden (Cmd+Shift+R) und nochmals versuchen.'
+      );
       return false;
     }
+
     alert(
       '✅ gallery.json erfolgreich zu GitHub gepusht!\n\n' +
       '⏱️ WICHTIG: GitHub Pages braucht 2-10 Minuten für das Update.\n\n' +
