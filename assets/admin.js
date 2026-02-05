@@ -534,7 +534,6 @@ function renderGalleryTable() {
   rows.forEach(({ gallery, idx }) => {
     const tr = document.createElement('tr');
     tr.dataset.galleryId = gallery.id || String(idx);
-    tr.draggable = true;
     const count = gallery.images?.length || 0;
     if (!gallery.subcategory && gallery.name) {
       gallery.subcategory = gallery.name;
@@ -547,7 +546,11 @@ function renderGalleryTable() {
     const showOnHomepage = gallery.showOnHomepage !== false;
     const pathParts = [getCategoryName(gallery.category), sub, folder].filter(Boolean);
     const pathLabel = pathParts.length ? pathParts.join(' / ') : '—';
+    const galleryIdValue = gallery.id || String(idx);
     tr.innerHTML = `
+      <td>
+        <button class="drag-handle" type="button" draggable="true" data-gallery-id="${galleryIdValue}" title="Ziehen">↕</button>
+      </td>
       <td>
         <select class="table-select" data-field="category" data-idx="${idx}">
           ${buildCategoryOptions(gallery.category)}
@@ -561,8 +564,8 @@ function renderGalleryTable() {
       <td>${passwordLabel}</td>
       <td><input class="table-check" data-field="showOnHomepage" data-idx="${idx}" type="checkbox" ${showOnHomepage ? 'checked' : ''}></td>
       <td class="table-action">
-        <button class="btn" data-action="move-up" data-idx="${idx}" data-gallery-id="${gallery.id || String(idx)}" title="Nach oben">↑</button>
-        <button class="btn" data-action="move-down" data-idx="${idx}" data-gallery-id="${gallery.id || String(idx)}" title="Nach unten">↓</button>
+        <button class="btn" data-action="move-up" data-idx="${idx}" data-gallery-id="${galleryIdValue}" title="Nach oben">↑</button>
+        <button class="btn" data-action="move-down" data-idx="${idx}" data-gallery-id="${galleryIdValue}" title="Nach unten">↓</button>
         <button class="btn" data-action="auto" data-idx="${idx}">Auto</button>
         <button class="btn" data-action="edit" data-idx="${idx}">Bearbeiten</button>
         <button class="btn" data-action="delete" data-idx="${idx}">Löschen</button>
@@ -1299,13 +1302,14 @@ async function init() {
       }
     });
     galleryTableBody.addEventListener('dragstart', (event) => {
-      const row = event.target.closest('tr');
-      if (!row) return;
-      dragGalleryId = row.dataset.galleryId || null;
+      const handle = event.target.closest('.drag-handle');
+      if (!handle) return;
+      dragGalleryId = handle.dataset.galleryId || null;
       if (!dragGalleryId) return;
+      const row = event.target.closest('tr');
+      if (row) row.classList.add('is-dragging');
       gallerySort = [];
       updateTableSortState();
-      row.classList.add('is-dragging');
       if (event.dataTransfer) {
         event.dataTransfer.effectAllowed = 'move';
       }

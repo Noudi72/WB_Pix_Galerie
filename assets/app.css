@@ -627,6 +627,29 @@ body.dark-mode .site-header {
   min-width: 720px;
 }
 
+.drag-handle {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  cursor: grab;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.admin-table tr.is-dragging {
+  opacity: 0.6;
+}
+
+.admin-table tr.is-dragover {
+  outline: 2px dashed var(--accent);
+  outline-offset: -2px;
+}
+
 .admin-table th,
 .admin-table td {
   text-align: left;
