@@ -33,6 +33,7 @@ function initTheme() {
 function buildThumbUrl(url, width = 480, height = 320) {
   if (!url) return '';
   if (!url.includes('res.cloudinary.com') || !url.includes('/upload/')) return url;
+  if (url.includes('/upload/c_')) return url;
   const transform = `c_fill,w_${width},h_${height},q_auto,f_auto`;
   return url.replace(/\/upload\/([^/]+\/)?/, `/upload/${transform}/`);
 }

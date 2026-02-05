@@ -84,6 +84,7 @@ function resolveUrl(url) {
 function buildThumbUrl(url, width = 520, height = 390) {
   if (!url) return '';
   if (!url.includes('res.cloudinary.com') || !url.includes('/upload/')) return url;
+  if (url.includes('/upload/c_')) return url;
   const transform = `c_fill,w_${width},h_${height},q_auto,f_auto`;
   return url.replace(/\/upload\/([^/]+\/)?/, `/upload/${transform}/`);
 }
@@ -241,14 +242,27 @@ function renderImages(images = []) {
   images.forEach((img, idx) => {
     const item = document.createElement('div');
     item.className = 'gallery-item';
-    const baseSrc = resolveUrl(img.thumbnailUrl || img.url);
-    const src = buildThumbUrl(baseSrc);
+    const thumbSrc = img.thumbnailUrl ? resolveUrl(img.thumbnailUrl) : '';
+    const fullSrc = resolveUrl(img.url || img.thumbnailUrl);
+    const src = thumbSrc || buildThumbUrl(fullSrc);
     const imgId = getImageId(img, idx);
     const isFav = favoriteIds.has(imgId);
     item.innerHTML = `
       <img src="${src}" alt="${img.name || 'Bild'}" loading="lazy" decoding="async">
       <button class="like-btn${isFav ? ' active' : ''}" aria-label="Favorit">${isFav ? '♥' : '♡'}</button>
     `;
+    const imgEl = item.querySelector('img');
+    if (imgEl) {
+      imgEl.addEventListener('error', () => {
+        if (imgEl.dataset.fallback === '1') return;
+        if (fullSrc && imgEl.src !== fullSrc) {
+          imgEl.dataset.fallback = '1';
+          imgEl.src = fullSrc;
+        } else {
+          imgEl.classList.add('is-broken');
+        }
+      });
+    }
     const likeBtn = item.querySelector('.like-btn');
     if (likeBtn) {
       likeBtn.addEventListener('click', (e) => {

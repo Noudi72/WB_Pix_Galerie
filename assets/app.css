@@ -353,6 +353,11 @@ body.dark-mode .site-header {
   aspect-ratio: 4 / 3;
 }
 
+.gallery-item img.is-broken {
+  opacity: 0.15;
+  background: var(--surface-2);
+}
+
 .lightbox {
   position: fixed;
   inset: 0;
