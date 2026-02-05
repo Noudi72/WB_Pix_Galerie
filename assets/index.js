@@ -153,9 +153,7 @@ function setupPortfolioSlider({ items, imageEl, prevBtn, nextBtn, mediaEl, inter
     }
     if (mediaEl) {
       mediaEl.onclick = () => {
-        if (item.galleryId) {
-          openPortfolioLightbox(item.src);
-        }
+        openPortfolioLightbox(item.src);
       };
     }
   };
