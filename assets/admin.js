@@ -57,6 +57,11 @@ const bestShotsEmptyLeft = document.getElementById('best-shots-empty-left');
 const bestShotsEmptyRight = document.getElementById('best-shots-empty-right');
 const bestShotsDropLeft = document.getElementById('best-shots-drop-left');
 const bestShotsDropRight = document.getElementById('best-shots-drop-right');
+const bestShotsPickLeft = document.getElementById('best-shots-pick-left');
+const bestShotsPickRight = document.getElementById('best-shots-pick-right');
+const bestShotsFileLeft = document.getElementById('best-shots-file-left');
+const bestShotsFileRight = document.getElementById('best-shots-file-right');
+const bestShotsStatus = document.getElementById('best-shots-status');
 const clearBestShotsBtn = document.getElementById('clear-best-shots-btn');
 
 const newGalleryBtn = document.getElementById('new-gallery-btn');
@@ -801,6 +806,18 @@ function addBestShot(side, img) {
   renderBestShots();
 }
 
+function addBestShotFromUrl(side, url) {
+  const shots = getBestShots(side);
+  const exists = shots.some((s) => s.url === url);
+  if (exists) return;
+  shots.push({
+    galleryId: '',
+    imageId: '',
+    url
+  });
+  renderBestShots();
+}
+
 function removeBestShot(side, idx) {
   const shots = getBestShots(side);
   shots.splice(idx, 1);
@@ -822,8 +839,8 @@ function renderBestShots() {
       const images = gallery?.images || [];
       const img = images.find(i => (i.publicId || i.id || i.name) === shot.imageId) || null;
       const thumb = buildThumbUrl(resolveUrl(img?.thumbnailUrl || img?.url || shot.url), 180, 120);
-      const title = gallery?.name || gallery?.subcategory || 'Galerie';
-      const meta = img?.name || shot.imageId || '';
+      const title = gallery?.name || gallery?.subcategory || (shot.galleryId ? 'Galerie' : 'Upload');
+      const meta = img?.name || shot.imageId || (shot.url ? shot.url.split('/').pop() : '');
       const item = document.createElement('div');
       item.className = 'best-shots-item';
       item.innerHTML = `
@@ -1231,6 +1248,48 @@ async function uploadFilesWithFiles(files) {
     }
   } else {
     alert(`Upload fehlgeschlagen: ${errorCount} Fehler (siehe Console)`);
+  }
+}
+
+async function uploadBestShotFiles(files, side) {
+  saveSettings();
+  const cloudName = cloudNameInput.value.trim();
+  const preset = uploadPresetInput.value.trim();
+  if (!cloudName || !preset) {
+    alert('Bitte Cloud Name und Upload Preset angeben.');
+    return;
+  }
+  const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
+  const folderPath = 'portfolio';
+  let okCount = 0;
+  let errorCount = 0;
+  if (bestShotsStatus) bestShotsStatus.textContent = 'Upload startet…';
+  for (let i = 0; i < files.length; i += 1) {
+    const file = files[i];
+    try {
+      if (bestShotsStatus) bestShotsStatus.textContent = `Upload ${i + 1}/${files.length}: ${file.name}`;
+      let uploadFile = file;
+      if (resizeBeforeUpload?.checked && file.size > MAX_UPLOAD_BYTES) {
+        uploadFile = await downscaleImage(file);
+      }
+      const form = new FormData();
+      form.append('file', uploadFile);
+      form.append('upload_preset', preset);
+      if (folderPath) form.append('folder', folderPath);
+      const res = await fetch(uploadUrl, { method: 'POST', body: form });
+      if (!res.ok) {
+        errorCount += 1;
+        continue;
+      }
+      const data = await res.json();
+      addBestShotFromUrl(side, data.secure_url);
+      okCount += 1;
+    } catch (_) {
+      errorCount += 1;
+    }
+  }
+  if (bestShotsStatus) {
+    bestShotsStatus.textContent = `Best Shots Upload: ${okCount} ok, ${errorCount} Fehler.`;
   }
 }
 
@@ -1804,6 +1863,11 @@ async function init() {
     dropEl.addEventListener('drop', (event) => {
       event.preventDefault();
       dropEl.classList.remove('is-dragover');
+      const files = Array.from(event.dataTransfer?.files || []);
+      if (files.length) {
+        uploadBestShotFiles(files, side);
+        return;
+      }
       const data = event.dataTransfer?.getData('application/json');
       if (!data) return;
       try {
@@ -1821,6 +1885,23 @@ async function init() {
   };
   setupBestShotDrop(bestShotsDropLeft, 'left');
   setupBestShotDrop(bestShotsDropRight, 'right');
+
+  if (bestShotsPickLeft && bestShotsFileLeft) {
+    bestShotsPickLeft.addEventListener('click', () => bestShotsFileLeft.click());
+    bestShotsFileLeft.addEventListener('change', () => {
+      const files = Array.from(bestShotsFileLeft.files || []);
+      if (files.length) uploadBestShotFiles(files, 'left');
+      bestShotsFileLeft.value = '';
+    });
+  }
+  if (bestShotsPickRight && bestShotsFileRight) {
+    bestShotsPickRight.addEventListener('click', () => bestShotsFileRight.click());
+    bestShotsFileRight.addEventListener('change', () => {
+      const files = Array.from(bestShotsFileRight.files || []);
+      if (files.length) uploadBestShotFiles(files, 'right');
+      bestShotsFileRight.value = '';
+    });
+  }
 
   renderWizard();
 }

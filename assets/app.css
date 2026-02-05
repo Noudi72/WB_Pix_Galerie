@@ -626,6 +626,10 @@ body.dark-mode .site-header {
   background: rgba(212, 165, 116, 0.12);
 }
 
+.file-input-hidden {
+  display: none;
+}
+
 .best-shots-item {
   display: grid;
   grid-template-columns: 72px 1fr auto;
