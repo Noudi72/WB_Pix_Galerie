@@ -20,6 +20,8 @@ const commentList = document.getElementById('comment-list');
 const commentCount = document.getElementById('comment-count');
 const commentStatus = document.getElementById('comment-status');
 const downloadLikesBtn = document.getElementById('download-likes-btn');
+const saveLikesBtn = document.getElementById('save-likes-btn');
+const likesStatus = document.getElementById('likes-status');
 
 let galleryConfig = null;
 let currentGallery = null;
@@ -242,6 +244,28 @@ function downloadBlob(blob, filename) {
   URL.revokeObjectURL(link.href);
 }
 
+function applyLikesFromGallery() {
+  (currentGallery?.images || []).forEach((img, idx) => {
+    if (img && img.liked) {
+      favoriteIds.add(getImageId(img, idx));
+    }
+  });
+}
+
+function syncLikesToGallery() {
+  (currentGallery?.images || []).forEach((img, idx) => {
+    const imgId = getImageId(img, idx);
+    if (!img) return;
+    if (favoriteIds.has(imgId)) {
+      img.liked = true;
+      if (!img.likeTs) img.likeTs = Date.now();
+    } else {
+      delete img.liked;
+      delete img.likeTs;
+    }
+  });
+}
+
 async function downloadImageFile(img, idx) {
   const src = resolveUrl(img.url || img.thumbnailUrl);
   if (!src) return;
@@ -258,7 +282,7 @@ async function downloadImageFile(img, idx) {
   }
 }
 
-function downloadLikesCsv() {
+async function downloadLikedImages() {
   if (!currentGallery) return;
   const liked = (currentGallery.images || []).filter((img, idx) => {
     const imgId = getImageId(img, idx);
@@ -268,15 +292,18 @@ function downloadLikesCsv() {
     alert('Keine Likes vorhanden.');
     return;
   }
-  const rows = [
-    ['id', 'name', 'url']
-  ];
-  liked.forEach((img, idx) => {
-    const imgId = getImageId(img, idx);
-    rows.push([imgId, img.name || '', resolveUrl(img.url || img.thumbnailUrl)]);
-  });
-  const csv = rows.map(r => r.map(v => `"${String(v || '').replace(/"/g, '""')}"`).join(',')).join('\n');
-  downloadBlob(new Blob([csv], { type: 'text/csv;charset=utf-8' }), 'likes.csv');
+  if (likesStatus) {
+    likesStatus.textContent = `Lade ${liked.length} gelikte Bilder…`;
+  }
+  for (let i = 0; i < liked.length; i += 1) {
+    await downloadImageFile(liked[i], i);
+    if (likesStatus) {
+      likesStatus.textContent = `Download ${i + 1}/${liked.length}…`;
+    }
+  }
+  if (likesStatus) {
+    likesStatus.textContent = 'Download abgeschlossen.';
+  }
 }
 
 function renderComments(img, idx) {
@@ -335,6 +362,7 @@ function renderImages(images = []) {
           favoriteIds.add(imgId);
         }
         saveFavorites(currentGallery?.id || 'default');
+    syncLikesToGallery();
         applySearch();
       });
     }
@@ -433,7 +461,21 @@ if (downloadImageBtn) {
 }
 
 if (downloadLikesBtn) {
-  downloadLikesBtn.addEventListener('click', downloadLikesCsv);
+  downloadLikesBtn.addEventListener('click', downloadLikedImages);
+}
+
+if (saveLikesBtn) {
+  saveLikesBtn.addEventListener('click', async () => {
+    if (!currentGallery) return;
+    syncLikesToGallery();
+    if (likesStatus) likesStatus.textContent = 'Speichere Likes zu GitHub…';
+    const ok = await pushGalleryJsonToGitHub();
+    if (likesStatus) {
+      likesStatus.textContent = ok
+        ? 'Likes gespeichert. Jetzt sind sie auf anderen PCs sichtbar.'
+        : 'Speichern fehlgeschlagen (Token nötig).';
+    }
+  });
 }
 
 searchInput.addEventListener('input', applySearch);
@@ -459,6 +501,7 @@ async function init() {
     const galleryId = currentGallery.id || 'default';
     favoriteIds = loadFavorites(galleryId);
     loadCommentsFromGallery();
+    applyLikesFromGallery();
     const localComments = loadCommentsLocal(galleryId);
     commentsById = mergeCommentMaps(commentsById, localComments);
     syncCommentsToImages();
