@@ -623,9 +623,13 @@ function moveGalleryById(galleryId, direction) {
   galleries[newIdx] = temp;
   console.log('Galleries swapped successfully');
   
+  // WICHTIG: Sortierung zurücksetzen, damit manuelle Reihenfolge sichtbar wird
+  gallerySort = [];
+  updateTableSortState();
+  
   populateGallerySelect();
   renderGalleryTable();
-  alert(`Galerie verschoben! Jetzt zu Schritt 3 → "Fertig" klicken um zu speichern.`);
+  alert(`Galerie verschoben!\n\n⚠️ Tabellen-Sortierung wurde zurückgesetzt.\n\nJetzt zu Schritt 3 → "Fertig" klicken um zu speichern.`);
 }
 
 function updateGalleryField(idx, field, value) {
