@@ -6,14 +6,10 @@ const countChip = document.getElementById('gallery-count-chip');
 const themeToggle = document.getElementById('theme-toggle');
 const portfolioSection = document.getElementById('portfolio-section');
 const portfolioLeftImage = document.getElementById('portfolio-left-image');
-const portfolioLeftTitle = document.getElementById('portfolio-left-title');
-const portfolioLeftMeta = document.getElementById('portfolio-left-meta');
 const portfolioLeftPrev = document.getElementById('portfolio-left-prev');
 const portfolioLeftNext = document.getElementById('portfolio-left-next');
 const portfolioLeftMedia = document.getElementById('portfolio-left-media');
 const portfolioRightImage = document.getElementById('portfolio-right-image');
-const portfolioRightTitle = document.getElementById('portfolio-right-title');
-const portfolioRightMeta = document.getElementById('portfolio-right-meta');
 const portfolioRightPrev = document.getElementById('portfolio-right-prev');
 const portfolioRightNext = document.getElementById('portfolio-right-next');
 const portfolioRightMedia = document.getElementById('portfolio-right-media');
@@ -69,11 +65,6 @@ function normalize(text) {
   return String(text || '').toLowerCase();
 }
 
-function formatGalleryMeta(gallery) {
-  const parts = [gallery.subcategory, gallery.folder, gallery.date].filter(Boolean);
-  return parts.join(' · ');
-}
-
 function collectPortfolioItems() {
   const galleries = galleryConfig?.galleries || [];
   const items = [];
@@ -82,28 +73,51 @@ function collectPortfolioItems() {
     if (!images.length) return;
     if (gallery.showOnHomepage === false) return;
     const img = images[0];
-    const src = buildThumbUrl(img.url || img.thumbnailUrl, 960, 540);
+    const src = buildThumbUrl(img.url || img.thumbnailUrl, 1200, 675);
     items.push({
       src,
-      title: gallery.name || gallery.subcategory || 'Galerie',
-      meta: formatGalleryMeta(gallery),
       galleryId: gallery.id || ''
     });
   });
   return items.slice(0, 12);
 }
 
-function setupPortfolioSlider({ items, imageEl, titleEl, metaEl, prevBtn, nextBtn, mediaEl, intervalMs = 6000 }) {
+function resolveManualPortfolioItems() {
+  const manual = Array.isArray(galleryConfig?.bestShots) ? galleryConfig.bestShots : [];
+  if (!manual.length) return null;
+  const galleries = galleryConfig?.galleries || [];
+  const items = [];
+  manual.forEach((entry) => {
+    if (!entry) return;
+    if (entry.url) {
+      items.push({ src: buildThumbUrl(entry.url, 1200, 675), galleryId: entry.galleryId || '' });
+      return;
+    }
+    const gallery = galleries.find(g => g.id === entry.galleryId) || galleries.find(g => g.name === entry.galleryName);
+    if (!gallery) return;
+    const images = gallery.images || [];
+    const img = images.find(i => (i.id || i.publicId || i.name) === entry.imageId) || images[0];
+    if (!img) return;
+    items.push({ src: buildThumbUrl(img.url || img.thumbnailUrl, 1200, 675), galleryId: gallery.id || '' });
+  });
+  return items.length ? items : null;
+}
+
+function setupPortfolioSlider({ items, imageEl, prevBtn, nextBtn, mediaEl, intervalMs = 6000 }) {
   if (!items.length) return null;
   let index = 0;
   let timer = null;
 
   const render = () => {
     const item = items[index];
-    if (imageEl) imageEl.src = item.src;
-    if (imageEl) imageEl.alt = item.title || 'Portfolio';
-    if (titleEl) titleEl.textContent = item.title || '';
-    if (metaEl) metaEl.textContent = item.meta || '';
+    if (imageEl) {
+      imageEl.classList.remove('is-visible');
+      imageEl.src = item.src;
+      imageEl.alt = 'Portfolio';
+      imageEl.onload = () => {
+        imageEl.classList.add('is-visible');
+      };
+    }
     if (mediaEl) {
       mediaEl.onclick = () => {
         if (item.galleryId) {
@@ -143,7 +157,7 @@ function setupPortfolioSlider({ items, imageEl, titleEl, metaEl, prevBtn, nextBt
 
 function renderPortfolio() {
   if (!portfolioSection) return;
-  const items = collectPortfolioItems();
+  const items = resolveManualPortfolioItems() || collectPortfolioItems();
   if (items.length < 2) {
     portfolioSection.classList.add('is-hidden');
     return;
@@ -154,8 +168,6 @@ function renderPortfolio() {
   setupPortfolioSlider({
     items: leftItems,
     imageEl: portfolioLeftImage,
-    titleEl: portfolioLeftTitle,
-    metaEl: portfolioLeftMeta,
     prevBtn: portfolioLeftPrev,
     nextBtn: portfolioLeftNext,
     mediaEl: portfolioLeftMedia
@@ -163,8 +175,6 @@ function renderPortfolio() {
   setupPortfolioSlider({
     items: rightItems.length ? rightItems : leftItems,
     imageEl: portfolioRightImage,
-    titleEl: portfolioRightTitle,
-    metaEl: portfolioRightMeta,
     prevBtn: portfolioRightPrev,
     nextBtn: portfolioRightNext,
     mediaEl: portfolioRightMedia
