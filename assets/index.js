@@ -4,6 +4,19 @@ const searchInput = document.getElementById('search-input');
 const emptyState = document.getElementById('empty-state');
 const countChip = document.getElementById('gallery-count-chip');
 const themeToggle = document.getElementById('theme-toggle');
+const portfolioSection = document.getElementById('portfolio-section');
+const portfolioLeftImage = document.getElementById('portfolio-left-image');
+const portfolioLeftTitle = document.getElementById('portfolio-left-title');
+const portfolioLeftMeta = document.getElementById('portfolio-left-meta');
+const portfolioLeftPrev = document.getElementById('portfolio-left-prev');
+const portfolioLeftNext = document.getElementById('portfolio-left-next');
+const portfolioLeftMedia = document.getElementById('portfolio-left-media');
+const portfolioRightImage = document.getElementById('portfolio-right-image');
+const portfolioRightTitle = document.getElementById('portfolio-right-title');
+const portfolioRightMeta = document.getElementById('portfolio-right-meta');
+const portfolioRightPrev = document.getElementById('portfolio-right-prev');
+const portfolioRightNext = document.getElementById('portfolio-right-next');
+const portfolioRightMedia = document.getElementById('portfolio-right-media');
 
 let galleryConfig = null;
 let selectedCategory = 'all';
@@ -54,6 +67,108 @@ function buildThumbUrl(url, width = 480, height = 320) {
 
 function normalize(text) {
   return String(text || '').toLowerCase();
+}
+
+function formatGalleryMeta(gallery) {
+  const parts = [gallery.subcategory, gallery.folder, gallery.date].filter(Boolean);
+  return parts.join(' · ');
+}
+
+function collectPortfolioItems() {
+  const galleries = galleryConfig?.galleries || [];
+  const items = [];
+  galleries.forEach((gallery) => {
+    const images = gallery.images || [];
+    if (!images.length) return;
+    if (gallery.showOnHomepage === false) return;
+    const img = images[0];
+    const src = buildThumbUrl(img.url || img.thumbnailUrl, 960, 540);
+    items.push({
+      src,
+      title: gallery.name || gallery.subcategory || 'Galerie',
+      meta: formatGalleryMeta(gallery),
+      galleryId: gallery.id || ''
+    });
+  });
+  return items.slice(0, 12);
+}
+
+function setupPortfolioSlider({ items, imageEl, titleEl, metaEl, prevBtn, nextBtn, mediaEl, intervalMs = 6000 }) {
+  if (!items.length) return null;
+  let index = 0;
+  let timer = null;
+
+  const render = () => {
+    const item = items[index];
+    if (imageEl) imageEl.src = item.src;
+    if (imageEl) imageEl.alt = item.title || 'Portfolio';
+    if (titleEl) titleEl.textContent = item.title || '';
+    if (metaEl) metaEl.textContent = item.meta || '';
+    if (mediaEl) {
+      mediaEl.onclick = () => {
+        if (item.galleryId) {
+          window.location.href = `./gallery.html?id=${encodeURIComponent(item.galleryId)}`;
+        }
+      };
+    }
+  };
+
+  const next = () => {
+    index = (index + 1) % items.length;
+    render();
+  };
+  const prev = () => {
+    index = (index - 1 + items.length) % items.length;
+    render();
+  };
+  const resetTimer = () => {
+    if (timer) clearInterval(timer);
+    timer = setInterval(next, intervalMs);
+  };
+
+  if (nextBtn) nextBtn.addEventListener('click', () => {
+    next();
+    resetTimer();
+  });
+  if (prevBtn) prevBtn.addEventListener('click', () => {
+    prev();
+    resetTimer();
+  });
+
+  render();
+  resetTimer();
+
+  return { next, prev, resetTimer };
+}
+
+function renderPortfolio() {
+  if (!portfolioSection) return;
+  const items = collectPortfolioItems();
+  if (items.length < 2) {
+    portfolioSection.classList.add('is-hidden');
+    return;
+  }
+  const midpoint = Math.ceil(items.length / 2);
+  const leftItems = items.slice(0, midpoint);
+  const rightItems = items.slice(midpoint);
+  setupPortfolioSlider({
+    items: leftItems,
+    imageEl: portfolioLeftImage,
+    titleEl: portfolioLeftTitle,
+    metaEl: portfolioLeftMeta,
+    prevBtn: portfolioLeftPrev,
+    nextBtn: portfolioLeftNext,
+    mediaEl: portfolioLeftMedia
+  });
+  setupPortfolioSlider({
+    items: rightItems.length ? rightItems : leftItems,
+    imageEl: portfolioRightImage,
+    titleEl: portfolioRightTitle,
+    metaEl: portfolioRightMeta,
+    prevBtn: portfolioRightPrev,
+    nextBtn: portfolioRightNext,
+    mediaEl: portfolioRightMedia
+  });
 }
 
 function renderCategories(categories = []) {
@@ -156,6 +271,7 @@ async function init() {
     galleryConfig = await res.json();
     renderCategories(galleryConfig.categories || []);
     renderGalleries();
+    renderPortfolio();
   } catch (err) {
     galleryGrid.innerHTML = '';
     emptyState.style.display = 'block';
