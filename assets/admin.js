@@ -49,6 +49,7 @@ const cleanGalleryImagesBtn = document.getElementById('clean-gallery-images-btn'
 
 const newGalleryBtn = document.getElementById('new-gallery-btn');
 const saveGalleryBtn = document.getElementById('save-gallery-btn');
+const openGalleryBtn = document.getElementById('open-gallery-btn');
 const uploadImagesBtn = document.getElementById('upload-images-btn');
 const addUrlBtn = document.getElementById('add-url-btn');
 const downloadBtn = document.getElementById('download-json-btn');
@@ -399,6 +400,8 @@ function populateGallerySelect() {
   const galleries = galleryConfig?.galleries || [];
   const query = (gallerySearchInput?.value || '').trim().toLowerCase();
   const options = [];
+  const keepId = currentGallery?.id || '';
+  const indexById = new Map();
   galleries.forEach((gallery, idx) => {
     const label = `${gallery.name || ''} ${gallery.subcategory || ''} ${gallery.folder || ''} ${gallery.date || ''}`.toLowerCase();
     if (query && !label.includes(query)) return;
@@ -407,6 +410,7 @@ function populateGallerySelect() {
     const meta = [gallery.subcategory, gallery.folder, gallery.date].filter(Boolean).join(' · ');
     opt.textContent = meta ? `${gallery.name || `Galerie ${idx + 1}`} (${meta})` : (gallery.name || `Galerie ${idx + 1}`);
     options.push(opt);
+    indexById.set(gallery.id || String(idx), String(idx));
   });
   options.forEach(opt => gallerySelect.appendChild(opt));
 
@@ -423,7 +427,11 @@ function populateGallerySelect() {
   }
 
   gallerySelect.disabled = false;
-  if (!gallerySelect.value) gallerySelect.value = options[0].value;
+  if (keepId && indexById.has(keepId)) {
+    gallerySelect.value = indexById.get(keepId);
+  } else if (!gallerySelect.value) {
+    gallerySelect.value = options[0].value;
+  }
   loadGalleryFromSelect();
 }
 
@@ -551,6 +559,12 @@ function selectGalleryByIndex(idx, { focusWizard = false } = {}) {
     const focusTarget = gallerySubcategoryInput || galleryNameInput;
     if (focusTarget) focusTarget.focus({ preventScroll: true });
   }
+}
+
+function openCurrentGallery() {
+  if (!currentGallery?.id) return;
+  const id = encodeURIComponent(currentGallery.id);
+  window.open(`./gallery.html?id=${id}`, '_blank');
 }
 
 function deleteGalleryByIndex(idx) {
@@ -992,6 +1006,7 @@ async function init() {
     goWizardStep(wizardStep + 1);
   });
   saveGalleryBtn.addEventListener('click', saveGallery);
+  if (openGalleryBtn) openGalleryBtn.addEventListener('click', openCurrentGallery);
   newGalleryBtn.addEventListener('click', createGallery);
   if (wizardNewGalleryBtn) wizardNewGalleryBtn.addEventListener('click', createGallery);
   if (deleteGalleryBtn) deleteGalleryBtn.addEventListener('click', deleteCurrentGallery);
