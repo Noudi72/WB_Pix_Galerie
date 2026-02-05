@@ -92,6 +92,8 @@ let gallerySort = [
 ];
 let pendingUploadFiles = [];
 let dragGalleryId = null;
+let mouseDragActive = false;
+let hoverGalleryId = null;
 async function downscaleImage(file) {
   const img = await createImageBitmap(file);
   const maxSide = Number(resizeMaxSide?.value || 4000);
@@ -659,6 +661,18 @@ function reorderGalleryById(sourceId, targetId) {
   if (galleryOrderStatus) {
     galleryOrderStatus.textContent = 'Reihenfolge geändert. Bitte oben auf "Reihenfolge speichern" klicken.';
   }
+}
+
+function resetDragState() {
+  mouseDragActive = false;
+  dragGalleryId = null;
+  hoverGalleryId = null;
+  const rows = galleryTableBody ? galleryTableBody.querySelectorAll('tr') : [];
+  rows.forEach((row) => {
+    row.classList.remove('is-dragging');
+    row.classList.remove('is-dragover');
+  });
+  document.body.classList.remove('is-dragging');
 }
 
 function updateGalleryField(idx, field, value) {
@@ -1345,6 +1359,42 @@ async function init() {
         el.classList.remove('is-dragover');
       });
       dragGalleryId = null;
+    });
+    // Fallback für Safari: Drag per Maus (ohne HTML5 DnD)
+    galleryTableBody.addEventListener('mousedown', (event) => {
+      const handle = event.target.closest('.drag-handle');
+      if (!handle) return;
+      event.preventDefault();
+      dragGalleryId = handle.dataset.galleryId || null;
+      if (!dragGalleryId) return;
+      mouseDragActive = true;
+      document.body.classList.add('is-dragging');
+      const row = event.target.closest('tr');
+      if (row) row.classList.add('is-dragging');
+      gallerySort = [];
+      updateTableSortState();
+    });
+    galleryTableBody.addEventListener('mousemove', (event) => {
+      if (!mouseDragActive || !dragGalleryId) return;
+      const row = event.target.closest('tr');
+      if (!row) return;
+      const targetId = row.dataset.galleryId;
+      if (!targetId || targetId === dragGalleryId) return;
+      if (hoverGalleryId !== targetId) {
+        hoverGalleryId = targetId;
+        Array.from(galleryTableBody.querySelectorAll('tr.is-dragover')).forEach(el => {
+          el.classList.remove('is-dragover');
+        });
+        row.classList.add('is-dragover');
+      }
+    });
+    document.addEventListener('mouseup', () => {
+      if (!mouseDragActive || !dragGalleryId) return;
+      const sourceId = dragGalleryId;
+      const targetId = hoverGalleryId;
+      resetDragState();
+      if (!targetId || sourceId === targetId) return;
+      reorderGalleryById(sourceId, targetId);
     });
     galleryTableBody.addEventListener('change', (event) => {
       const fieldEl = event.target.closest('[data-field]');

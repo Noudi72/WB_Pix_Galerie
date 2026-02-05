@@ -635,9 +635,15 @@ body.dark-mode .site-header {
   background: var(--surface-2);
   color: var(--text);
   cursor: grab;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .drag-handle:active {
+  cursor: grabbing;
+}
+
+.is-dragging .drag-handle {
   cursor: grabbing;
 }
 
