@@ -1370,7 +1370,7 @@ async function init() {
   });
   saveGalleryBtn.addEventListener('click', saveGallery);
   if (openGalleryBtn) openGalleryBtn.addEventListener('click', openCurrentGallery);
-  newGalleryBtn.addEventListener('click', createGallery);
+  if (newGalleryBtn) newGalleryBtn.addEventListener('click', createGallery);
   if (wizardNewGalleryBtn) wizardNewGalleryBtn.addEventListener('click', () => {
     resetWizardFields();
     goWizardStep(1);
