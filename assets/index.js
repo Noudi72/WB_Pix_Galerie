@@ -30,12 +30,26 @@ function initTheme() {
   }
 }
 
+function isCloudinaryTransformSegment(segment) {
+  if (!segment) return false;
+  if (segment.includes(',')) return true;
+  return /^(?:c_|w_|h_|q_|f_|g_|ar_|e_|l_|b_|dpr_|fl_|t_)/.test(segment);
+}
+
 function buildThumbUrl(url, width = 480, height = 320) {
   if (!url) return '';
   if (!url.includes('res.cloudinary.com') || !url.includes('/upload/')) return url;
-  if (url.includes('/upload/c_')) return url;
   const transform = `c_fill,w_${width},h_${height},q_auto:good,f_auto`;
-  return url.replace(/\/upload\/([^/]+\/)?/, `/upload/${transform}/`);
+  const marker = '/upload/';
+  const idx = url.indexOf(marker);
+  if (idx === -1) return url;
+  const prefix = url.slice(0, idx + marker.length);
+  const rest = url.slice(idx + marker.length);
+  const parts = rest.split('/').filter(Boolean);
+  while (parts.length && isCloudinaryTransformSegment(parts[0])) {
+    parts.shift();
+  }
+  return `${prefix}${transform}/${parts.join('/')}`;
 }
 
 function normalize(text) {
@@ -118,7 +132,9 @@ function renderGalleries() {
 
 async function init() {
   try {
-    const res = await fetch('./gallery.json', { cache: 'no-store' });
+    // Cache-Bust Parameter um immer neueste Version zu laden
+    const cacheBust = Date.now();
+    const res = await fetch(`./gallery.json?v=${cacheBust}`, { cache: 'no-store' });
     if (!res.ok) throw new Error('gallery.json konnte nicht geladen werden');
     galleryConfig = await res.json();
     renderCategories(galleryConfig.categories || []);

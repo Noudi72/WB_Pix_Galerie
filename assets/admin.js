@@ -353,11 +353,27 @@ function ensureCategoryByName(name) {
 
 function getOrCreateGallery({ categoryId, subcategory, folder, date }) {
   const galleries = galleryConfig?.galleries || [];
-  const match = galleries.find(g => (g.category || '') === categoryId
-    && (g.subcategory || '') === subcategory
-    && (g.folder || '') === folder
-    && (g.date || '') === (date || ''));
-  if (match) return match;
+  
+  // Normalisiere Werte für Vergleich
+  const normalizeForMatch = (val) => String(val || '').trim();
+  const catNorm = normalizeForMatch(categoryId);
+  const subNorm = normalizeForMatch(subcategory);
+  const folderNorm = normalizeForMatch(folder);
+  const dateNorm = normalizeForMatch(date);
+  
+  // Suche exakte Übereinstimmung
+  const match = galleries.find(g => 
+    normalizeForMatch(g.category) === catNorm
+    && normalizeForMatch(g.subcategory) === subNorm
+    && normalizeForMatch(g.folder) === folderNorm
+    && normalizeForMatch(g.date) === dateNorm
+  );
+  
+  if (match) {
+    console.log('Verwende bestehende Galerie:', match.id, match.name);
+    return match;
+  }
+  
   const id = `gallery-${Date.now()}`;
   const newGallery = {
     id,
@@ -370,6 +386,7 @@ function getOrCreateGallery({ categoryId, subcategory, folder, date }) {
     date: date || ''
   };
   galleries.push(newGallery);
+  console.log('Neue Galerie erstellt:', id, subcategory);
   return newGallery;
 }
 
@@ -534,6 +551,8 @@ function renderGalleryTable() {
       <td>${count}</td>
       <td>${passwordLabel}</td>
       <td class="table-action">
+        <button class="btn" data-action="move-up" data-idx="${idx}" title="Nach oben">↑</button>
+        <button class="btn" data-action="move-down" data-idx="${idx}" title="Nach unten">↓</button>
         <button class="btn" data-action="auto" data-idx="${idx}">Auto</button>
         <button class="btn" data-action="edit" data-idx="${idx}">Bearbeiten</button>
         <button class="btn" data-action="delete" data-idx="${idx}">Löschen</button>
@@ -576,6 +595,17 @@ function deleteGalleryByIndex(idx) {
   galleries.splice(idx, 1);
   populateGallerySelect();
   updateSuggestions();
+  renderGalleryTable();
+}
+
+function moveGallery(idx, direction) {
+  const galleries = galleryConfig?.galleries || [];
+  const newIdx = idx + direction;
+  if (newIdx < 0 || newIdx >= galleries.length) return;
+  const temp = galleries[idx];
+  galleries[idx] = galleries[newIdx];
+  galleries[newIdx] = temp;
+  populateGallerySelect();
   renderGalleryTable();
 }
 
@@ -672,14 +702,62 @@ function clearGalleryImages() {
   renderGalleryTable();
 }
 
-function cleanGalleryImages() {
+async function cleanGalleryImages() {
   if (!currentGallery) return;
   const before = currentGallery.images?.length || 0;
   currentGallery.images = (currentGallery.images || []).filter(img => img && (img.url || img.thumbnailUrl));
-  const after = currentGallery.images.length;
+  const removedEmpty = before - currentGallery.images.length;
+
+  const doCheck = confirm(
+    `Bereinigt: ${removedEmpty} leere Einträge entfernt.\n\nZusätzlich jetzt Cloudinary-Links prüfen (404) und kaputte Einträge entfernen?`
+  );
+
+  if (!doCheck) {
+    renderImageList();
+    renderGalleryTable();
+    alert(`Bereinigt: ${removedEmpty} Einträge entfernt.`);
+    return;
+  }
+
+  const okImages = [];
+  let broken = 0;
+
+  for (let i = 0; i < currentGallery.images.length; i += 1) {
+    const img = currentGallery.images[i];
+    const url = resolveUrl(img.url || img.thumbnailUrl);
+    const isCloudinary = url.includes('res.cloudinary.com') && url.includes('/upload/');
+
+    if (uploadStatus) {
+      uploadStatus.textContent = `Prüfe Bilder ${i + 1}/${currentGallery.images.length}…`;
+    }
+
+    if (!isCloudinary) {
+      okImages.push(img);
+      continue;
+    }
+
+    let exists = true;
+    try {
+      const res = await fetch(url, { method: 'HEAD', cache: 'no-store' });
+      if (res.status === 404) exists = false;
+    } catch (_) {
+      exists = true;
+    }
+
+    if (exists) {
+      okImages.push(img);
+    } else {
+      broken += 1;
+    }
+  }
+
+  currentGallery.images = okImages;
   renderImageList();
   renderGalleryTable();
-  alert(`Bereinigt: ${before - after} Einträge entfernt.`);
+  if (uploadStatus) {
+    uploadStatus.textContent = `Check fertig: ${broken} kaputte Links entfernt.`;
+  }
+  alert(`Check fertig:\n- ${removedEmpty} leere entfernt\n- ${broken} kaputte Cloudinary-Links entfernt`);
 }
 
 function autoFillFromFolder(idx) {
@@ -824,7 +902,11 @@ async function uploadFiles() {
 
 async function uploadFilesWithFiles(files) {
   saveSettings();
-  if (!currentGallery) return;
+  if (!currentGallery) {
+    alert('Bitte zuerst eine Galerie auswählen oder anlegen.');
+    return;
+  }
+  currentGallery.images = Array.isArray(currentGallery.images) ? currentGallery.images : [];
   if (uploadStatus) uploadStatus.textContent = '';
   const cloudName = cloudNameInput.value.trim();
   const preset = uploadPresetInput.value.trim();
@@ -833,44 +915,76 @@ async function uploadFilesWithFiles(files) {
     return;
   }
 
+  const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
   const folderPath = buildCloudinaryFolder();
-  for (const file of files) {
-    let uploadFile = file;
-    if (resizeBeforeUpload?.checked && file.size > MAX_UPLOAD_BYTES) {
-      if (uploadStatus) uploadStatus.textContent = `Skaliere ${file.name}...`;
-      uploadFile = await downscaleImage(file);
+  let okCount = 0;
+  let errorCount = 0;
+
+  for (let i = 0; i < files.length; i += 1) {
+    const file = files[i];
+    try {
+      if (uploadStatus) {
+        uploadStatus.textContent = `Upload ${i + 1}/${files.length}: ${file.name}`;
+      }
+
+      let uploadFile = file;
+      if (resizeBeforeUpload?.checked && file.size > MAX_UPLOAD_BYTES) {
+        if (uploadStatus) uploadStatus.textContent = `Skaliere ${file.name}...`;
+        uploadFile = await downscaleImage(file);
+      }
+
+      const form = new FormData();
+      form.append('file', uploadFile);
+      form.append('upload_preset', preset);
+      if (folderPath) form.append('folder', folderPath);
+
+      const res = await fetch(uploadUrl, { method: 'POST', body: form });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        console.error(`Upload fehlgeschlagen: ${file.name}`, err);
+        errorCount += 1;
+        continue;
+      }
+
+      const data = await res.json();
+      const url = data.secure_url;
+      currentGallery.images.push({
+        id: data.public_id,
+        name: file.name,
+        url,
+        thumbnailUrl: buildThumbUrl(url),
+        uploadDate: new Date().toISOString(),
+        width: data.width,
+        height: data.height,
+        source: 'cloudinary',
+        publicId: data.public_id
+      });
+      okCount += 1;
+    } catch (err) {
+      console.error(`Upload Fehler: ${file.name}`, err);
+      errorCount += 1;
     }
-    const form = new FormData();
-    form.append('file', uploadFile);
-    form.append('upload_preset', preset);
-    if (folderPath) form.append('folder', folderPath);
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/upload`, {
-      method: 'POST',
-      body: form
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      alert(`Upload fehlgeschlagen: ${file.name}\n${err?.error?.message || res.status}`);
-      continue;
-    }
-    const data = await res.json();
-    const url = data.secure_url;
-    currentGallery.images.push({
-      id: data.public_id,
-      name: file.name,
-      url,
-      thumbnailUrl: buildThumbUrl(url),
-      uploadDate: new Date().toISOString(),
-      width: data.width,
-      height: data.height,
-      source: 'cloudinary',
-      publicId: data.public_id
-    });
   }
 
   imageFilesInput.value = '';
   renderImageList();
-  alert('Upload abgeschlossen.');
+  renderGalleryTable();
+  if (uploadStatus) {
+    uploadStatus.textContent = `Upload abgeschlossen: ${okCount} erfolgreich, ${errorCount} Fehler.`;
+  }
+  
+  if (okCount > 0) {
+    const doSave = confirm(
+      `Upload abgeschlossen: ${okCount} Bild(er) erfolgreich hochgeladen!${errorCount > 0 ? `\n(${errorCount} Fehler - siehe Console)` : ''}\n\n` +
+      'Möchtest du jetzt zu Schritt 3 springen und die Änderungen zu GitHub pushen?\n\n' +
+      '(Ohne Push sind die Bilder nur lokal im Admin sichtbar!)'
+    );
+    if (doSave) {
+      goWizardStep(3);
+    }
+  } else {
+    alert(`Upload fehlgeschlagen: ${errorCount} Fehler (siehe Console)`);
+  }
 }
 
 function addImageUrl() {
@@ -903,49 +1017,86 @@ function downloadJson() {
 }
 
 async function pushJsonToGitHub() {
-  saveSettings();
-  const owner = ghOwnerInput.value.trim();
-  const repo = ghRepoInput.value.trim();
-  const branch = ghBranchInput.value.trim() || 'main';
-  const path = ghPathInput.value.trim() || 'gallery.json';
-  const token = ghTokenInput.value.trim();
-  if (!owner || !repo || !token) {
-    alert('Bitte Owner, Repo und Token angeben.');
-    return;
-  }
-  const content = btoa(unescape(encodeURIComponent(JSON.stringify(galleryConfig, null, 2))));
-  const apiBase = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-  let sha = null;
   try {
-    const getRes = await fetch(`${apiBase}?ref=${encodeURIComponent(branch)}`, {
-      headers: { Authorization: `token ${token}` }
-    });
-    if (getRes.ok) {
-      const data = await getRes.json();
-      sha = data.sha;
+    saveSettings();
+    const owner = ghOwnerInput.value.trim();
+    const repo = ghRepoInput.value.trim();
+    const branch = ghBranchInput.value.trim() || 'main';
+    const path = ghPathInput.value.trim() || 'gallery.json';
+    const token = ghTokenInput.value.trim();
+    if (!owner || !repo || !token) {
+      alert('Bitte Owner, Repo und Token angeben.');
+      return false;
     }
-  } catch (_) {}
+    if (galleryConfig && typeof galleryConfig === 'object') {
+      galleryConfig.generated = new Date().toISOString();
+    }
+    const json = JSON.stringify(galleryConfig, null, 2);
+    const content = btoa(unescape(encodeURIComponent(json)));
+    const apiBase = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+    
+    // IMMER aktuellen SHA vor dem Push holen
+    let sha = null;
+    try {
+      const getRes = await fetch(`${apiBase}?ref=${encodeURIComponent(branch)}&_=${Date.now()}`, {
+        headers: { 
+          Authorization: `token ${token}`,
+          'Cache-Control': 'no-cache'
+        }
+      });
+      if (getRes.ok) {
+        const data = await getRes.json();
+        sha = data.sha;
+      }
+    } catch (err) {
+      console.warn('SHA abrufen fehlgeschlagen:', err);
+    }
 
-  const putRes = await fetch(apiBase, {
-    method: 'PUT',
-    headers: {
-      Authorization: `token ${token}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      message: 'Update gallery.json via admin',
-      content,
-      branch,
-      sha: sha || undefined
-    })
-  });
+    const putRes = await fetch(apiBase, {
+      method: 'PUT',
+      headers: {
+        Authorization: `token ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: 'Update gallery.json via admin',
+        content,
+        branch,
+        ...(sha ? { sha } : {})
+      })
+    });
 
-  if (!putRes.ok) {
-    const err = await putRes.json().catch(() => ({}));
-    alert(`GitHub Push fehlgeschlagen: ${err.message || putRes.status}`);
-    return;
+    if (!putRes.ok) {
+      const err = await putRes.json().catch(() => ({}));
+      const message = err.message || `HTTP ${putRes.status}`;
+      
+      // Bei SHA-Conflict: Benutzer informieren und Lösung anbieten
+      if (message.includes('does not match') || message.includes('sha')) {
+        const retry = confirm(
+          'Die Datei auf GitHub wurde zwischenzeitlich geändert.\n\n' +
+          'Möchtest du trotzdem pushen? (überschreibt GitHub-Version)'
+        );
+        if (!retry) {
+          alert('Push abgebrochen. Bitte Seite neu laden (Cmd+Shift+R) und erneut versuchen.');
+          return false;
+        }
+        // Nochmal SHA holen und erneut versuchen
+        return await pushJsonToGitHub();
+      }
+      
+      alert(`GitHub Push fehlgeschlagen:\n${message}`);
+      return false;
+    }
+    alert(
+      '✅ gallery.json erfolgreich zu GitHub gepusht!\n\n' +
+      '⏱️ WICHTIG: GitHub Pages braucht 2-10 Minuten für das Update.\n\n' +
+      'Danach Galerie-Seite mit Cmd+Shift+R neu laden.'
+    );
+    return true;
+  } catch (err) {
+    alert(`GitHub Push fehlgeschlagen:\n${err?.message || err}`);
+    return false;
   }
-  alert('gallery.json erfolgreich zu GitHub gepusht.');
 }
 
 function slugify(text) {
@@ -1001,14 +1152,21 @@ async function init() {
     });
   }
   if (wizardPrev) wizardPrev.addEventListener('click', () => goWizardStep(wizardStep - 1));
-  if (wizardNext) wizardNext.addEventListener('click', () => {
+  if (wizardNext) wizardNext.addEventListener('click', async () => {
     if (wizardStep === 1) {
       saveGallery();
       goWizardStep(wizardStep + 1);
       return;
     }
     if (wizardStep === 3) {
-      pushJsonToGitHub();
+      wizardNext.disabled = true;
+      try {
+        await pushJsonToGitHub();
+      } catch (err) {
+        alert(`GitHub Push fehlgeschlagen: ${err?.message || err}`);
+      } finally {
+        wizardNext.disabled = false;
+      }
       return;
     }
     goWizardStep(wizardStep + 1);
@@ -1056,7 +1214,11 @@ async function init() {
       const idx = Number(btn.dataset.idx);
       if (Number.isNaN(idx)) return;
       const action = btn.dataset.action;
-      if (action === 'auto') {
+      if (action === 'move-up') {
+        moveGallery(idx, -1);
+      } else if (action === 'move-down') {
+        moveGallery(idx, 1);
+      } else if (action === 'auto') {
         autoFillFromFolder(idx);
       } else if (action === 'edit') {
         selectGalleryByIndex(idx, { focusWizard: true });
@@ -1117,6 +1279,8 @@ async function init() {
       e.preventDefault();
       uploadDropzone.classList.remove('is-dragover');
       if (e.dataTransfer?.files?.length) {
+        // Leere File-Input um Duplikate zu vermeiden
+        if (imageFilesInput) imageFilesInput.value = '';
         openUploadModal(Array.from(e.dataTransfer.files));
       }
     });

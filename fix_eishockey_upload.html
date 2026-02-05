@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eishockey Fix - Bilder hinzufügen</title>
+  <style>
+    body { font-family: system-ui; max-width: 800px; margin: 40px auto; padding: 20px; background: #1a1a1a; color: #fff; }
+    h1 { color: #d4a574; }
+    button { background: #d4a574; color: #000; border: none; padding: 12px 24px; border-radius: 8px; font-size: 16px; cursor: pointer; margin: 10px 5px; }
+    button:hover { background: #e5b685; }
+    #log { background: #2a2a2a; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 12px; white-space: pre-wrap; max-height: 400px; overflow-y: auto; }
+    input { background: #2a2a2a; border: 1px solid #444; color: #fff; padding: 8px; border-radius: 4px; width: 100%; margin: 10px 0; }
+    .warning { background: #ff6b6b; color: #fff; padding: 15px; border-radius: 8px; margin: 20px 0; }
+  </style>
+</head>
+<body>
+  <h1>🏒 Eishockey Galerie Fix</h1>
+  <p>Fügt die neu hochgeladenen Bilder zur bestehenden Eishockey-Galerie hinzu.</p>
+  
+  <div class="warning">
+    <strong>⚠️ Wichtig:</strong> Diese Seite fügt die 6 neuen Bilder zur Eishockey-Galerie hinzu und pusht direkt zu GitHub!
+  </div>
+
+  <h3>1. Neue Bilder (Public IDs von Cloudinary):</h3>
+  <p>Gib die Public IDs der 6 neuen Bilder ein (kommagetrennt):</p>
+  <input type="text" id="publicIds" placeholder="z.B. lq38ouatrpyigypt5gae,kjdkm0dievdtr8ekbexl,...">
+  
+  <h3>2. GitHub Einstellungen:</h3>
+  <input type="text" id="ghOwner" value="Noudi72" placeholder="GitHub Owner">
+  <input type="text" id="ghRepo" value="WB_Pix_Galerie" placeholder="GitHub Repo">
+  <input type="password" id="ghToken" placeholder="GitHub Token (aus Admin kopieren)">
+  
+  <button onclick="addImagesAndPush()">Bilder hinzufügen & zu GitHub pushen</button>
+  <button onclick="showCurrentGallery()">Aktuelle Eishockey-Galerie anzeigen</button>
+  
+  <h3>Log:</h3>
+  <div id="log"></div>
+
+  <script>
+    const cloudName = 'dnvqw9wif';
+    let galleryConfig = null;
+    
+    function log(msg) {
+      document.getElementById('log').textContent += msg + '\n';
+    }
+    
+    async function loadGalleryJson() {
+      if (galleryConfig) return galleryConfig;
+      log('Lade gallery.json...');
+      const res = await fetch('./gallery.json?' + Date.now());
+      galleryConfig = await res.json();
+      log('✅ gallery.json geladen');
+      return galleryConfig;
+    }
+    
+    async function showCurrentGallery() {
+      document.getElementById('log').textContent = '';
+      const config = await loadGalleryJson();
+      const eishockey = config.galleries.find(g => g.id === 'eishockey');
+      if (!eishockey) {
+        log('❌ Eishockey-Galerie nicht gefunden!');
+        return;
+      }
+      log('Eishockey-Galerie:');
+      log('- Name: ' + eishockey.name);
+      log('- Bilder: ' + eishockey.images.length);
+      log('- Subcategory: ' + eishockey.subcategory);
+      log('- Folder: ' + eishockey.folder);
+      log('- Date: ' + eishockey.date);
+    }
+    
+    async function addImagesAndPush() {
+      document.getElementById('log').textContent = '';
+      
+      const publicIdsInput = document.getElementById('publicIds').value.trim();
+      const owner = document.getElementById('ghOwner').value.trim();
+      const repo = document.getElementById('ghRepo').value.trim();
+      const token = document.getElementById('ghToken').value.trim();
+      
+      if (!publicIdsInput) {
+        log('❌ Bitte Public IDs eingeben!');
+        return;
+      }
+      if (!owner || !repo || !token) {
+        log('❌ Bitte GitHub-Einstellungen ausfüllen!');
+        return;
+      }
+      
+      const publicIds = publicIdsInput.split(',').map(s => s.trim()).filter(Boolean);
+      log(`Verarbeite ${publicIds.length} Bilder...`);
+      
+      const config = await loadGalleryJson();
+      const eishockey = config.galleries.find(g => g.id === 'eishockey');
+      if (!eishockey) {
+        log('❌ Eishockey-Galerie nicht gefunden!');
+        return;
+      }
+      
+      log(`✅ Eishockey-Galerie gefunden (${eishockey.images.length} Bilder)`);
+      
+      // Füge neue Bilder hinzu
+      let added = 0;
+      for (const publicId of publicIds) {
+        // Prüfe ob Bild schon existiert
+        const exists = eishockey.images.some(img => img.publicId === publicId || img.id === publicId);
+        if (exists) {
+          log(`⚠️  Bild ${publicId} existiert bereits, überspringe...`);
+          continue;
+        }
+        
+        // Hole Bild-Info von Cloudinary
+        log(`Hole Info für ${publicId}...`);
+        const url = `https://res.cloudinary.com/${cloudName}/image/upload/${publicId}.jpg`;
+        const checkRes = await fetch(url, { method: 'HEAD' });
+        
+        if (!checkRes.ok) {
+          log(`❌ Bild ${publicId} nicht gefunden in Cloudinary!`);
+          continue;
+        }
+        
+        // Füge Bild hinzu
+        eishockey.images.push({
+          id: publicId,
+          name: publicId,
+          url: url,
+          thumbnailUrl: url,
+          uploadDate: new Date().toISOString(),
+          source: 'cloudinary',
+          publicId: publicId
+        });
+        added++;
+        log(`✅ Bild ${publicId} hinzugefügt`);
+      }
+      
+      if (added === 0) {
+        log('⚠️  Keine neuen Bilder hinzugefügt!');
+        return;
+      }
+      
+      log(`\n${added} Bilder hinzugefügt, pushe zu GitHub...`);
+      
+      // Update generated timestamp
+      config.generated = new Date().toISOString();
+      
+      // Push zu GitHub
+      const content = btoa(unescape(encodeURIComponent(JSON.stringify(config, null, 2))));
+      const apiBase = `https://api.github.com/repos/${owner}/${repo}/contents/gallery.json`;
+      
+      // Hole aktuellen SHA
+      const getRes = await fetch(`${apiBase}?_=${Date.now()}`, {
+        headers: { Authorization: `token ${token}` }
+      });
+      let sha = null;
+      if (getRes.ok) {
+        const data = await getRes.json();
+        sha = data.sha;
+      }
+      
+      // Push
+      const putRes = await fetch(apiBase, {
+        method: 'PUT',
+        headers: {
+          Authorization: `token ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: 'Fix: Eishockey Bilder hinzugefügt',
+          content,
+          branch: 'main',
+          sha
+        })
+      });
+      
+      if (!putRes.ok) {
+        const err = await putRes.json();
+        log('❌ GitHub Push fehlgeschlagen: ' + (err.message || putRes.status));
+        return;
+      }
+      
+      log('✅ GitHub Push erfolgreich!');
+      log(`\nFertig! ${added} Bilder zur Eishockey-Galerie hinzugefügt.`);
+      log('\n⚠️  Jetzt Galerie-Seite neu laden (Cmd+Shift+R) und prüfen!');
+    }
+  </script>
+</body>
+</html>
