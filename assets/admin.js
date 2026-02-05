@@ -461,6 +461,7 @@ function updateSuggestions() {
 }
 
 function populateGallerySelect() {
+  if (!gallerySelect) return;
   gallerySelect.innerHTML = '';
   const galleries = galleryConfig?.galleries || [];
   const query = (gallerySearchInput?.value || '').trim().toLowerCase();
@@ -623,8 +624,14 @@ function renderGalleryTable() {
 }
 
 function selectGalleryByIndex(idx, { focusWizard = false } = {}) {
-  gallerySelect.value = String(idx);
-  loadGalleryFromSelect();
+  const gallery = (galleryConfig?.galleries || [])[idx];
+  if (!gallery) return;
+  if (gallerySelect) {
+    gallerySelect.value = String(idx);
+    loadGalleryFromSelect();
+  } else {
+    applyGalleryToForm(gallery);
+  }
   if (focusWizard) {
     if (wizardStep !== 1) goWizardStep(1);
     const wizardSection = document.querySelector('.admin-wizard');
@@ -890,20 +897,27 @@ function autoFillFromFolder(idx) {
 }
 
 function loadGalleryFromSelect() {
+  if (!gallerySelect) return;
   const idx = Number(gallerySelect.value);
-  currentGallery = (galleryConfig?.galleries || [])[idx] || null;
-  if (!currentGallery) return;
-  if (galleryNameInput) galleryNameInput.value = currentGallery.name || '';
-  galleryDescInput.value = currentGallery.description || '';
-  galleryCategorySelect.value = currentGallery.category || '';
-  const subValue = currentGallery.subcategory || currentGallery.name || '';
+  const gallery = (galleryConfig?.galleries || [])[idx] || null;
+  if (!gallery) return;
+  applyGalleryToForm(gallery);
+}
+
+function applyGalleryToForm(gallery) {
+  if (!gallery) return;
+  currentGallery = gallery;
+  if (galleryNameInput) galleryNameInput.value = gallery.name || '';
+  galleryDescInput.value = gallery.description || '';
+  if (galleryCategorySelect) galleryCategorySelect.value = gallery.category || '';
+  const subValue = gallery.subcategory || gallery.name || '';
   gallerySubcategoryInput.value = subValue;
-  if (!currentGallery.subcategory && subValue) {
-    currentGallery.subcategory = subValue;
+  if (!gallery.subcategory && subValue) {
+    gallery.subcategory = subValue;
   }
-  galleryFolderInput.value = currentGallery.folder || '';
-  galleryDateInput.value = currentGallery.date || '';
-  galleryPasswordInput.value = currentGallery.password || '';
+  galleryFolderInput.value = gallery.folder || '';
+  galleryDateInput.value = gallery.date || '';
+  galleryPasswordInput.value = gallery.password || '';
   renderImageList();
 }
 
@@ -973,8 +987,12 @@ function createGallery() {
   galleryConfig.galleries.push(newGallery);
   persistOrderFromArray();
   populateGallerySelect();
-  gallerySelect.value = String(galleryConfig.galleries.length - 1);
-  loadGalleryFromSelect();
+  if (gallerySelect) {
+    gallerySelect.value = String(galleryConfig.galleries.length - 1);
+    loadGalleryFromSelect();
+  } else {
+    applyGalleryToForm(newGallery);
+  }
   updateSuggestions();
   renderGalleryTable();
   renderImageList();
@@ -1318,13 +1336,13 @@ async function init() {
 
   populateCategories();
   populateGallerySelect();
-  loadGalleryFromSelect();
+  if (gallerySelect) loadGalleryFromSelect();
   resetWizardFields();
   updateSuggestions();
   updateTableSortState();
   renderGalleryTable();
 
-  gallerySelect.addEventListener('change', loadGalleryFromSelect);
+  if (gallerySelect) gallerySelect.addEventListener('change', loadGalleryFromSelect);
   if (gallerySearchInput) {
     gallerySearchInput.addEventListener('input', () => {
       populateGallerySelect();
@@ -1504,7 +1522,7 @@ async function init() {
   uploadImagesBtn.addEventListener('click', uploadFiles);
   addUrlBtn.addEventListener('click', addImageUrl);
   if (downloadBtn) downloadBtn.addEventListener('click', downloadJson);
-  pushBtn.addEventListener('click', pushJsonToGitHub);
+  if (pushBtn) pushBtn.addEventListener('click', pushJsonToGitHub);
   if (globalPushBtn) globalPushBtn.addEventListener('click', pushJsonToGitHub);
   if (saveOrderBtn) saveOrderBtn.addEventListener('click', async () => {
     const owner = ghOwnerInput.value.trim();
