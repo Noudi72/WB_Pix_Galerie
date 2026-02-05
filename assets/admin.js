@@ -484,45 +484,48 @@ function renderGalleryTable() {
     });
   }
 
-  const compareText = (a, b) => (a || '').localeCompare(b || '', 'de');
-  const compareNum = (a, b) => (a || 0) - (b || 0);
-  const compareBool = (a, b) => Number(Boolean(a)) - Number(Boolean(b));
-  rows.sort((a, b) => {
-    const ga = a.gallery;
-    const gb = b.gallery;
-    const sortList = gallerySort.length ? gallerySort : [{ key: 'name', dir: 'asc' }];
-    for (const sort of sortList) {
-      let result = 0;
-      switch (sort.key) {
-        case 'date':
-          result = compareText(ga.date, gb.date);
-          break;
-        case 'category':
-          result = compareText(getCategoryName(ga.category), getCategoryName(gb.category));
-          break;
-        case 'subcategory':
-          result = compareText(ga.subcategory, gb.subcategory);
-          break;
-        case 'folder':
-          result = compareText(ga.folder, gb.folder);
-          break;
-        case 'images':
-          result = compareNum(ga.images?.length, gb.images?.length);
-          break;
-        case 'password':
-          result = compareBool(ga.password, gb.password);
-          break;
-        case 'name':
-        default:
-          result = compareText(ga.name, gb.name);
-          break;
+  // Nur sortieren, wenn gallerySort nicht leer ist
+  if (gallerySort.length > 0) {
+    const compareText = (a, b) => (a || '').localeCompare(b || '', 'de');
+    const compareNum = (a, b) => (a || 0) - (b || 0);
+    const compareBool = (a, b) => Number(Boolean(a)) - Number(Boolean(b));
+    rows.sort((a, b) => {
+      const ga = a.gallery;
+      const gb = b.gallery;
+      for (const sort of gallerySort) {
+        let result = 0;
+        switch (sort.key) {
+          case 'date':
+            result = compareText(ga.date, gb.date);
+            break;
+          case 'category':
+            result = compareText(getCategoryName(ga.category), getCategoryName(gb.category));
+            break;
+          case 'subcategory':
+            result = compareText(ga.subcategory, gb.subcategory);
+            break;
+          case 'folder':
+            result = compareText(ga.folder, gb.folder);
+            break;
+          case 'images':
+            result = compareNum(ga.images?.length, gb.images?.length);
+            break;
+          case 'password':
+            result = compareBool(ga.password, gb.password);
+            break;
+          case 'name':
+          default:
+            result = compareText(ga.name, gb.name);
+            break;
+        }
+        if (result !== 0) {
+          return sort.dir === 'asc' ? result : -result;
+        }
       }
-      if (result !== 0) {
-        return sort.dir === 'asc' ? result : -result;
-      }
-    }
-    return 0;
-  });
+      return 0;
+    });
+  }
+  // Wenn gallerySort leer ist, Array-Reihenfolge beibehalten (keine Sortierung)
 
   galleryTableBody.innerHTML = '';
   rows.forEach(({ gallery, idx }) => {
