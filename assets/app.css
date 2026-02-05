@@ -188,9 +188,9 @@ body.dark-mode .site-header {
 }
 
 .portfolio-hint {
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   color: var(--muted);
-  margin-bottom: 10px;
+  margin-bottom: 16px;
 }
 
 .portfolio-grid {
