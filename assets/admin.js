@@ -63,6 +63,7 @@ const bestShotsFileLeft = document.getElementById('best-shots-file-left');
 const bestShotsFileRight = document.getElementById('best-shots-file-right');
 const bestShotsStatus = document.getElementById('best-shots-status');
 const clearBestShotsBtn = document.getElementById('clear-best-shots-btn');
+const saveBestShotsBtn = document.getElementById('save-best-shots-btn');
 
 const newGalleryBtn = document.getElementById('new-gallery-btn');
 const saveGalleryBtn = document.getElementById('save-gallery-btn');
@@ -1847,6 +1848,31 @@ async function init() {
       galleryConfig.bestShotsLeft = [];
       galleryConfig.bestShotsRight = [];
       renderBestShots();
+    });
+  }
+
+  if (saveBestShotsBtn) {
+    saveBestShotsBtn.addEventListener('click', async () => {
+      const owner = ghOwnerInput.value.trim();
+      const repo = ghRepoInput.value.trim();
+      const token = ghTokenInput.value.trim();
+      if (!owner || !repo || !token) {
+        if (bestShotsStatus) {
+          bestShotsStatus.textContent = 'Bitte Owner, Repo und Token in Schritt 3 eintragen.';
+        }
+        goWizardStep(3);
+        const wizardSection = document.querySelector('.admin-wizard');
+        if (wizardSection) wizardSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        alert('Bitte Owner, Repo und Token in Schritt 3 eintragen.');
+        return;
+      }
+      if (bestShotsStatus) bestShotsStatus.textContent = 'Speichere Best Shots zu GitHub…';
+      const ok = await pushJsonToGitHub();
+      if (bestShotsStatus) {
+        bestShotsStatus.textContent = ok
+          ? 'Best Shots gespeichert. Bitte Startseite mit Cmd+Shift+R neu laden.'
+          : 'Speichern fehlgeschlagen. Bitte nochmals versuchen.';
+      }
     });
   }
 
