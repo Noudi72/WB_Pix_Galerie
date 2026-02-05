@@ -30,6 +30,7 @@ let showFavoritesOnly = false;
 let favoriteIds = new Set();
 let commentsById = {};
 let likesSaveTimer = null;
+let likesSaveInFlight = false;
 
 function applyTheme(theme) {
   const isDark = theme === 'dark';
@@ -270,6 +271,8 @@ async function autoSaveLikes() {
   if (!currentGallery) return;
   const { token, owner, repo } = getGitHubSettings();
   if (!token || !owner || !repo) return;
+  if (likesSaveInFlight) return;
+  likesSaveInFlight = true;
   if (likesStatus) likesStatus.textContent = 'Likes speichern…';
   const ok = await pushGalleryJsonToGitHub();
   if (likesStatus) {
@@ -277,6 +280,7 @@ async function autoSaveLikes() {
       ? 'Likes gespeichert.'
       : 'Likes konnten nicht gespeichert werden.';
   }
+  likesSaveInFlight = false;
 }
 
 async function downloadImageFile(img, idx) {
@@ -293,6 +297,17 @@ async function downloadImageFile(img, idx) {
     // Fallback: direkt öffnen
     window.open(src, '_blank');
   }
+}
+
+function getOriginalFilename(img, idx) {
+  const name = String(img?.name || '').trim();
+  if (name) return name;
+  const url = resolveUrl(img?.url || img?.thumbnailUrl);
+  if (url) {
+    const last = url.split('/').pop() || '';
+    return last.split('?')[0] || `bild-${idx + 1}`;
+  }
+  return `bild-${idx + 1}`;
 }
 
 async function downloadLikedZip() {
@@ -318,15 +333,25 @@ async function downloadLikedZip() {
       const res = await fetch(src);
       if (!res.ok) throw new Error('Download fehlgeschlagen');
       const blob = await res.blob();
-      const ext = blob.type === 'image/png' ? '.png' : '.jpg';
-      const name = (img.name || `bild-${i + 1}`).replace(/[^\w-]+/g, '_');
-      zip.file(`${name}${ext}`, blob);
-      if (likesStatus) likesStatus.textContent = `ZIP: ${i + 1}/${liked.length}…`;
+      const extFromType = blob.type === 'image/png' ? '.png' : '.jpg';
+      const original = getOriginalFilename(img, i);
+      const safeBase = original.replace(/\.[^.]+$/, '').replace(/[^\w-]+/g, '_');
+      const ext = original.includes('.') ? `.${original.split('.').pop()}` : extFromType;
+      zip.file(`${safeBase}${ext}`, blob);
+      if (likesStatus) {
+        const pct = Math.round(((i + 1) / liked.length) * 100);
+        likesStatus.textContent = `ZIP: ${pct}% (${i + 1}/${liked.length})…`;
+      }
     } catch (_) {
       // skip failed image
     }
   }
-  const zipBlob = await zip.generateAsync({ type: 'blob' });
+  const zipBlob = await zip.generateAsync(
+    { type: 'blob' },
+    (meta) => {
+      if (likesStatus) likesStatus.textContent = `ZIP: ${Math.round(meta.percent)}%`;
+    }
+  );
   downloadBlob(zipBlob, 'likes.zip');
   if (likesStatus) likesStatus.textContent = 'ZIP heruntergeladen.';
 }
@@ -389,7 +414,7 @@ function renderImages(images = []) {
         saveFavorites(currentGallery?.id || 'default');
     syncLikesToGallery();
     if (likesSaveTimer) clearTimeout(likesSaveTimer);
-    likesSaveTimer = setTimeout(autoSaveLikes, 800);
+    likesSaveTimer = setTimeout(autoSaveLikes, 10000);
         applySearch();
       });
     }
