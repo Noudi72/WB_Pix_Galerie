@@ -1,6 +1,6 @@
 {
   "version": "3.0",
-  "generated": "2026-02-05T18:14:30.513Z",
+  "generated": "2026-02-05T18:25:24.126Z",
   "categories": [
     {
       "id": "sport",
@@ -248,24 +248,13 @@
           "height": 2668,
           "source": "cloudinary",
           "publicId": "sport/eishockey/ehcb-vs-zsc/k3okgmucbk9lzsgdvwly"
-        },
-        {
-          "id": "sport/eishockey/ehcb-vs-zsc/nykphnlfhsigzpec6e9f",
-          "name": "11142025_EHCB vs ZSC-3888.jpg",
-          "url": "https://res.cloudinary.com/dnvqw9wif/image/upload/v1770313392/sport/eishockey/ehcb-vs-zsc/nykphnlfhsigzpec6e9f.jpg",
-          "thumbnailUrl": "https://res.cloudinary.com/dnvqw9wif/image/upload/c_fill,w_520,h_390,q_auto,f_auto/sport/eishockey/ehcb-vs-zsc/nykphnlfhsigzpec6e9f.jpg",
-          "uploadDate": "2026-02-05T17:43:13.159Z",
-          "width": 4000,
-          "height": 2668,
-          "source": "cloudinary",
-          "publicId": "sport/eishockey/ehcb-vs-zsc/nykphnlfhsigzpec6e9f"
         }
       ],
       "description": "Home Game",
       "category": "sport",
       "folder": "EHCB vs ZSC",
       "subcategory": "Eishockey",
-      "date": "2025-11-16",
+      "date": "2025-11-14",
       "order": 1
     },
     {
@@ -820,216 +809,6 @@
       "order": 2
     },
     {
-      "id": "sport-street-inlinehockey",
-      "name": "Street-Inlinehockey",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "sport",
-      "folder": "",
-      "subcategory": "Street-Inlinehockey",
-      "order": 3
-    },
-    {
-      "id": "sport-motorsport",
-      "name": "Motorsport",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "sport",
-      "folder": "",
-      "subcategory": "Motorsport",
-      "order": 4
-    },
-    {
-      "id": "sport-wintersport",
-      "name": "Wintersport",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "sport",
-      "folder": "",
-      "subcategory": "Wintersport",
-      "order": 5
-    },
-    {
-      "id": "landschaft-berge-alpen",
-      "name": "Berge & Alpen",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "landschaft",
-      "folder": "",
-      "subcategory": "Berge & Alpen",
-      "order": 6
-    },
-    {
-      "id": "landschaft-kueste-meer",
-      "name": "Küste & Meer",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "landschaft",
-      "folder": "",
-      "subcategory": "Küste & Meer",
-      "order": 7
-    },
-    {
-      "id": "landschaft-wald-forst",
-      "name": "Wald & Forst",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "landschaft",
-      "folder": "",
-      "subcategory": "Wald & Forst",
-      "order": 8
-    },
-    {
-      "id": "landschaft-nacht",
-      "name": "Nachtfotografie",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "landschaft",
-      "folder": "",
-      "subcategory": "Nachtfotografie",
-      "order": 9
-    },
-    {
-      "id": "portrait-business",
-      "name": "Business & Corporate",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "portrait",
-      "folder": "",
-      "subcategory": "Business & Corporate",
-      "order": 10
-    },
-    {
-      "id": "portrait-lifestyle",
-      "name": "Lifestyle & Street",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "portrait",
-      "folder": "",
-      "subcategory": "Lifestyle & Street",
-      "order": 11
-    },
-    {
-      "id": "portrait-familie",
-      "name": "Familie & Kinder",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "portrait",
-      "folder": "",
-      "subcategory": "Familie & Kinder",
-      "order": 12
-    },
-    {
-      "id": "portrait-studio",
-      "name": "Studio",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "portrait",
-      "folder": "",
-      "subcategory": "Studio",
-      "order": 13
-    },
-    {
-      "id": "tiere-wildlife",
-      "name": "Wildlife & Wildtiere",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "tiere",
-      "folder": "",
-      "subcategory": "Wildlife & Wildtiere",
-      "order": 14
-    },
-    {
-      "id": "tiere-haustiere",
-      "name": "Haustiere",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "tiere",
-      "folder": "",
-      "subcategory": "Haustiere",
-      "order": 15
-    },
-    {
-      "id": "tiere-zoo",
-      "name": "Zoo & Vogelpark",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "tiere",
-      "folder": "",
-      "subcategory": "Zoo & Vogelpark",
-      "order": 16
-    },
-    {
-      "id": "tiere-makro",
-      "name": "Makro & Insekten",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "tiere",
-      "folder": "",
-      "subcategory": "Makro & Insekten",
-      "order": 17
-    },
-    {
-      "id": "architektur-urban",
-      "name": "Urban & Stadt",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "architektur",
-      "folder": "",
-      "subcategory": "Urban & Stadt",
-      "order": 18
-    },
-    {
-      "id": "architektur-lost",
-      "name": "Lost Places",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "architektur",
-      "folder": "",
-      "subcategory": "Lost Places",
-      "order": 19
-    },
-    {
-      "id": "architektur-innen",
-      "name": "Innenarchitektur",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "architektur",
-      "folder": "",
-      "subcategory": "Innenarchitektur",
-      "order": 20
-    },
-    {
-      "id": "events-konzerte",
-      "name": "Konzerte",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "events",
-      "folder": "",
-      "subcategory": "Konzerte",
-      "order": 21
-    },
-    {
-      "id": "events-hochzeiten",
-      "name": "Hochzeiten",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "events",
-      "folder": "",
-      "subcategory": "Hochzeiten",
-      "order": 22
-    },
-    {
-      "id": "events-firmenfeiern",
-      "name": "Firmenfeiern",
-      "images": [],
-      "description": "Demnächst verfügbar",
-      "category": "events",
-      "folder": "",
-      "subcategory": "Firmenfeiern",
-      "order": 23
-    },
-    {
       "id": "gallery-1770314538010",
       "name": "Shooting",
       "description": "",
@@ -1094,8 +873,218 @@
       "subcategory": "Shooting",
       "folder": "Noël",
       "date": "",
-      "order": 24,
+      "order": 3,
       "password": "Noudi72"
+    },
+    {
+      "id": "sport-street-inlinehockey",
+      "name": "Street-Inlinehockey",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "sport",
+      "folder": "",
+      "subcategory": "Street-Inlinehockey",
+      "order": 4
+    },
+    {
+      "id": "sport-motorsport",
+      "name": "Motorsport",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "sport",
+      "folder": "",
+      "subcategory": "Motorsport",
+      "order": 5
+    },
+    {
+      "id": "sport-wintersport",
+      "name": "Wintersport",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "sport",
+      "folder": "",
+      "subcategory": "Wintersport",
+      "order": 6
+    },
+    {
+      "id": "landschaft-berge-alpen",
+      "name": "Berge & Alpen",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "landschaft",
+      "folder": "",
+      "subcategory": "Berge & Alpen",
+      "order": 7
+    },
+    {
+      "id": "landschaft-kueste-meer",
+      "name": "Küste & Meer",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "landschaft",
+      "folder": "",
+      "subcategory": "Küste & Meer",
+      "order": 8
+    },
+    {
+      "id": "landschaft-wald-forst",
+      "name": "Wald & Forst",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "landschaft",
+      "folder": "",
+      "subcategory": "Wald & Forst",
+      "order": 9
+    },
+    {
+      "id": "landschaft-nacht",
+      "name": "Nachtfotografie",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "landschaft",
+      "folder": "",
+      "subcategory": "Nachtfotografie",
+      "order": 10
+    },
+    {
+      "id": "portrait-business",
+      "name": "Business & Corporate",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "portrait",
+      "folder": "",
+      "subcategory": "Business & Corporate",
+      "order": 11
+    },
+    {
+      "id": "portrait-lifestyle",
+      "name": "Lifestyle & Street",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "portrait",
+      "folder": "",
+      "subcategory": "Lifestyle & Street",
+      "order": 12
+    },
+    {
+      "id": "portrait-familie",
+      "name": "Familie & Kinder",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "portrait",
+      "folder": "",
+      "subcategory": "Familie & Kinder",
+      "order": 13
+    },
+    {
+      "id": "portrait-studio",
+      "name": "Studio",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "portrait",
+      "folder": "",
+      "subcategory": "Studio",
+      "order": 14
+    },
+    {
+      "id": "tiere-wildlife",
+      "name": "Wildlife & Wildtiere",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "tiere",
+      "folder": "",
+      "subcategory": "Wildlife & Wildtiere",
+      "order": 15
+    },
+    {
+      "id": "tiere-haustiere",
+      "name": "Haustiere",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "tiere",
+      "folder": "",
+      "subcategory": "Haustiere",
+      "order": 16
+    },
+    {
+      "id": "tiere-zoo",
+      "name": "Zoo & Vogelpark",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "tiere",
+      "folder": "",
+      "subcategory": "Zoo & Vogelpark",
+      "order": 17
+    },
+    {
+      "id": "tiere-makro",
+      "name": "Makro & Insekten",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "tiere",
+      "folder": "",
+      "subcategory": "Makro & Insekten",
+      "order": 18
+    },
+    {
+      "id": "architektur-urban",
+      "name": "Urban & Stadt",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "architektur",
+      "folder": "",
+      "subcategory": "Urban & Stadt",
+      "order": 19
+    },
+    {
+      "id": "architektur-lost",
+      "name": "Lost Places",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "architektur",
+      "folder": "",
+      "subcategory": "Lost Places",
+      "order": 20
+    },
+    {
+      "id": "architektur-innen",
+      "name": "Innenarchitektur",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "architektur",
+      "folder": "",
+      "subcategory": "Innenarchitektur",
+      "order": 21
+    },
+    {
+      "id": "events-konzerte",
+      "name": "Konzerte",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "events",
+      "folder": "",
+      "subcategory": "Konzerte",
+      "order": 22
+    },
+    {
+      "id": "events-hochzeiten",
+      "name": "Hochzeiten",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "events",
+      "folder": "",
+      "subcategory": "Hochzeiten",
+      "order": 23
+    },
+    {
+      "id": "events-firmenfeiern",
+      "name": "Firmenfeiern",
+      "images": [],
+      "description": "Demnächst verfügbar",
+      "category": "events",
+      "folder": "",
+      "subcategory": "Firmenfeiern",
+      "order": 24
     }
   ],
   "portfolio": [
