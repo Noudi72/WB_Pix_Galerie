@@ -29,8 +29,10 @@ const galleryTableBody = galleryTable?.querySelector('tbody');
 const galleryTableSearch = document.getElementById('gallery-table-search');
 const galleryTablePasswordFilter = document.getElementById('gallery-table-password');
 const galleryTableStatus = document.getElementById('gallery-table-status');
+const galleryOrderStatus = document.getElementById('gallery-order-status');
 const galleryTableSortButtons = galleryTable?.querySelectorAll('.table-sort') || [];
 const globalPushBtn = document.getElementById('push-json-global-btn');
+const saveOrderBtn = document.getElementById('save-order-btn');
 const applyPrivateFixBtn = document.getElementById('apply-private-fix-btn');
 
 const uploadModal = document.getElementById('upload-modal');
@@ -602,21 +604,16 @@ function deleteGalleryByIndex(idx) {
 }
 
 function moveGalleryById(galleryId, direction) {
-  console.log('moveGalleryById called:', { galleryId, direction });
   const galleries = galleryConfig?.galleries || [];
   const idx = galleries.findIndex(g => g.id === galleryId);
-  console.log('Found gallery at index:', idx);
   
   if (idx === -1) {
-    console.warn('Gallery not found:', galleryId);
     return;
   }
   
   const newIdx = idx + direction;
-  console.log('Moving to index:', newIdx);
   
   if (newIdx < 0 || newIdx >= galleries.length) {
-    console.warn('Cannot move: out of bounds');
     return;
   }
   
@@ -624,7 +621,6 @@ function moveGalleryById(galleryId, direction) {
   const temp = galleries[idx];
   galleries[idx] = galleries[newIdx];
   galleries[newIdx] = temp;
-  console.log('Galleries swapped successfully');
   
   // WICHTIG: Sortierung zurücksetzen, damit manuelle Reihenfolge sichtbar wird
   gallerySort = [];
@@ -632,7 +628,9 @@ function moveGalleryById(galleryId, direction) {
   
   populateGallerySelect();
   renderGalleryTable();
-  alert(`Galerie verschoben!\n\n⚠️ Tabellen-Sortierung wurde zurückgesetzt.\n\nJetzt zu Schritt 3 → "Fertig" klicken um zu speichern.`);
+  if (galleryOrderStatus) {
+    galleryOrderStatus.textContent = 'Reihenfolge geändert. Bitte oben auf "Reihenfolge speichern" klicken.';
+  }
 }
 
 function updateGalleryField(idx, field, value) {
@@ -1240,13 +1238,8 @@ async function init() {
       const action = btn.dataset.action;
       
       if (action === 'move-up' || action === 'move-down') {
-        console.log('Move button clicked:', action);
         const galleryId = btn.dataset.galleryId;
-        console.log('Gallery ID:', galleryId);
-        if (!galleryId) {
-          console.error('No gallery ID found on button!');
-          return;
-        }
+        if (!galleryId) return;
         const direction = action === 'move-up' ? -1 : 1;
         moveGalleryById(galleryId, direction);
         return;
@@ -1278,6 +1271,15 @@ async function init() {
   downloadBtn.addEventListener('click', downloadJson);
   pushBtn.addEventListener('click', pushJsonToGitHub);
   if (globalPushBtn) globalPushBtn.addEventListener('click', pushJsonToGitHub);
+  if (saveOrderBtn) saveOrderBtn.addEventListener('click', async () => {
+    if (galleryOrderStatus) galleryOrderStatus.textContent = 'Speichere Reihenfolge zu GitHub…';
+    const ok = await pushJsonToGitHub();
+    if (galleryOrderStatus) {
+      galleryOrderStatus.textContent = ok
+        ? 'Reihenfolge gespeichert. Bitte Startseite mit Cmd+Shift+R neu laden.'
+        : 'Speichern fehlgeschlagen. Bitte nochmals versuchen.';
+    }
+  });
   if (applyPrivateFixBtn) applyPrivateFixBtn.addEventListener('click', applyPrivateFix);
   if (clearGalleryImagesBtn) clearGalleryImagesBtn.addEventListener('click', clearGalleryImages);
   if (cleanGalleryImagesBtn) cleanGalleryImagesBtn.addEventListener('click', cleanGalleryImages);
