@@ -14,6 +14,8 @@ const imageFilesInput = document.getElementById('image-files');
 const imageUrlInput = document.getElementById('image-url');
 const uploadDropzone = document.getElementById('upload-dropzone');
 const uploadStatus = document.getElementById('upload-status');
+const uploadProgress = document.getElementById('upload-progress');
+const uploadProgressLabel = document.getElementById('upload-progress-label');
 const resizeBeforeUpload = document.getElementById('resize-before-upload');
 const resizeMaxSide = document.getElementById('resize-max-side');
 const resizeQuality = document.getElementById('resize-quality');
@@ -906,6 +908,19 @@ function loadGalleryFromSelect() {
   renderImageList();
 }
 
+function resetWizardFields() {
+  if (galleryNameInput) galleryNameInput.value = '';
+  galleryDescInput.value = '';
+  gallerySubcategoryInput.value = '';
+  galleryFolderInput.value = '';
+  galleryDateInput.value = '';
+  galleryPasswordInput.value = '';
+  if (newCategoryInput) newCategoryInput.value = '';
+  currentGallery = null;
+  if (gallerySelect) gallerySelect.value = '';
+  renderImageList();
+}
+
 function ensureCategoryExists() {
   const name = newCategoryInput.value.trim();
   if (!name) return;
@@ -920,7 +935,10 @@ function ensureCategoryExists() {
 }
 
 function saveGallery() {
-  if (!currentGallery) return;
+  if (!currentGallery) {
+    createGallery();
+    return;
+  }
   ensureCategoryExists();
   const subValue = gallerySubcategoryInput.value.trim();
   currentGallery.name = subValue || (galleryNameInput ? galleryNameInput.value.trim() : '');
@@ -954,6 +972,7 @@ function createGallery() {
     date: dateValue
   };
   galleryConfig.galleries.push(newGallery);
+  persistOrderFromArray();
   populateGallerySelect();
   gallerySelect.value = String(galleryConfig.galleries.length - 1);
   loadGalleryFromSelect();
@@ -1017,6 +1036,8 @@ async function uploadFilesWithFiles(files) {
   }
   currentGallery.images = Array.isArray(currentGallery.images) ? currentGallery.images : [];
   if (uploadStatus) uploadStatus.textContent = '';
+  if (uploadProgress) uploadProgress.value = 0;
+  if (uploadProgressLabel) uploadProgressLabel.textContent = '';
   const cloudName = cloudNameInput.value.trim();
   const preset = uploadPresetInput.value.trim();
   if (!cloudName || !preset) {
@@ -1028,13 +1049,39 @@ async function uploadFilesWithFiles(files) {
   const folderPath = buildCloudinaryFolder();
   let okCount = 0;
   let errorCount = 0;
+  const total = files.length;
+
+  const uploadWithProgress = (form, onProgress) => new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', uploadUrl, true);
+    xhr.upload.onprogress = (event) => {
+      if (!event.lengthComputable) return;
+      const percent = Math.round((event.loaded / event.total) * 100);
+      onProgress(percent);
+    };
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try {
+          resolve(JSON.parse(xhr.responseText));
+        } catch (err) {
+          reject(err);
+        }
+      } else {
+        try {
+          reject(JSON.parse(xhr.responseText));
+        } catch (err) {
+          reject(err);
+        }
+      }
+    };
+    xhr.onerror = () => reject(new Error('Upload fehlgeschlagen'));
+    xhr.send(form);
+  });
 
   for (let i = 0; i < files.length; i += 1) {
     const file = files[i];
     try {
-      if (uploadStatus) {
-        uploadStatus.textContent = `Upload ${i + 1}/${files.length}: ${file.name}`;
-      }
+      if (uploadStatus) uploadStatus.textContent = `Upload ${i + 1}/${total}: ${file.name}`;
 
       let uploadFile = file;
       if (resizeBeforeUpload?.checked && file.size > MAX_UPLOAD_BYTES) {
@@ -1047,15 +1094,13 @@ async function uploadFilesWithFiles(files) {
       form.append('upload_preset', preset);
       if (folderPath) form.append('folder', folderPath);
 
-      const res = await fetch(uploadUrl, { method: 'POST', body: form });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        console.error(`Upload fehlgeschlagen: ${file.name}`, err);
-        errorCount += 1;
-        continue;
-      }
-
-      const data = await res.json();
+      const data = await uploadWithProgress(form, (percent) => {
+        const overall = Math.round(((i + percent / 100) / total) * 100);
+        if (uploadProgress) uploadProgress.value = overall;
+        if (uploadProgressLabel) {
+          uploadProgressLabel.textContent = `${overall}% (${i + 1}/${total})`;
+        }
+      });
       const url = data.secure_url;
       currentGallery.images.push({
         id: data.public_id,
@@ -1076,6 +1121,8 @@ async function uploadFilesWithFiles(files) {
   }
 
   imageFilesInput.value = '';
+  if (uploadProgress) uploadProgress.value = 100;
+  if (uploadProgressLabel) uploadProgressLabel.textContent = '100%';
   renderImageList();
   renderGalleryTable();
   if (uploadStatus) {
@@ -1273,6 +1320,7 @@ async function init() {
   populateCategories();
   populateGallerySelect();
   loadGalleryFromSelect();
+  resetWizardFields();
   updateSuggestions();
   updateTableSortState();
   renderGalleryTable();
@@ -1306,7 +1354,10 @@ async function init() {
   saveGalleryBtn.addEventListener('click', saveGallery);
   if (openGalleryBtn) openGalleryBtn.addEventListener('click', openCurrentGallery);
   newGalleryBtn.addEventListener('click', createGallery);
-  if (wizardNewGalleryBtn) wizardNewGalleryBtn.addEventListener('click', createGallery);
+  if (wizardNewGalleryBtn) wizardNewGalleryBtn.addEventListener('click', () => {
+    resetWizardFields();
+    goWizardStep(1);
+  });
   if (deleteGalleryBtn) deleteGalleryBtn.addEventListener('click', deleteCurrentGallery);
   if (categoryRenameBtn) categoryRenameBtn.addEventListener('click', renameCategory);
   if (categoryDeleteBtn) categoryDeleteBtn.addEventListener('click', deleteCategory);

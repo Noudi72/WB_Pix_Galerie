@@ -15,9 +15,11 @@ const lightboxPrev = document.getElementById('lightbox-prev');
 const lightboxNext = document.getElementById('lightbox-next');
 const commentInput = document.getElementById('comment-input');
 const commentSaveBtn = document.getElementById('comment-save');
+const downloadImageBtn = document.getElementById('download-image-btn');
 const commentList = document.getElementById('comment-list');
 const commentCount = document.getElementById('comment-count');
 const commentStatus = document.getElementById('comment-status');
+const downloadLikesBtn = document.getElementById('download-likes-btn');
 
 let galleryConfig = null;
 let currentGallery = null;
@@ -230,6 +232,53 @@ function escapeHtml(text) {
     .replace(/'/g, '&#39;');
 }
 
+function downloadBlob(blob, filename) {
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(link.href);
+}
+
+async function downloadImageFile(img, idx) {
+  const src = resolveUrl(img.url || img.thumbnailUrl);
+  if (!src) return;
+  const name = img.name || `bild-${idx + 1}`;
+  try {
+    const res = await fetch(src);
+    if (!res.ok) throw new Error('Download fehlgeschlagen');
+    const blob = await res.blob();
+    const ext = blob.type === 'image/png' ? '.png' : '.jpg';
+    downloadBlob(blob, `${name}${ext}`);
+  } catch (_) {
+    // Fallback: direkt öffnen
+    window.open(src, '_blank');
+  }
+}
+
+function downloadLikesCsv() {
+  if (!currentGallery) return;
+  const liked = (currentGallery.images || []).filter((img, idx) => {
+    const imgId = getImageId(img, idx);
+    return favoriteIds.has(imgId);
+  });
+  if (!liked.length) {
+    alert('Keine Likes vorhanden.');
+    return;
+  }
+  const rows = [
+    ['id', 'name', 'url']
+  ];
+  liked.forEach((img, idx) => {
+    const imgId = getImageId(img, idx);
+    rows.push([imgId, img.name || '', resolveUrl(img.url || img.thumbnailUrl)]);
+  });
+  const csv = rows.map(r => r.map(v => `"${String(v || '').replace(/"/g, '""')}"`).join(',')).join('\n');
+  downloadBlob(new Blob([csv], { type: 'text/csv;charset=utf-8' }), 'likes.csv');
+}
+
 function renderComments(img, idx) {
   if (!commentList || !commentCount || !commentInput) return;
   const imgId = getImageId(img, idx);
@@ -373,6 +422,18 @@ if (commentSaveBtn) {
         : 'Kommentar gespeichert (lokal). Für Sync bitte Admin‑Push.';
     }
   });
+}
+
+if (downloadImageBtn) {
+  downloadImageBtn.addEventListener('click', async () => {
+    if (!filteredImages.length) return;
+    const img = filteredImages[currentIndex];
+    await downloadImageFile(img, currentIndex);
+  });
+}
+
+if (downloadLikesBtn) {
+  downloadLikesBtn.addEventListener('click', downloadLikesCsv);
 }
 
 searchInput.addEventListener('input', applySearch);

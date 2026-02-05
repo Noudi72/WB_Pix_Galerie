@@ -656,6 +656,18 @@ body.dark-mode .site-header {
   outline-offset: -2px;
 }
 
+.upload-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.upload-progress progress {
+  width: 220px;
+  height: 10px;
+}
+
 .admin-table th,
 .admin-table td {
   text-align: left;
