@@ -801,7 +801,8 @@ function addBestShot(side, img) {
   shots.push({
     galleryId: currentGallery.id,
     imageId,
-    url: img.url || img.thumbnailUrl || ''
+    url: img.url || img.thumbnailUrl || '',
+    order: shots.length + 1
   });
   renderBestShots();
 }
@@ -813,7 +814,8 @@ function addBestShotFromUrl(side, url) {
   shots.push({
     galleryId: '',
     imageId: '',
-    url
+    url,
+    order: shots.length + 1
   });
   renderBestShots();
 }
@@ -821,13 +823,20 @@ function addBestShotFromUrl(side, url) {
 function removeBestShot(side, idx) {
   const shots = getBestShots(side);
   shots.splice(idx, 1);
+  shots.forEach((s, i) => {
+    s.order = i + 1;
+  });
   renderBestShots();
 }
 
 function renderBestShots() {
   const renderSide = (side, listEl, emptyEl) => {
     if (!listEl) return;
-    const shots = getBestShots(side);
+    const shots = getBestShots(side).slice().sort((a, b) => {
+      const ao = typeof a.order === 'number' ? a.order : Number.MAX_SAFE_INTEGER;
+      const bo = typeof b.order === 'number' ? b.order : Number.MAX_SAFE_INTEGER;
+      return ao - bo;
+    });
     listEl.innerHTML = '';
     if (!shots.length) {
       if (emptyEl) emptyEl.classList.remove('is-hidden');
@@ -846,7 +855,7 @@ function renderBestShots() {
       item.innerHTML = `
         <img class="best-shots-thumb" src="${thumb}" alt="">
         <div class="best-shots-meta">
-          <strong>${title}</strong>
+          <strong>#${idx + 1} · ${title}</strong>
           <span>${meta}</span>
         </div>
         <button class="btn danger" data-action="remove-best-shot" data-idx="${idx}" data-side="${side}">Entfernen</button>
@@ -1267,7 +1276,10 @@ async function uploadBestShotFiles(files, side) {
   for (let i = 0; i < files.length; i += 1) {
     const file = files[i];
     try {
-      if (bestShotsStatus) bestShotsStatus.textContent = `Upload ${i + 1}/${files.length}: ${file.name}`;
+      if (bestShotsStatus) {
+        const pct = Math.round(((i) / files.length) * 100);
+        bestShotsStatus.textContent = `Upload ${i + 1}/${files.length} · ${pct}%`;
+      }
       let uploadFile = file;
       if (resizeBeforeUpload?.checked && file.size > MAX_UPLOAD_BYTES) {
         uploadFile = await downscaleImage(file);
@@ -1284,6 +1296,10 @@ async function uploadBestShotFiles(files, side) {
       const data = await res.json();
       addBestShotFromUrl(side, data.secure_url);
       okCount += 1;
+      if (bestShotsStatus) {
+        const pct = Math.round(((i + 1) / files.length) * 100);
+        bestShotsStatus.textContent = `Upload ${i + 1}/${files.length} · ${pct}%`;
+      }
     } catch (_) {
       errorCount += 1;
     }
