@@ -1,6 +1,6 @@
 {
   "version": "3.0",
-  "generated": "2026-02-05T16:56:50.120Z",
+  "generated": "2026-02-05T17:20:43.783Z",
   "categories": [
     {
       "id": "sport",
@@ -580,7 +580,8 @@
       "category": "sport",
       "subcategory": "Eishockey",
       "folder": "EHCB vs HCD",
-      "date": "2025-11-14"
+      "date": "2025-11-14",
+      "order": 1
     },
     {
       "id": "noel",
@@ -632,7 +633,8 @@
       "folder": "Noël",
       "subcategory": "Shootings",
       "date": "2025-11-14",
-      "password": "Noudi72"
+      "password": "Noudi72",
+      "order": 2
     },
     {
       "id": "sport-street-inlinehockey",
@@ -641,7 +643,8 @@
       "description": "Demnächst verfügbar",
       "category": "sport",
       "folder": "",
-      "subcategory": "Street-Inlinehockey"
+      "subcategory": "Street-Inlinehockey",
+      "order": 3
     },
     {
       "id": "sport-motorsport",
@@ -650,7 +653,8 @@
       "description": "Demnächst verfügbar",
       "category": "sport",
       "folder": "",
-      "subcategory": "Motorsport"
+      "subcategory": "Motorsport",
+      "order": 4
     },
     {
       "id": "sport-wintersport",
@@ -659,7 +663,8 @@
       "description": "Demnächst verfügbar",
       "category": "sport",
       "folder": "",
-      "subcategory": "Wintersport"
+      "subcategory": "Wintersport",
+      "order": 5
     },
     {
       "id": "landschaft-berge-alpen",
@@ -668,7 +673,8 @@
       "description": "Demnächst verfügbar",
       "category": "landschaft",
       "folder": "",
-      "subcategory": "Berge & Alpen"
+      "subcategory": "Berge & Alpen",
+      "order": 6
     },
     {
       "id": "landschaft-kueste-meer",
@@ -677,7 +683,8 @@
       "description": "Demnächst verfügbar",
       "category": "landschaft",
       "folder": "",
-      "subcategory": "Küste & Meer"
+      "subcategory": "Küste & Meer",
+      "order": 7
     },
     {
       "id": "landschaft-wald-forst",
@@ -686,7 +693,8 @@
       "description": "Demnächst verfügbar",
       "category": "landschaft",
       "folder": "",
-      "subcategory": "Wald & Forst"
+      "subcategory": "Wald & Forst",
+      "order": 8
     },
     {
       "id": "landschaft-nacht",
@@ -695,7 +703,8 @@
       "description": "Demnächst verfügbar",
       "category": "landschaft",
       "folder": "",
-      "subcategory": "Nachtfotografie"
+      "subcategory": "Nachtfotografie",
+      "order": 9
     },
     {
       "id": "portrait-business",
@@ -704,7 +713,8 @@
       "description": "Demnächst verfügbar",
       "category": "portrait",
       "folder": "",
-      "subcategory": "Business & Corporate"
+      "subcategory": "Business & Corporate",
+      "order": 10
     },
     {
       "id": "portrait-lifestyle",
@@ -713,7 +723,8 @@
       "description": "Demnächst verfügbar",
       "category": "portrait",
       "folder": "",
-      "subcategory": "Lifestyle & Street"
+      "subcategory": "Lifestyle & Street",
+      "order": 11
     },
     {
       "id": "portrait-familie",
@@ -722,7 +733,8 @@
       "description": "Demnächst verfügbar",
       "category": "portrait",
       "folder": "",
-      "subcategory": "Familie & Kinder"
+      "subcategory": "Familie & Kinder",
+      "order": 12
     },
     {
       "id": "portrait-studio",
@@ -731,7 +743,8 @@
       "description": "Demnächst verfügbar",
       "category": "portrait",
       "folder": "",
-      "subcategory": "Studio"
+      "subcategory": "Studio",
+      "order": 13
     },
     {
       "id": "tiere-wildlife",
@@ -740,7 +753,8 @@
       "description": "Demnächst verfügbar",
       "category": "tiere",
       "folder": "",
-      "subcategory": "Wildlife & Wildtiere"
+      "subcategory": "Wildlife & Wildtiere",
+      "order": 14
     },
     {
       "id": "tiere-haustiere",
@@ -749,7 +763,8 @@
       "description": "Demnächst verfügbar",
       "category": "tiere",
       "folder": "",
-      "subcategory": "Haustiere"
+      "subcategory": "Haustiere",
+      "order": 15
     },
     {
       "id": "tiere-zoo",
@@ -758,7 +773,8 @@
       "description": "Demnächst verfügbar",
       "category": "tiere",
       "folder": "",
-      "subcategory": "Zoo & Vogelpark"
+      "subcategory": "Zoo & Vogelpark",
+      "order": 16
     },
     {
       "id": "tiere-makro",
@@ -767,7 +783,8 @@
       "description": "Demnächst verfügbar",
       "category": "tiere",
       "folder": "",
-      "subcategory": "Makro & Insekten"
+      "subcategory": "Makro & Insekten",
+      "order": 17
     },
     {
       "id": "architektur-urban",
@@ -776,7 +793,8 @@
       "description": "Demnächst verfügbar",
       "category": "architektur",
       "folder": "",
-      "subcategory": "Urban & Stadt"
+      "subcategory": "Urban & Stadt",
+      "order": 18
     },
     {
       "id": "architektur-lost",
@@ -785,7 +803,8 @@
       "description": "Demnächst verfügbar",
       "category": "architektur",
       "folder": "",
-      "subcategory": "Lost Places"
+      "subcategory": "Lost Places",
+      "order": 19
     },
     {
       "id": "architektur-innen",
@@ -794,7 +813,8 @@
       "description": "Demnächst verfügbar",
       "category": "architektur",
       "folder": "",
-      "subcategory": "Innenarchitektur"
+      "subcategory": "Innenarchitektur",
+      "order": 20
     },
     {
       "id": "events-konzerte",
@@ -803,7 +823,8 @@
       "description": "Demnächst verfügbar",
       "category": "events",
       "folder": "",
-      "subcategory": "Konzerte"
+      "subcategory": "Konzerte",
+      "order": 21
     },
     {
       "id": "events-hochzeiten",
@@ -812,7 +833,8 @@
       "description": "Demnächst verfügbar",
       "category": "events",
       "folder": "",
-      "subcategory": "Hochzeiten"
+      "subcategory": "Hochzeiten",
+      "order": 22
     },
     {
       "id": "events-firmenfeiern",
@@ -821,7 +843,8 @@
       "description": "Demnächst verfügbar",
       "category": "events",
       "folder": "",
-      "subcategory": "Firmenfeiern"
+      "subcategory": "Firmenfeiern",
+      "order": 23
     }
   ],
   "portfolio": [
