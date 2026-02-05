@@ -28,6 +28,7 @@ const galleryTable = document.getElementById('gallery-table');
 const galleryTableBody = galleryTable?.querySelector('tbody');
 const galleryTableSearch = document.getElementById('gallery-table-search');
 const galleryTablePasswordFilter = document.getElementById('gallery-table-password');
+const gallerySortModeSelect = document.getElementById('gallery-sort-mode');
 const galleryTableStatus = document.getElementById('gallery-table-status');
 const galleryOrderStatus = document.getElementById('gallery-order-status');
 const galleryTableSortButtons = galleryTable?.querySelectorAll('.table-sort') || [];
@@ -94,6 +95,7 @@ let pendingUploadFiles = [];
 let dragGalleryId = null;
 let mouseDragActive = false;
 let hoverGalleryId = null;
+let gallerySortMode = 'manual';
 
 function ensureGalleryOrder() {
   const galleries = galleryConfig?.galleries || [];
@@ -120,6 +122,18 @@ function persistOrderFromArray() {
   galleries.forEach((g, idx) => {
     g.order = idx + 1;
   });
+}
+
+function setSortMode(mode) {
+  gallerySortMode = mode === 'columns' ? 'columns' : 'manual';
+  localStorage.setItem('wbg_gallery_sort_mode', gallerySortMode);
+  if (gallerySortMode === 'manual') {
+    gallerySort = [];
+  } else if (!gallerySort.length) {
+    gallerySort = [{ key: 'category', dir: 'asc' }];
+  }
+  updateTableSortState();
+  renderGalleryTable();
 }
 async function downscaleImage(file) {
   const img = await createImageBitmap(file);
@@ -517,8 +531,8 @@ function renderGalleryTable() {
     });
   }
 
-  // Nur sortieren, wenn gallerySort nicht leer ist
-  if (gallerySort.length > 0) {
+  // Nur sortieren, wenn Sortiermodus "Spalten" aktiv ist
+  if (gallerySortMode === 'columns' && gallerySort.length > 0) {
     const compareText = (a, b) => (a || '').localeCompare(b || '', 'de');
     const compareNum = (a, b) => (a || 0) - (b || 0);
     const compareBool = (a, b) => Number(Boolean(a)) - Number(Boolean(b));
@@ -660,8 +674,7 @@ function moveGalleryById(galleryId, direction) {
   
   persistOrderFromArray();
   // WICHTIG: Sortierung zurücksetzen, damit manuelle Reihenfolge sichtbar wird
-  gallerySort = [];
-  updateTableSortState();
+  setSortMode('manual');
   
   populateGallerySelect();
   renderGalleryTable();
@@ -681,8 +694,7 @@ function reorderGalleryById(sourceId, targetId) {
   galleries.splice(insertIdx, 0, moved);
 
   persistOrderFromArray();
-  gallerySort = [];
-  updateTableSortState();
+  setSortMode('manual');
   populateGallerySelect();
   renderGalleryTable();
   if (galleryOrderStatus) {
@@ -1250,6 +1262,14 @@ async function init() {
   ensureGalleryOrder();
   sortGalleriesByOrder();
 
+  gallerySortMode = localStorage.getItem('wbg_gallery_sort_mode') || 'manual';
+  if (gallerySortModeSelect) {
+    gallerySortModeSelect.value = gallerySortMode;
+    gallerySortModeSelect.addEventListener('change', () => {
+      setSortMode(gallerySortModeSelect.value);
+    });
+  }
+
   populateCategories();
   populateGallerySelect();
   loadGalleryFromSelect();
@@ -1295,6 +1315,9 @@ async function init() {
   if (galleryTableSortButtons.length) {
     galleryTableSortButtons.forEach((btn) => {
       btn.addEventListener('click', (event) => {
+        if (gallerySortMode !== 'columns') {
+          setSortMode('columns');
+        }
         const key = btn.dataset.sort;
         if (!key) return;
         const existingIndex = gallerySort.findIndex(item => item.key === key);
@@ -1413,7 +1436,7 @@ async function init() {
       if (!mouseDragActive || !dragGalleryId) return;
       const sourceId = dragGalleryId;
       const targetId = hoverGalleryId;
-      resetDragState();
+  resetDragState();
       if (!targetId || sourceId === targetId) return;
       reorderGalleryById(sourceId, targetId);
     });
