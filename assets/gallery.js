@@ -7,6 +7,8 @@ const searchInput = document.getElementById('gallery-search');
 const filterAllBtn = document.getElementById('filter-all');
 const filterFavBtn = document.getElementById('filter-favorites');
 const themeToggle = document.getElementById('theme-toggle');
+const brandLogo = document.getElementById('brand-logo');
+const faviconEl = document.querySelector('link[rel="icon"]');
 
 const lightbox = document.getElementById('lightbox');
 const lightboxImg = document.getElementById('lightbox-image');
@@ -32,6 +34,19 @@ let commentsById = {};
 let likesSaveTimer = null;
 let likesSaveInFlight = false;
 
+const DEFAULT_LOGO_URL = './assets/logo_wb.png';
+
+function getSavedLogoUrl() {
+  const saved = localStorage.getItem('wbg_logo_url');
+  return saved && saved.trim() ? saved.trim() : DEFAULT_LOGO_URL;
+}
+
+function applyBranding() {
+  const logoUrl = getSavedLogoUrl();
+  if (brandLogo) brandLogo.src = logoUrl;
+  if (faviconEl) faviconEl.href = logoUrl;
+}
+
 function applyTheme(theme) {
   const isDark = theme === 'dark';
   document.documentElement.classList.toggle('dark-mode', isDark);
@@ -46,6 +61,7 @@ function applyTheme(theme) {
 function initTheme() {
   const saved = localStorage.getItem('wbg_theme') || 'light';
   applyTheme(saved);
+  applyBranding();
   if (themeToggle) {
     themeToggle.addEventListener('click', () => {
       const next = document.body.classList.contains('dark-mode') ? 'light' : 'dark';

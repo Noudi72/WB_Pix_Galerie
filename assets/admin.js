@@ -38,6 +38,16 @@ const globalPushBtn = document.getElementById('push-json-global-btn');
 const saveOrderBtn = document.getElementById('save-order-btn');
 const applyPrivateFixBtn = document.getElementById('apply-private-fix-btn');
 
+const brandLogoInput = document.getElementById('brand-logo-url');
+const brandLogoPathInput = document.getElementById('brand-logo-path');
+const brandLogoFileInput = document.getElementById('brand-logo-file');
+const saveLogoBtn = document.getElementById('save-logo-btn');
+const uploadLogoBtn = document.getElementById('upload-logo-btn');
+const resetLogoBtn = document.getElementById('reset-logo-btn');
+const brandLogo = document.getElementById('brand-logo');
+const faviconEl = document.querySelector('link[rel="icon"]');
+const brandLogoStatus = document.getElementById('brand-logo-status');
+
 const uploadModal = document.getElementById('upload-modal');
 const uploadCategorySelect = document.getElementById('upload-category');
 const uploadSubcategoryInput = document.getElementById('upload-subcategory');
@@ -95,6 +105,8 @@ const ghBranchInput = document.getElementById('gh-branch');
 const ghPathInput = document.getElementById('gh-path');
 const ghTokenInput = document.getElementById('gh-token');
 const themeToggle = document.getElementById('theme-toggle');
+
+const DEFAULT_LOGO_URL = './assets/logo_wb.png';
 
 let galleryConfig = null;
 let currentGallery = null;
@@ -190,6 +202,183 @@ function initTheme() {
       const next = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
       applyTheme(next);
     });
+  }
+}
+
+function getSavedLogoUrl() {
+  const saved = localStorage.getItem('wbg_logo_url');
+  return saved && saved.trim() ? saved.trim() : DEFAULT_LOGO_URL;
+}
+
+function applyBranding() {
+  const logoUrl = getSavedLogoUrl();
+  if (brandLogo) brandLogo.src = logoUrl;
+  if (faviconEl) faviconEl.href = logoUrl;
+}
+
+function initBranding() {
+  const logoUrl = getSavedLogoUrl();
+  if (brandLogoInput) {
+    brandLogoInput.value = logoUrl === DEFAULT_LOGO_URL ? '' : logoUrl;
+  }
+  if (brandLogoPathInput) {
+    const baseDir = getRepoBaseDir();
+    const defaultPath = baseDir ? `${baseDir}/assets/logo_custom.png` : 'assets/logo_custom.png';
+    brandLogoPathInput.value = defaultPath;
+  }
+  applyBranding();
+  if (saveLogoBtn && brandLogoInput) {
+    saveLogoBtn.addEventListener('click', () => {
+      const next = brandLogoInput.value.trim();
+      if (next) {
+        localStorage.setItem('wbg_logo_url', next);
+      } else {
+        localStorage.removeItem('wbg_logo_url');
+      }
+      applyBranding();
+    });
+  }
+  if (uploadLogoBtn && brandLogoFileInput) {
+    uploadLogoBtn.addEventListener('click', () => {
+      brandLogoFileInput.click();
+    });
+  }
+  if (brandLogoFileInput) {
+    brandLogoFileInput.addEventListener('change', async () => {
+      const file = brandLogoFileInput.files?.[0];
+      brandLogoFileInput.value = '';
+      if (!file) return;
+      await uploadLogoToGitHub(file);
+    });
+  }
+  if (resetLogoBtn) {
+    resetLogoBtn.addEventListener('click', () => {
+      localStorage.removeItem('wbg_logo_url');
+      if (brandLogoInput) brandLogoInput.value = '';
+      applyBranding();
+    });
+  }
+}
+
+function getRepoBaseDir() {
+  const path = ghPathInput?.value?.trim() || '';
+  if (!path.includes('/')) return '';
+  return path.split('/').slice(0, -1).join('/');
+}
+
+function getLogoRepoPath() {
+  const raw = brandLogoPathInput?.value?.trim() || '';
+  if (raw) return raw.replace(/^\/+/, '');
+  const baseDir = getRepoBaseDir();
+  return baseDir ? `${baseDir}/assets/logo_custom.png` : 'assets/logo_custom.png';
+}
+
+function deriveLocalLogoUrl(repoPath) {
+  if (!repoPath) return DEFAULT_LOGO_URL;
+  const normalized = repoPath.replace(/^\/+/, '');
+  const idx = normalized.lastIndexOf('/assets/');
+  if (idx >= 0) {
+    return `./${normalized.slice(idx + 1)}`;
+  }
+  if (normalized.startsWith('assets/')) return `./${normalized}`;
+  return `./${normalized.split('/').pop() || 'assets/logo_custom.png'}`;
+}
+
+function readFileAsBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const res = String(reader.result || '');
+      const base64 = res.includes(',') ? res.split(',')[1] : res;
+      resolve(base64);
+    };
+    reader.onerror = () => reject(reader.error || new Error('Datei konnte nicht gelesen werden.'));
+    reader.readAsDataURL(file);
+  });
+}
+
+async function pushFileToGitHub({ owner, repo, branch, path, token, contentBase64, message }) {
+  const apiBase = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+  const fetchSha = async () => {
+    const getRes = await fetch(`${apiBase}?ref=${encodeURIComponent(branch)}&_=${Date.now()}`, {
+      headers: { Authorization: `token ${token}` }
+    });
+    if (!getRes.ok) return null;
+    const data = await getRes.json();
+    return data.sha || null;
+  };
+  const tryPut = async (sha) => {
+    return await fetch(apiBase, {
+      method: 'PUT',
+      headers: {
+        Authorization: `token ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message,
+        content: contentBase64,
+        branch,
+        ...(sha ? { sha } : {})
+      })
+    });
+  };
+
+  let sha = await fetchSha();
+  let putRes = await tryPut(sha);
+  if (!putRes.ok) {
+    const err = await putRes.json().catch(() => ({}));
+    const messageText = err.message || `HTTP ${putRes.status}`;
+    const isShaConflict = messageText.includes('does not match') || messageText.includes('sha');
+    if (isShaConflict) {
+      sha = await fetchSha();
+      putRes = await tryPut(sha);
+    }
+  }
+  return putRes;
+}
+
+async function uploadLogoToGitHub(file) {
+  try {
+    saveSettings();
+    if (brandLogoStatus) brandLogoStatus.textContent = 'Logo wird hochgeladen…';
+    const owner = ghOwnerInput.value.trim();
+    const repo = ghRepoInput.value.trim();
+    const branch = ghBranchInput.value.trim() || 'main';
+    const token = ghTokenInput.value.trim();
+    if (!owner || !repo || !token) {
+      alert('Bitte Owner, Repo und Token angeben.');
+      if (brandLogoStatus) brandLogoStatus.textContent = 'Upload abgebrochen: GitHub Daten fehlen.';
+      return;
+    }
+    const repoPath = getLogoRepoPath();
+    const contentBase64 = await readFileAsBase64(file);
+    const putRes = await pushFileToGitHub({
+      owner,
+      repo,
+      branch,
+      path: repoPath,
+      token,
+      contentBase64,
+      message: 'Update logo via admin'
+    });
+    if (!putRes.ok) {
+      const err = await putRes.json().catch(() => ({}));
+      const messageText = err.message || `HTTP ${putRes.status}`;
+      alert(`GitHub Upload fehlgeschlagen:\n${messageText}`);
+      if (brandLogoStatus) brandLogoStatus.textContent = 'Upload fehlgeschlagen.';
+      return;
+    }
+    const localUrl = deriveLocalLogoUrl(repoPath);
+    localStorage.setItem('wbg_logo_url', localUrl);
+    if (brandLogoInput) brandLogoInput.value = localUrl;
+    applyBranding();
+    if (brandLogoStatus) {
+      brandLogoStatus.textContent = '✅ Logo hochgeladen und lokal aktiviert.';
+    }
+  } catch (err) {
+    console.error(err);
+    alert(`Logo Upload fehlgeschlagen:\n${err?.message || err}`);
+    if (brandLogoStatus) brandLogoStatus.textContent = 'Upload fehlgeschlagen.';
   }
 }
 
@@ -1448,6 +1637,7 @@ function buildCloudinaryFolder() {
 
 async function init() {
   initTheme();
+  initBranding();
   loadSettings();
   cloudNameInput.addEventListener('change', saveSettings);
   uploadPresetInput.addEventListener('change', saveSettings);

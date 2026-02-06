@@ -17,8 +17,24 @@ const portfolioLightbox = document.getElementById('portfolio-lightbox');
 const portfolioLightboxImg = document.getElementById('portfolio-lightbox-image');
 const portfolioLightboxClose = document.getElementById('portfolio-lightbox-close');
 
+const brandLogo = document.getElementById('brand-logo');
+const faviconEl = document.querySelector('link[rel="icon"]');
+
 let galleryConfig = null;
 let selectedCategory = 'all';
+
+const DEFAULT_LOGO_URL = './assets/logo_wb.png';
+
+function getSavedLogoUrl() {
+  const saved = localStorage.getItem('wbg_logo_url');
+  return saved && saved.trim() ? saved.trim() : DEFAULT_LOGO_URL;
+}
+
+function applyBranding() {
+  const logoUrl = getSavedLogoUrl();
+  if (brandLogo) brandLogo.src = logoUrl;
+  if (faviconEl) faviconEl.href = logoUrl;
+}
 
 function applyTheme(theme) {
   const isDark = theme === 'dark';
@@ -34,6 +50,7 @@ function applyTheme(theme) {
 function initTheme() {
   const saved = localStorage.getItem('wbg_theme') || 'light';
   applyTheme(saved);
+  applyBranding();
   if (themeToggle) {
     themeToggle.addEventListener('click', () => {
       const next = document.body.classList.contains('dark-mode') ? 'light' : 'dark';

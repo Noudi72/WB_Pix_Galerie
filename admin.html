@@ -10,7 +10,11 @@
 <body>
   <header class="site-header">
     <div class="site-header-inner">
-      <a class="back-link" href="./index.html">← Zurück</a>
+      <div class="header-left">
+        <img class="logo" id="brand-logo" src="./assets/logo_wb.png" alt="Blaurock Pix">
+        <a class="back-link" href="./index.html">← Zurück</a>
+      </div>
+      <div class="header-title" id="header-title">Blaurock Pix</div>
       <div class="header-actions">
         <button class="btn theme-toggle" id="theme-toggle" type="button">Dunkel</button>
         <span class="chip">Admin</span>
@@ -35,6 +39,27 @@
         </div>
       </div>
       <p class="admin-note">Diese Werte werden lokal gespeichert (LocalStorage).</p>
+    </section>
+
+    <section class="admin-section">
+      <h3>Branding</h3>
+      <div class="admin-grid">
+        <div class="admin-field">
+          <label for="brand-logo-url">Logo URL</label>
+          <input id="brand-logo-url" type="text" placeholder="https://... oder ./assets/logo_wb.png">
+        </div>
+        <div class="admin-field">
+          <label for="brand-logo-path">Logo‑Pfad im GitHub Repo</label>
+          <input id="brand-logo-path" type="text" placeholder="assets/logo_custom.png">
+        </div>
+      </div>
+      <div class="admin-actions">
+        <button class="btn" id="save-logo-btn">Logo speichern</button>
+        <input id="brand-logo-file" type="file" accept="image/*" class="file-input-hidden" title="Logo auswählen">
+        <label class="btn" for="brand-logo-file" id="upload-logo-btn">Logo zu GitHub hochladen</label>
+        <button class="btn" id="reset-logo-btn">Standardlogo</button>
+      </div>
+      <p class="admin-note" id="brand-logo-status">Logo wird lokal im Browser gespeichert.</p>
     </section>
 
     <section class="admin-section">
