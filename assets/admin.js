@@ -55,6 +55,7 @@ const brandTitleFontInput = document.getElementById('brand-title-font');
 const headerTitle = document.getElementById('header-title');
 const previewHeaderTitle = document.querySelector('.branding-preview-title');
 const resetTitleBtn = document.getElementById('reset-title-btn');
+const brandFontStatus = document.getElementById('brand-font-status');
 
 const uploadModal = document.getElementById('upload-modal');
 const uploadCategorySelect = document.getElementById('upload-category');
@@ -262,6 +263,33 @@ function applyBrandFont(font) {
   document.documentElement.style.setProperty('--brand-font', `${wrapped}, inherit`);
 }
 
+function isFontAvailable(font) {
+  const testText = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  const size = '16px';
+  const fallback = 'monospace';
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+  if (!context) return true;
+  context.font = `${size} ${fallback}`;
+  const baseline = context.measureText(testText).width;
+  context.font = `${size} "${font}", ${fallback}`;
+  const testWidth = context.measureText(testText).width;
+  return Math.abs(testWidth - baseline) > 0.1;
+}
+
+function updateFontStatus(font) {
+  if (!brandFontStatus) return;
+  const trimmed = font && font.trim() ? font.trim() : '';
+  if (!trimmed) {
+    brandFontStatus.textContent = '';
+    return;
+  }
+  const ok = isFontAvailable(trimmed);
+  brandFontStatus.textContent = ok
+    ? 'Font erkannt (lokal verfügbar).'
+    : 'Font nicht gefunden – bitte Schreibweise prüfen.';
+}
+
 function applyBranding() {
   const logoUrl = getSavedLogoUrl();
   if (brandLogo) brandLogo.src = logoUrl;
@@ -309,8 +337,10 @@ function initBranding() {
   if (brandTitleFontInput) {
     brandTitleFontInput.value = font;
     applyBrandFont(font);
+    updateFontStatus(font);
     brandTitleFontInput.addEventListener('input', () => {
       applyBrandFont(brandTitleFontInput.value);
+      updateFontStatus(brandTitleFontInput.value);
     });
     brandTitleFontInput.addEventListener('change', () => {
       localStorage.setItem('wbg_brand_font', brandTitleFontInput.value.trim());
@@ -324,6 +354,7 @@ function initBranding() {
       if (brandTitleFontInput) brandTitleFontInput.value = '';
       applyBrandTitle(DEFAULT_BRAND_TITLE);
       applyBrandFont('');
+      updateFontStatus('');
     });
   }
   applyBranding();
