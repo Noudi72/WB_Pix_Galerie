@@ -1023,6 +1023,24 @@ body.dark-mode .site-header {
   margin-top: 10px;
 }
 
+.branding-dropzone {
+  margin-top: 10px;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px dashed var(--border);
+  background: var(--surface-2);
+  font-size: 0.9rem;
+  color: var(--muted);
+  text-align: center;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.branding-dropzone.is-active {
+  border-color: var(--accent);
+  color: var(--text);
+  background: rgba(212, 165, 116, 0.12);
+}
+
 .branding-preview-frame {
   width: 72px;
   height: 72px;

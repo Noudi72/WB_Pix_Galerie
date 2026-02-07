@@ -38,16 +38,15 @@ const globalPushBtn = document.getElementById('push-json-global-btn');
 const saveOrderBtn = document.getElementById('save-order-btn');
 const applyPrivateFixBtn = document.getElementById('apply-private-fix-btn');
 
-const brandLogoInput = document.getElementById('brand-logo-url');
 const brandLogoPathInput = document.getElementById('brand-logo-path');
 const brandLogoFileInput = document.getElementById('brand-logo-file');
-const saveLogoBtn = document.getElementById('save-logo-btn');
 const uploadLogoBtn = document.getElementById('upload-logo-btn');
 const resetLogoBtn = document.getElementById('reset-logo-btn');
 const brandLogo = document.getElementById('brand-logo');
 const brandLogoPreview = document.getElementById('brand-logo-preview');
 const faviconEl = document.querySelector('link[rel="icon"]');
 const brandLogoStatus = document.getElementById('brand-logo-status');
+const brandLogoDropzone = document.getElementById('brand-logo-dropzone');
 
 const uploadModal = document.getElementById('upload-modal');
 const uploadCategorySelect = document.getElementById('upload-category');
@@ -220,26 +219,12 @@ function applyBranding() {
 
 function initBranding() {
   const logoUrl = getSavedLogoUrl();
-  if (brandLogoInput) {
-    brandLogoInput.value = logoUrl === DEFAULT_LOGO_URL ? '' : logoUrl;
-  }
   if (brandLogoPathInput) {
     const baseDir = getRepoBaseDir();
     const defaultPath = baseDir ? `${baseDir}/assets/logo_custom.png` : 'assets/logo_custom.png';
     brandLogoPathInput.value = defaultPath;
   }
   applyBranding();
-  if (saveLogoBtn && brandLogoInput) {
-    saveLogoBtn.addEventListener('click', () => {
-      const next = brandLogoInput.value.trim();
-      if (next) {
-        localStorage.setItem('wbg_logo_url', next);
-      } else {
-        localStorage.removeItem('wbg_logo_url');
-      }
-      applyBranding();
-    });
-  }
   if (uploadLogoBtn && brandLogoFileInput) {
     uploadLogoBtn.addEventListener('click', () => {
       brandLogoFileInput.click();
@@ -256,8 +241,27 @@ function initBranding() {
   if (resetLogoBtn) {
     resetLogoBtn.addEventListener('click', () => {
       localStorage.removeItem('wbg_logo_url');
-      if (brandLogoInput) brandLogoInput.value = '';
       applyBranding();
+    });
+  }
+  if (brandLogoDropzone) {
+    const highlight = (on) => brandLogoDropzone.classList.toggle('is-active', on);
+    ['dragenter', 'dragover'].forEach((evt) => {
+      brandLogoDropzone.addEventListener(evt, (event) => {
+        event.preventDefault();
+        highlight(true);
+      });
+    });
+    ['dragleave', 'drop'].forEach((evt) => {
+      brandLogoDropzone.addEventListener(evt, (event) => {
+        event.preventDefault();
+        highlight(false);
+      });
+    });
+    brandLogoDropzone.addEventListener('drop', async (event) => {
+      const file = event.dataTransfer?.files?.[0];
+      if (!file) return;
+      await uploadLogoToGitHub(file);
     });
   }
 }
@@ -397,7 +401,6 @@ async function uploadLogoToGitHub(file) {
     }
     const localUrl = deriveLocalLogoUrl(repoPath);
     localStorage.setItem('wbg_logo_url', localUrl);
-    if (brandLogoInput) brandLogoInput.value = localUrl;
     applyBranding();
     previewLogoFile(file);
     if (brandLogoStatus) {
