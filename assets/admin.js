@@ -245,22 +245,25 @@ function initBranding() {
     });
   }
   if (brandLogoDropzone) {
-    const highlight = (on) => brandLogoDropzone.classList.toggle('is-active', on);
+    const highlight = (on) => setDropzoneState({ active: on });
     ['dragenter', 'dragover'].forEach((evt) => {
       brandLogoDropzone.addEventListener(evt, (event) => {
         event.preventDefault();
         highlight(true);
+        const file = event.dataTransfer?.files?.[0];
+        if (file) previewDropLogo(file);
       });
     });
     ['dragleave', 'drop'].forEach((evt) => {
       brandLogoDropzone.addEventListener(evt, (event) => {
         event.preventDefault();
-        highlight(false);
+        setDropzoneState({ active: false, invalid: false });
       });
     });
     brandLogoDropzone.addEventListener('drop', async (event) => {
       const file = event.dataTransfer?.files?.[0];
       if (!file) return;
+      previewDropLogo(file);
       await uploadLogoToGitHub(file);
     });
   }
@@ -304,10 +307,10 @@ function readFileAsBase64(file) {
 }
 
 function validateLogoFile(file) {
-  const maxBytes = 2 * 1024 * 1024;
+  const maxBytes = 10 * 1024 * 1024;
   if (!file) return 'Keine Datei ausgewählt.';
   if (!file.type.startsWith('image/')) return 'Bitte eine Bilddatei wählen.';
-  if (file.size > maxBytes) return 'Datei ist zu groß (max. 2 MB).';
+  if (file.size > maxBytes) return 'Datei ist zu groß (max. 10 MB).';
   const ext = (file.name.split('.').pop() || '').toLowerCase();
   if (!['png', 'jpg', 'jpeg', 'webp', 'gif', 'svg'].includes(ext)) {
     return 'Ungültiges Format. Erlaubt: PNG, JPG, WEBP, GIF, SVG.';
@@ -320,6 +323,28 @@ function previewLogoFile(file) {
   const url = URL.createObjectURL(file);
   brandLogoPreview.src = url;
   brandLogoPreview.onload = () => URL.revokeObjectURL(url);
+}
+
+function setDropzoneState({ active = false, invalid = false, message = '' } = {}) {
+  if (!brandLogoDropzone) return;
+  brandLogoDropzone.classList.toggle('is-active', active);
+  brandLogoDropzone.classList.toggle('is-invalid', invalid);
+  if (message) {
+    brandLogoDropzone.textContent = message;
+  } else if (!invalid) {
+    brandLogoDropzone.textContent = 'Logo hier ablegen (Drag & Drop) · max. 10 MB';
+  }
+}
+
+function previewDropLogo(file) {
+  const error = validateLogoFile(file);
+  if (error) {
+    setDropzoneState({ active: true, invalid: true, message: error });
+    return;
+  }
+  const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+  setDropzoneState({ active: true, message: `Vorschau: ${file.name} · ${sizeMb} MB` });
+  previewLogoFile(file);
 }
 
 async function pushFileToGitHub({ owner, repo, branch, path, token, contentBase64, message }) {
