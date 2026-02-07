@@ -45,6 +45,7 @@ const saveLogoBtn = document.getElementById('save-logo-btn');
 const uploadLogoBtn = document.getElementById('upload-logo-btn');
 const resetLogoBtn = document.getElementById('reset-logo-btn');
 const brandLogo = document.getElementById('brand-logo');
+const brandLogoPreview = document.getElementById('brand-logo-preview');
 const faviconEl = document.querySelector('link[rel="icon"]');
 const brandLogoStatus = document.getElementById('brand-logo-status');
 
@@ -213,6 +214,7 @@ function getSavedLogoUrl() {
 function applyBranding() {
   const logoUrl = getSavedLogoUrl();
   if (brandLogo) brandLogo.src = logoUrl;
+  if (brandLogoPreview) brandLogoPreview.src = logoUrl;
   if (faviconEl) faviconEl.href = logoUrl;
 }
 
@@ -297,6 +299,25 @@ function readFileAsBase64(file) {
   });
 }
 
+function validateLogoFile(file) {
+  const maxBytes = 2 * 1024 * 1024;
+  if (!file) return 'Keine Datei ausgewählt.';
+  if (!file.type.startsWith('image/')) return 'Bitte eine Bilddatei wählen.';
+  if (file.size > maxBytes) return 'Datei ist zu groß (max. 2 MB).';
+  const ext = (file.name.split('.').pop() || '').toLowerCase();
+  if (!['png', 'jpg', 'jpeg', 'webp', 'gif', 'svg'].includes(ext)) {
+    return 'Ungültiges Format. Erlaubt: PNG, JPG, WEBP, GIF, SVG.';
+  }
+  return '';
+}
+
+function previewLogoFile(file) {
+  if (!brandLogoPreview) return;
+  const url = URL.createObjectURL(file);
+  brandLogoPreview.src = url;
+  brandLogoPreview.onload = () => URL.revokeObjectURL(url);
+}
+
 async function pushFileToGitHub({ owner, repo, branch, path, token, contentBase64, message }) {
   const apiBase = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
   const fetchSha = async () => {
@@ -339,6 +360,12 @@ async function pushFileToGitHub({ owner, repo, branch, path, token, contentBase6
 
 async function uploadLogoToGitHub(file) {
   try {
+    const validationError = validateLogoFile(file);
+    if (validationError) {
+      alert(validationError);
+      if (brandLogoStatus) brandLogoStatus.textContent = `Upload abgebrochen: ${validationError}`;
+      return;
+    }
     saveSettings();
     if (brandLogoStatus) brandLogoStatus.textContent = 'Logo wird hochgeladen…';
     const owner = ghOwnerInput.value.trim();
@@ -372,6 +399,7 @@ async function uploadLogoToGitHub(file) {
     localStorage.setItem('wbg_logo_url', localUrl);
     if (brandLogoInput) brandLogoInput.value = localUrl;
     applyBranding();
+    previewLogoFile(file);
     if (brandLogoStatus) {
       brandLogoStatus.textContent = '✅ Logo hochgeladen und lokal aktiviert.';
     }

@@ -1015,6 +1015,32 @@ body.dark-mode .site-header {
   margin-top: 10px;
 }
 
+.branding-preview {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 12px;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.branding-preview-frame {
+  width: 72px;
+  height: 72px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.branding-preview-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .legacy-section {
   display: none;
 }
