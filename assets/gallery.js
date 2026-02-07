@@ -35,10 +35,22 @@ let likesSaveTimer = null;
 let likesSaveInFlight = false;
 
 const DEFAULT_LOGO_URL = './assets/logo_wb.png';
+const DEFAULT_LOGO_WIDTH = 180;
 
 function getSavedLogoUrl() {
   const saved = localStorage.getItem('wbg_logo_url');
   return saved && saved.trim() ? saved.trim() : DEFAULT_LOGO_URL;
+}
+
+function getSavedLogoWidth() {
+  const raw = localStorage.getItem('wbg_logo_width');
+  const value = Number(raw);
+  return Number.isFinite(value) && value > 0 ? value : DEFAULT_LOGO_WIDTH;
+}
+
+function applyLogoWidth() {
+  const width = getSavedLogoWidth();
+  document.documentElement.style.setProperty('--logo-width', `${width}px`);
 }
 
 function applyBranding() {
@@ -61,6 +73,7 @@ function applyTheme(theme) {
 function initTheme() {
   const saved = localStorage.getItem('wbg_theme') || 'light';
   applyTheme(saved);
+  applyLogoWidth();
   applyBranding();
   if (themeToggle) {
     themeToggle.addEventListener('click', () => {

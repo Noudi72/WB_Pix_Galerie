@@ -14,6 +14,7 @@
   --radius-lg: 18px;
   --radius-md: 12px;
   --radius-sm: 8px;
+  --logo-width: 180px;
 }
 
 html.dark-mode,
@@ -140,11 +141,16 @@ body.dark-mode .site-header {
 .brand .logo {
   width: auto;
   height: 40px;
-  max-width: 180px;
+  max-width: var(--logo-width);
   border-radius: 10px;
   background: transparent;
   border: 1px solid var(--border);
   object-fit: contain;
+}
+
+.admin-page .site-header .logo {
+  height: 32px;
+  max-width: min(var(--logo-width), 160px);
 }
 
 .theme-toggle {
@@ -1024,6 +1030,49 @@ body.dark-mode .site-header {
   margin-top: 10px;
 }
 
+.branding-preview-header {
+  margin-top: 12px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.branding-preview-headerbar {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 10px;
+}
+
+.branding-preview-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.branding-preview-left img {
+  height: 28px;
+  max-width: var(--logo-width);
+  object-fit: contain;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: transparent;
+}
+
+.branding-preview-title {
+  font-weight: 700;
+  justify-self: center;
+}
+
+.branding-preview-actions {
+  justify-self: end;
+  display: inline-flex;
+  gap: 6px;
+}
 .branding-dropzone {
   margin-top: 10px;
   padding: 14px;

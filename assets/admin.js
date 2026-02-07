@@ -44,9 +44,12 @@ const uploadLogoBtn = document.getElementById('upload-logo-btn');
 const resetLogoBtn = document.getElementById('reset-logo-btn');
 const brandLogo = document.getElementById('brand-logo');
 const brandLogoPreview = document.getElementById('brand-logo-preview');
+const brandLogoPreviewHeader = document.getElementById('brand-logo-preview-header');
 const faviconEl = document.querySelector('link[rel="icon"]');
 const brandLogoStatus = document.getElementById('brand-logo-status');
 const brandLogoDropzone = document.getElementById('brand-logo-dropzone');
+const brandLogoSizeInput = document.getElementById('brand-logo-size');
+const brandLogoSizeLabel = document.getElementById('brand-logo-size-label');
 
 const uploadModal = document.getElementById('upload-modal');
 const uploadCategorySelect = document.getElementById('upload-category');
@@ -107,6 +110,7 @@ const ghTokenInput = document.getElementById('gh-token');
 const themeToggle = document.getElementById('theme-toggle');
 
 const DEFAULT_LOGO_URL = './assets/logo_wb.png';
+const DEFAULT_LOGO_WIDTH = 180;
 
 let galleryConfig = null;
 let currentGallery = null;
@@ -210,19 +214,46 @@ function getSavedLogoUrl() {
   return saved && saved.trim() ? saved.trim() : DEFAULT_LOGO_URL;
 }
 
+function getSavedLogoWidth() {
+  const raw = localStorage.getItem('wbg_logo_width');
+  const value = Number(raw);
+  return Number.isFinite(value) && value > 0 ? value : DEFAULT_LOGO_WIDTH;
+}
+
+function applyLogoWidth(width) {
+  document.documentElement.style.setProperty('--logo-width', `${width}px`);
+  if (brandLogoSizeLabel) brandLogoSizeLabel.textContent = `${width} px`;
+}
+
 function applyBranding() {
   const logoUrl = getSavedLogoUrl();
   if (brandLogo) brandLogo.src = logoUrl;
   if (brandLogoPreview) brandLogoPreview.src = logoUrl;
+  if (brandLogoPreviewHeader) brandLogoPreviewHeader.src = logoUrl;
   if (faviconEl) faviconEl.href = logoUrl;
 }
 
 function initBranding() {
   const logoUrl = getSavedLogoUrl();
+  const width = getSavedLogoWidth();
   if (brandLogoPathInput) {
     const baseDir = getRepoBaseDir();
     const defaultPath = baseDir ? `${baseDir}/assets/logo_custom.png` : 'assets/logo_custom.png';
     brandLogoPathInput.value = defaultPath;
+  }
+  if (brandLogoSizeInput) {
+    brandLogoSizeInput.value = String(width);
+    applyLogoWidth(width);
+    brandLogoSizeInput.addEventListener('input', () => {
+      const next = Number(brandLogoSizeInput.value);
+      if (!Number.isFinite(next)) return;
+      applyLogoWidth(next);
+    });
+    brandLogoSizeInput.addEventListener('change', () => {
+      const next = Number(brandLogoSizeInput.value);
+      if (!Number.isFinite(next)) return;
+      localStorage.setItem('wbg_logo_width', String(next));
+    });
   }
   applyBranding();
   if (uploadLogoBtn && brandLogoFileInput) {
@@ -322,6 +353,7 @@ function previewLogoFile(file) {
   if (!brandLogoPreview) return;
   const url = URL.createObjectURL(file);
   brandLogoPreview.src = url;
+  if (brandLogoPreviewHeader) brandLogoPreviewHeader.src = url;
   brandLogoPreview.onload = () => URL.revokeObjectURL(url);
 }
 

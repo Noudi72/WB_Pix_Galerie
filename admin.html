@@ -7,7 +7,7 @@
   <link rel="icon" href="./assets/logo_wb.png">
   <link rel="stylesheet" href="./assets/app.css">
 </head>
-<body>
+<body class="admin-page">
   <header class="site-header">
     <div class="site-header-inner">
       <div class="header-left">
@@ -48,6 +48,11 @@
           <label for="brand-logo-path">Logo‑Pfad im GitHub Repo</label>
           <input id="brand-logo-path" type="text" placeholder="assets/logo_custom.png">
         </div>
+        <div class="admin-field">
+          <label for="brand-logo-size">Logo‑Breite Startseite</label>
+          <input id="brand-logo-size" type="range" min="80" max="320" step="10" value="180">
+          <p class="admin-note" id="brand-logo-size-label">180 px</p>
+        </div>
       </div>
       <div class="admin-actions">
         <input id="brand-logo-file" type="file" accept="image/*" class="file-input-hidden" title="Logo auswählen">
@@ -56,6 +61,18 @@
       </div>
       <div class="branding-dropzone" id="brand-logo-dropzone">
         Logo hier ablegen (Drag & Drop) · max. 10 MB
+      </div>
+      <div class="branding-preview-header">Header‑Vorschau</div>
+      <div class="branding-preview-headerbar">
+        <div class="branding-preview-left">
+          <img id="brand-logo-preview-header" alt="Logo Vorschau Header">
+          <span class="back-link">← Zurück</span>
+        </div>
+        <div class="branding-preview-title">Blaurock Pix</div>
+        <div class="branding-preview-actions">
+          <span class="chip">Hell</span>
+          <span class="chip">Admin</span>
+        </div>
       </div>
       <div class="branding-preview">
         <div class="branding-preview-frame">
