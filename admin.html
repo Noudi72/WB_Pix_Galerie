@@ -63,6 +63,29 @@
           <p class="admin-note">Bitte exakten Font‑Namen eingeben (nur lokal verfügbare Fonts).</p>
           <p class="admin-note" id="brand-font-status"></p>
         </div>
+        <div class="admin-field">
+          <label for="brand-font-preset">Font‑Vorschläge</label>
+          <select id="brand-font-preset">
+            <option value="">— auswählen —</option>
+            <optgroup label="macOS‑Fonts">
+              <option value="SF Pro Display">SF Pro Display</option>
+              <option value="SF Pro Text">SF Pro Text</option>
+              <option value="Avenir Next">Avenir Next</option>
+              <option value="Avenir Next Condensed">Avenir Next Condensed</option>
+              <option value="Helvetica Neue">Helvetica Neue</option>
+              <option value="Helvetica">Helvetica</option>
+              <option value="Menlo">Menlo</option>
+            </optgroup>
+            <optgroup label="Web‑Safe">
+              <option value="Arial">Arial</option>
+              <option value="Georgia">Georgia</option>
+              <option value="Times New Roman">Times New Roman</option>
+              <option value="Verdana">Verdana</option>
+              <option value="Trebuchet MS">Trebuchet MS</option>
+            </optgroup>
+          </select>
+          <p class="admin-note">Auswahl setzt das Feld oben.</p>
+        </div>
       </div>
       <div class="admin-actions">
         <input id="brand-logo-file" type="file" accept="image/*" class="file-input-hidden" title="Logo auswählen">

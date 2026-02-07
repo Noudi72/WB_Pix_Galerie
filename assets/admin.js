@@ -56,6 +56,7 @@ const headerTitle = document.getElementById('header-title');
 const previewHeaderTitle = document.querySelector('.branding-preview-title');
 const resetTitleBtn = document.getElementById('reset-title-btn');
 const brandFontStatus = document.getElementById('brand-font-status');
+const brandFontPreset = document.getElementById('brand-font-preset');
 
 const uploadModal = document.getElementById('upload-modal');
 const uploadCategorySelect = document.getElementById('upload-category');
@@ -347,6 +348,17 @@ function initBranding() {
     });
     brandTitleFontInput.addEventListener('change', () => {
       localStorage.setItem('wbg_brand_font', brandTitleFontInput.value.trim());
+    });
+  }
+  if (brandFontPreset) {
+    brandFontPreset.addEventListener('change', () => {
+      const next = brandFontPreset.value;
+      if (!next) return;
+      if (brandTitleFontInput) brandTitleFontInput.value = next;
+      applyBrandFont(next);
+      updateFontStatus(next);
+      localStorage.setItem('wbg_brand_font', next);
+      brandFontPreset.value = '';
     });
   }
   if (resetTitleBtn) {
