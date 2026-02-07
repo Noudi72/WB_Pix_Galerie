@@ -1078,6 +1078,14 @@ body.dark-mode .site-header {
   display: inline-flex;
   gap: 6px;
 }
+
+.font-status-ok {
+  color: #5fb66b;
+}
+
+.font-status-error {
+  color: #e0615e;
+}
 .branding-dropzone {
   margin-top: 10px;
   padding: 14px;

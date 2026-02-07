@@ -282,12 +282,15 @@ function updateFontStatus(font) {
   const trimmed = font && font.trim() ? font.trim() : '';
   if (!trimmed) {
     brandFontStatus.textContent = '';
+    brandFontStatus.classList.remove('font-status-ok', 'font-status-error');
     return;
   }
   const ok = isFontAvailable(trimmed);
   brandFontStatus.textContent = ok
     ? 'Font erkannt (lokal verfügbar).'
     : 'Font nicht gefunden – bitte Schreibweise prüfen.';
+  brandFontStatus.classList.toggle('font-status-ok', ok);
+  brandFontStatus.classList.toggle('font-status-error', !ok);
 }
 
 function applyBranding() {
