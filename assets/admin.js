@@ -54,6 +54,7 @@ const brandTitleInput = document.getElementById('brand-title-text');
 const brandTitleFontInput = document.getElementById('brand-title-font');
 const headerTitle = document.getElementById('header-title');
 const previewHeaderTitle = document.querySelector('.branding-preview-title');
+const resetTitleBtn = document.getElementById('reset-title-btn');
 
 const uploadModal = document.getElementById('upload-modal');
 const uploadCategorySelect = document.getElementById('upload-category');
@@ -313,6 +314,16 @@ function initBranding() {
     });
     brandTitleFontInput.addEventListener('change', () => {
       localStorage.setItem('wbg_brand_font', brandTitleFontInput.value.trim());
+    });
+  }
+  if (resetTitleBtn) {
+    resetTitleBtn.addEventListener('click', () => {
+      localStorage.removeItem('wbg_brand_title');
+      localStorage.removeItem('wbg_brand_font');
+      if (brandTitleInput) brandTitleInput.value = DEFAULT_BRAND_TITLE;
+      if (brandTitleFontInput) brandTitleFontInput.value = '';
+      applyBrandTitle(DEFAULT_BRAND_TITLE);
+      applyBrandFont('');
     });
   }
   applyBranding();

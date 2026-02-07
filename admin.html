@@ -59,7 +59,7 @@
         </div>
         <div class="admin-field">
           <label for="brand-title-font">Titel‑Font (Systemschrift)</label>
-          <input id="brand-title-font" type="text" placeholder="z. B. \"SF Pro Display\", \"Avenir Next\"">
+          <input id="brand-title-font" type="text" list="brand-font-list" placeholder="z. B. \"SF Pro Display\", \"Avenir Next\"">
           <p class="admin-note">Bitte exakten Font‑Namen eingeben (nur lokal verfügbare Fonts).</p>
         </div>
       </div>
@@ -67,7 +67,20 @@
         <input id="brand-logo-file" type="file" accept="image/*" class="file-input-hidden" title="Logo auswählen">
         <label class="btn" for="brand-logo-file" id="upload-logo-btn">Logo auswählen</label>
         <button class="btn" id="reset-logo-btn">Standardlogo</button>
+        <button class="btn" id="reset-title-btn">Titel/Font zurücksetzen</button>
       </div>
+      <datalist id="brand-font-list">
+        <option value="SF Pro Display"></option>
+        <option value="SF Pro Text"></option>
+        <option value="Avenir Next"></option>
+        <option value="Avenir Next Condensed"></option>
+        <option value="Helvetica Neue"></option>
+        <option value="Helvetica"></option>
+        <option value="Arial"></option>
+        <option value="Georgia"></option>
+        <option value="Times New Roman"></option>
+        <option value="Menlo"></option>
+      </datalist>
       <div class="branding-dropzone" id="brand-logo-dropzone">
         Logo hier ablegen (Drag & Drop) · max. 10 MB
       </div>
