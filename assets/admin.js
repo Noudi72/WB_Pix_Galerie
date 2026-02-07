@@ -55,6 +55,7 @@ const brandTitleFontInput = document.getElementById('brand-title-font');
 const headerTitle = document.getElementById('header-title');
 const previewHeaderTitle = document.querySelector('.branding-preview-title');
 const resetTitleBtn = document.getElementById('reset-title-btn');
+const saveTitleBtn = document.getElementById('save-title-btn');
 const brandFontStatus = document.getElementById('brand-font-status');
 const brandFontPreset = document.getElementById('brand-font-preset');
 
@@ -251,6 +252,15 @@ function applyBrandTitle(title) {
   if (previewHeaderTitle) previewHeaderTitle.textContent = value;
 }
 
+let saveTitleTimer = null;
+function scheduleSaveTitleFont() {
+  if (saveTitleTimer) clearTimeout(saveTitleTimer);
+  saveTitleTimer = setTimeout(() => {
+    if (brandTitleInput) localStorage.setItem('wbg_brand_title', brandTitleInput.value.trim());
+    if (brandTitleFontInput) localStorage.setItem('wbg_brand_font', brandTitleFontInput.value.trim());
+  }, 300);
+}
+
 function applyBrandFont(font) {
   const trimmed = font && font.trim() ? font.trim() : '';
   if (!trimmed) {
@@ -338,6 +348,7 @@ function initBranding() {
     applyBrandTitle(title);
     brandTitleInput.addEventListener('input', () => {
       applyBrandTitle(brandTitleInput.value);
+      scheduleSaveTitleFont();
     });
     brandTitleInput.addEventListener('change', () => {
       localStorage.setItem('wbg_brand_title', brandTitleInput.value.trim());
@@ -350,9 +361,16 @@ function initBranding() {
     brandTitleFontInput.addEventListener('input', () => {
       applyBrandFont(brandTitleFontInput.value);
       updateFontStatus(brandTitleFontInput.value);
+      scheduleSaveTitleFont();
     });
     brandTitleFontInput.addEventListener('change', () => {
       localStorage.setItem('wbg_brand_font', brandTitleFontInput.value.trim());
+    });
+  }
+  if (saveTitleBtn) {
+    saveTitleBtn.addEventListener('click', () => {
+      if (brandTitleInput) localStorage.setItem('wbg_brand_title', brandTitleInput.value.trim());
+      if (brandTitleFontInput) localStorage.setItem('wbg_brand_font', brandTitleFontInput.value.trim());
     });
   }
   if (brandFontPreset) {
