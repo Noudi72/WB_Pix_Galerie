@@ -309,6 +309,13 @@ function updateFontStatus(font) {
   brandFontStatus.classList.toggle('font-status-error', !ok);
 }
 
+function syncFontPreset(font) {
+  if (!brandFontPreset) return;
+  const value = font && font.trim() ? font.trim() : '';
+  const option = Array.from(brandFontPreset.options || []).find((o) => o.value === value);
+  brandFontPreset.value = option ? value : '';
+}
+
 function applyBranding() {
   const logoUrl = getSavedLogoUrl();
   if (brandLogo) brandLogo.src = logoUrl;
@@ -358,9 +365,11 @@ function initBranding() {
     brandTitleFontInput.value = font;
     applyBrandFont(font);
     updateFontStatus(font);
+    syncFontPreset(font);
     brandTitleFontInput.addEventListener('input', () => {
       applyBrandFont(brandTitleFontInput.value);
       updateFontStatus(brandTitleFontInput.value);
+      syncFontPreset(brandTitleFontInput.value);
       scheduleSaveTitleFont();
     });
     brandTitleFontInput.addEventListener('change', () => {
@@ -381,7 +390,7 @@ function initBranding() {
       applyBrandFont(next);
       updateFontStatus(next);
       localStorage.setItem('wbg_brand_font', next);
-      brandFontPreset.value = '';
+      syncFontPreset(next);
     });
   }
   if (resetTitleBtn) {
