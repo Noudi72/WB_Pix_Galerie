@@ -273,7 +273,7 @@ function applyBrandFont(font) {
   const wrapped = hasComma || trimmed.includes('"') || trimmed.includes("'")
     ? trimmed
     : `"${trimmed}"`;
-  const fontValue = `${wrapped}, inherit`;
+  const fontValue = `${wrapped}, system-ui, -apple-system, sans-serif`;
   document.documentElement.style.setProperty('--brand-font', fontValue);
   if (headerTitle) headerTitle.style.fontFamily = fontValue;
   if (previewHeaderTitle) previewHeaderTitle.style.fontFamily = fontValue;
