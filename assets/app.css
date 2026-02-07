@@ -143,7 +143,6 @@ body.dark-mode .site-header {
 .brand .logo {
   width: var(--logo-width);
   height: auto;
-  max-height: 48px;
   border-radius: 10px;
   background: transparent;
   border: 1px solid var(--border);
@@ -153,7 +152,6 @@ body.dark-mode .site-header {
 .admin-page .site-header .logo {
   width: min(var(--logo-width), 160px);
   height: auto;
-  max-height: 36px;
 }
 
 .theme-toggle {
@@ -1060,7 +1058,6 @@ body.dark-mode .site-header {
 .branding-preview-left img {
   width: var(--logo-width);
   height: auto;
-  max-height: 40px;
   object-fit: contain;
   border-radius: 8px;
   border: 1px solid var(--border);

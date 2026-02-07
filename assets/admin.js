@@ -255,13 +255,18 @@ function applyBrandFont(font) {
   const trimmed = font && font.trim() ? font.trim() : '';
   if (!trimmed) {
     document.documentElement.style.setProperty('--brand-font', 'inherit');
+    if (headerTitle) headerTitle.style.fontFamily = '';
+    if (previewHeaderTitle) previewHeaderTitle.style.fontFamily = '';
     return;
   }
   const hasComma = trimmed.includes(',');
   const wrapped = hasComma || trimmed.includes('"') || trimmed.includes("'")
     ? trimmed
     : `"${trimmed}"`;
-  document.documentElement.style.setProperty('--brand-font', `${wrapped}, inherit`);
+  const fontValue = `${wrapped}, inherit`;
+  document.documentElement.style.setProperty('--brand-font', fontValue);
+  if (headerTitle) headerTitle.style.fontFamily = fontValue;
+  if (previewHeaderTitle) previewHeaderTitle.style.fontFamily = fontValue;
 }
 
 function isFontAvailable(font) {
