@@ -50,6 +50,10 @@ const brandLogoStatus = document.getElementById('brand-logo-status');
 const brandLogoDropzone = document.getElementById('brand-logo-dropzone');
 const brandLogoSizeInput = document.getElementById('brand-logo-size');
 const brandLogoSizeLabel = document.getElementById('brand-logo-size-label');
+const brandTitleInput = document.getElementById('brand-title-text');
+const brandTitleFontInput = document.getElementById('brand-title-font');
+const headerTitle = document.getElementById('header-title');
+const previewHeaderTitle = document.querySelector('.branding-preview-title');
 
 const uploadModal = document.getElementById('upload-modal');
 const uploadCategorySelect = document.getElementById('upload-category');
@@ -111,6 +115,7 @@ const themeToggle = document.getElementById('theme-toggle');
 
 const DEFAULT_LOGO_URL = './assets/logo_wb.png';
 const DEFAULT_LOGO_WIDTH = 180;
+const DEFAULT_BRAND_TITLE = 'Blaurock Pix';
 
 let galleryConfig = null;
 let currentGallery = null;
@@ -220,9 +225,30 @@ function getSavedLogoWidth() {
   return Number.isFinite(value) && value > 0 ? value : DEFAULT_LOGO_WIDTH;
 }
 
+function getSavedBrandTitle() {
+  const raw = localStorage.getItem('wbg_brand_title');
+  return raw && raw.trim() ? raw.trim() : DEFAULT_BRAND_TITLE;
+}
+
+function getSavedBrandFont() {
+  const raw = localStorage.getItem('wbg_brand_font');
+  return raw && raw.trim() ? raw.trim() : '';
+}
+
 function applyLogoWidth(width) {
   document.documentElement.style.setProperty('--logo-width', `${width}px`);
   if (brandLogoSizeLabel) brandLogoSizeLabel.textContent = `${width} px`;
+}
+
+function applyBrandTitle(title) {
+  const value = title && title.trim() ? title.trim() : DEFAULT_BRAND_TITLE;
+  if (headerTitle) headerTitle.textContent = value;
+  if (previewHeaderTitle) previewHeaderTitle.textContent = value;
+}
+
+function applyBrandFont(font) {
+  const value = font && font.trim() ? font.trim() : 'inherit';
+  document.documentElement.style.setProperty('--brand-font', value);
 }
 
 function applyBranding() {
@@ -231,11 +257,15 @@ function applyBranding() {
   if (brandLogoPreview) brandLogoPreview.src = logoUrl;
   if (brandLogoPreviewHeader) brandLogoPreviewHeader.src = logoUrl;
   if (faviconEl) faviconEl.href = logoUrl;
+  applyBrandTitle(getSavedBrandTitle());
+  applyBrandFont(getSavedBrandFont());
 }
 
 function initBranding() {
   const logoUrl = getSavedLogoUrl();
   const width = getSavedLogoWidth();
+  const title = getSavedBrandTitle();
+  const font = getSavedBrandFont();
   if (brandLogoPathInput) {
     const baseDir = getRepoBaseDir();
     const defaultPath = baseDir ? `${baseDir}/assets/logo_custom.png` : 'assets/logo_custom.png';
@@ -253,6 +283,26 @@ function initBranding() {
       const next = Number(brandLogoSizeInput.value);
       if (!Number.isFinite(next)) return;
       localStorage.setItem('wbg_logo_width', String(next));
+    });
+  }
+  if (brandTitleInput) {
+    brandTitleInput.value = title;
+    applyBrandTitle(title);
+    brandTitleInput.addEventListener('input', () => {
+      applyBrandTitle(brandTitleInput.value);
+    });
+    brandTitleInput.addEventListener('change', () => {
+      localStorage.setItem('wbg_brand_title', brandTitleInput.value.trim());
+    });
+  }
+  if (brandTitleFontInput) {
+    brandTitleFontInput.value = font;
+    applyBrandFont(font);
+    brandTitleFontInput.addEventListener('input', () => {
+      applyBrandFont(brandTitleFontInput.value);
+    });
+    brandTitleFontInput.addEventListener('change', () => {
+      localStorage.setItem('wbg_brand_font', brandTitleFontInput.value.trim());
     });
   }
   applyBranding();
@@ -354,6 +404,7 @@ function previewLogoFile(file) {
   const url = URL.createObjectURL(file);
   brandLogoPreview.src = url;
   if (brandLogoPreviewHeader) brandLogoPreviewHeader.src = url;
+  if (brandLogo) brandLogo.src = url;
   brandLogoPreview.onload = () => URL.revokeObjectURL(url);
 }
 

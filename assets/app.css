@@ -15,6 +15,7 @@
   --radius-md: 12px;
   --radius-sm: 8px;
   --logo-width: 180px;
+  --brand-font: inherit;
 }
 
 html.dark-mode,
@@ -105,6 +106,7 @@ body.dark-mode .site-header {
   font-size: 1rem;
   letter-spacing: 0.01em;
   justify-self: center;
+  font-family: var(--brand-font);
 }
 
 .header-actions {
@@ -139,9 +141,9 @@ body.dark-mode .site-header {
 }
 
 .brand .logo {
-  width: auto;
-  height: 40px;
-  max-width: var(--logo-width);
+  width: var(--logo-width);
+  height: auto;
+  max-height: 48px;
   border-radius: 10px;
   background: transparent;
   border: 1px solid var(--border);
@@ -149,8 +151,9 @@ body.dark-mode .site-header {
 }
 
 .admin-page .site-header .logo {
-  height: 32px;
-  max-width: min(var(--logo-width), 160px);
+  width: min(var(--logo-width), 160px);
+  height: auto;
+  max-height: 36px;
 }
 
 .theme-toggle {
@@ -1066,6 +1069,7 @@ body.dark-mode .site-header {
 .branding-preview-title {
   font-weight: 700;
   justify-self: center;
+  font-family: var(--brand-font);
 }
 
 .branding-preview-actions {

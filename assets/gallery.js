@@ -9,6 +9,7 @@ const filterFavBtn = document.getElementById('filter-favorites');
 const themeToggle = document.getElementById('theme-toggle');
 const brandLogo = document.getElementById('brand-logo');
 const faviconEl = document.querySelector('link[rel="icon"]');
+const headerTitle = document.getElementById('header-title');
 
 const lightbox = document.getElementById('lightbox');
 const lightboxImg = document.getElementById('lightbox-image');
@@ -36,6 +37,7 @@ let likesSaveInFlight = false;
 
 const DEFAULT_LOGO_URL = './assets/logo_wb.png';
 const DEFAULT_LOGO_WIDTH = 180;
+const DEFAULT_BRAND_TITLE = 'Blaurock Pix';
 
 function getSavedLogoUrl() {
   const saved = localStorage.getItem('wbg_logo_url');
@@ -48,9 +50,25 @@ function getSavedLogoWidth() {
   return Number.isFinite(value) && value > 0 ? value : DEFAULT_LOGO_WIDTH;
 }
 
+function getSavedBrandTitle() {
+  const raw = localStorage.getItem('wbg_brand_title');
+  return raw && raw.trim() ? raw.trim() : DEFAULT_BRAND_TITLE;
+}
+
+function getSavedBrandFont() {
+  const raw = localStorage.getItem('wbg_brand_font');
+  return raw && raw.trim() ? raw.trim() : '';
+}
+
 function applyLogoWidth() {
   const width = getSavedLogoWidth();
   document.documentElement.style.setProperty('--logo-width', `${width}px`);
+}
+
+function applyBrandText() {
+  if (headerTitle) headerTitle.textContent = getSavedBrandTitle();
+  const font = getSavedBrandFont();
+  document.documentElement.style.setProperty('--brand-font', font && font.trim() ? font : 'inherit');
 }
 
 function applyBranding() {
@@ -74,6 +92,7 @@ function initTheme() {
   const saved = localStorage.getItem('wbg_theme') || 'light';
   applyTheme(saved);
   applyLogoWidth();
+  applyBrandText();
   applyBranding();
   if (themeToggle) {
     themeToggle.addEventListener('click', () => {
