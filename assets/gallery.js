@@ -614,6 +614,15 @@ async function init() {
 init();
 initTheme();
 
+window.addEventListener('storage', (event) => {
+  if (!event.key) return;
+  const keys = new Set(['wbg_logo_url', 'wbg_logo_width', 'wbg_brand_title', 'wbg_brand_font']);
+  if (!keys.has(event.key)) return;
+  applyLogoWidth();
+  applyBrandText();
+  applyBranding();
+});
+
 filterAllBtn.addEventListener('click', () => {
   showFavoritesOnly = false;
   filterAllBtn.classList.add('active');

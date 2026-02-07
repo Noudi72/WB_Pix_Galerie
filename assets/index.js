@@ -387,6 +387,15 @@ searchInput.addEventListener('input', renderGalleries);
 initTheme();
 init();
 
+window.addEventListener('storage', (event) => {
+  if (!event.key) return;
+  const keys = new Set(['wbg_logo_url', 'wbg_logo_width', 'wbg_brand_title', 'wbg_brand_font']);
+  if (!keys.has(event.key)) return;
+  applyLogoWidth();
+  applyBrandText();
+  applyBranding();
+});
+
 if (portfolioLightboxClose) {
   portfolioLightboxClose.addEventListener('click', closePortfolioLightbox);
 }

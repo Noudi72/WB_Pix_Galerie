@@ -380,6 +380,11 @@ function initBranding() {
     saveTitleBtn.addEventListener('click', () => {
       if (brandTitleInput) localStorage.setItem('wbg_brand_title', brandTitleInput.value.trim());
       if (brandTitleFontInput) localStorage.setItem('wbg_brand_font', brandTitleFontInput.value.trim());
+      if (brandTitleInput) applyBrandTitle(brandTitleInput.value);
+      if (brandTitleFontInput) {
+        applyBrandFont(brandTitleFontInput.value);
+        updateFontStatus(brandTitleFontInput.value);
+      }
     });
   }
   if (brandFontPreset) {
