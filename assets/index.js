@@ -57,7 +57,16 @@ function applyLogoWidth() {
 function applyBrandText() {
   if (headerTitle) headerTitle.textContent = getSavedBrandTitle();
   const font = getSavedBrandFont();
-  document.documentElement.style.setProperty('--brand-font', font && font.trim() ? font : 'inherit');
+  const trimmed = font && font.trim() ? font.trim() : '';
+  if (!trimmed) {
+    document.documentElement.style.setProperty('--brand-font', 'inherit');
+    return;
+  }
+  const hasComma = trimmed.includes(',');
+  const wrapped = hasComma || trimmed.includes('"') || trimmed.includes("'")
+    ? trimmed
+    : `"${trimmed}"`;
+  document.documentElement.style.setProperty('--brand-font', `${wrapped}, inherit`);
 }
 
 function applyBranding() {

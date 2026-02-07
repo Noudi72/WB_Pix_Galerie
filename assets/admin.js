@@ -238,6 +238,8 @@ function getSavedBrandFont() {
 function applyLogoWidth(width) {
   document.documentElement.style.setProperty('--logo-width', `${width}px`);
   if (brandLogoSizeLabel) brandLogoSizeLabel.textContent = `${width} px`;
+  if (brandLogo) brandLogo.style.width = `${width}px`;
+  if (brandLogoPreviewHeader) brandLogoPreviewHeader.style.width = `${width}px`;
 }
 
 function applyBrandTitle(title) {
@@ -247,8 +249,16 @@ function applyBrandTitle(title) {
 }
 
 function applyBrandFont(font) {
-  const value = font && font.trim() ? font.trim() : 'inherit';
-  document.documentElement.style.setProperty('--brand-font', value);
+  const trimmed = font && font.trim() ? font.trim() : '';
+  if (!trimmed) {
+    document.documentElement.style.setProperty('--brand-font', 'inherit');
+    return;
+  }
+  const hasComma = trimmed.includes(',');
+  const wrapped = hasComma || trimmed.includes('"') || trimmed.includes("'")
+    ? trimmed
+    : `"${trimmed}"`;
+  document.documentElement.style.setProperty('--brand-font', `${wrapped}, inherit`);
 }
 
 function applyBranding() {

@@ -1058,8 +1058,9 @@ body.dark-mode .site-header {
 }
 
 .branding-preview-left img {
-  height: 28px;
-  max-width: var(--logo-width);
+  width: var(--logo-width);
+  height: auto;
+  max-height: 40px;
   object-fit: contain;
   border-radius: 8px;
   border: 1px solid var(--border);
