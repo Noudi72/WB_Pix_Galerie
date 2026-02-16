@@ -118,6 +118,7 @@ const ghTokenInput = document.getElementById('gh-token');
 const themeToggle = document.getElementById('theme-toggle');
 
 const DEFAULT_LOGO_URL = './assets/logo_wb.png';
+const DEFAULT_LOGO_REPO_PATH = 'assets/logo_wb.png';
 const DEFAULT_LOGO_WIDTH = 180;
 const DEFAULT_BRAND_TITLE = 'Blaurock Pix';
 
@@ -333,7 +334,7 @@ function initBranding() {
   const font = getSavedBrandFont();
   if (brandLogoPathInput) {
     const baseDir = getRepoBaseDir();
-    const defaultPath = baseDir ? `${baseDir}/assets/logo_custom.png` : 'assets/logo_custom.png';
+    const defaultPath = baseDir ? `${baseDir}/${DEFAULT_LOGO_REPO_PATH}` : DEFAULT_LOGO_REPO_PATH;
     brandLogoPathInput.value = defaultPath;
   }
   if (brandLogoSizeInput) {
@@ -464,18 +465,16 @@ function getLogoRepoPath() {
   const raw = brandLogoPathInput?.value?.trim() || '';
   if (raw) return raw.replace(/^\/+/, '');
   const baseDir = getRepoBaseDir();
-  return baseDir ? `${baseDir}/assets/logo_custom.png` : 'assets/logo_custom.png';
+  return baseDir ? `${baseDir}/${DEFAULT_LOGO_REPO_PATH}` : DEFAULT_LOGO_REPO_PATH;
 }
 
 function deriveLocalLogoUrl(repoPath) {
   if (!repoPath) return DEFAULT_LOGO_URL;
   const normalized = repoPath.replace(/^\/+/, '');
-  const idx = normalized.lastIndexOf('/assets/');
-  if (idx >= 0) {
-    return `./${normalized.slice(idx + 1)}`;
-  }
+  const assetsIdx = normalized.indexOf('assets/');
+  if (assetsIdx >= 0) return `./${normalized.slice(assetsIdx)}`;
   if (normalized.startsWith('assets/')) return `./${normalized}`;
-  return `./${normalized.split('/').pop() || 'assets/logo_custom.png'}`;
+  return `./${DEFAULT_LOGO_REPO_PATH}`;
 }
 
 function readFileAsBase64(file) {
@@ -612,11 +611,12 @@ async function uploadLogoToGitHub(file) {
       return;
     }
     const localUrl = deriveLocalLogoUrl(repoPath);
-    localStorage.setItem('wbg_logo_url', localUrl);
+    const cacheBustedUrl = `${localUrl}?v=${Date.now()}`;
+    localStorage.setItem('wbg_logo_url', cacheBustedUrl);
     applyBranding();
     previewLogoFile(file);
     if (brandLogoStatus) {
-      brandLogoStatus.textContent = '✅ Logo hochgeladen und lokal aktiviert.';
+      brandLogoStatus.textContent = '✅ Logo hochgeladen. GitHub Pages aktualisiert das Logo auf allen Geräten (kann kurz dauern).';
     }
   } catch (err) {
     console.error(err);

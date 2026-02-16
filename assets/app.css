@@ -145,7 +145,8 @@ body.dark-mode .site-header {
   height: auto;
   border-radius: 10px;
   background: transparent;
-  border: 1px solid var(--border);
+  border: none;
+  box-shadow: none;
   object-fit: contain;
 }
 
