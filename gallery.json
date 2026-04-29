@@ -1,12 +1,12 @@
 {
   "version": "3.0",
-  "generated": "2026-02-06T15:51:58.252Z",
+  "generated": "2026-04-29T14:23:59.655Z",
   "siteSettings": {
     "logoUrl": "./assets/logo_wb.png",
     "logoWidth": 180,
     "brandTitle": "Blaurock Pix",
-    "brandFont": "",
-    "updated": "2026-04-28T00:00:00.000Z"
+    "brandFont": "Avenir Next",
+    "updated": "2026-04-29T14:23:59.655Z"
   },
   "categories": [
     {
@@ -1092,6 +1092,17 @@
       "folder": "",
       "subcategory": "Firmenfeiern",
       "order": 24
+    },
+    {
+      "id": "gallery-1777472520640",
+      "name": "Neue Galerie",
+      "description": "",
+      "images": [],
+      "category": "sport",
+      "subcategory": "Neue Galerie",
+      "folder": "",
+      "date": "",
+      "order": 25
     }
   ],
   "portfolio": [
