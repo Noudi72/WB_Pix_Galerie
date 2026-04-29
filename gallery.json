@@ -1,12 +1,12 @@
 {
   "version": "3.0",
-  "generated": "2026-04-29T14:23:59.655Z",
+  "generated": "2026-04-29T14:25:33.309Z",
   "siteSettings": {
     "logoUrl": "./assets/logo_wb.png",
     "logoWidth": 180,
-    "brandTitle": "Blaurock Pix",
+    "brandTitle": "Foto Manager",
     "brandFont": "Avenir Next",
-    "updated": "2026-04-29T14:23:59.655Z"
+    "updated": "2026-04-29T14:25:33.309Z"
   },
   "categories": [
     {
