@@ -416,12 +416,19 @@ function getMissingGitHubFields(settings = getGitHubPublishSettings()) {
 }
 
 function revealGitHubSettings(missing, statusEl = null) {
+  goWizardStep(3);
   if (githubSettingsDetails) {
     githubSettingsDetails.open = true;
-    githubSettingsDetails.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    githubSettingsDetails.classList.add('needs-attention');
+    setTimeout(() => githubSettingsDetails.classList.remove('needs-attention'), 3200);
+    setTimeout(() => githubSettingsDetails.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
   }
   const firstInput = missing[0]?.input;
-  if (firstInput) setTimeout(() => firstInput.focus(), 250);
+  if (firstInput) {
+    firstInput.classList.add('needs-attention');
+    setTimeout(() => firstInput.classList.remove('needs-attention'), 3200);
+    setTimeout(() => firstInput.focus(), 450);
+  }
   const labels = missing.map(item => item.label).join(', ');
   const message = `GitHub-Veröffentlichung unvollständig: ${labels || 'Einstellungen'} fehlt.`;
   if (statusEl) statusEl.textContent = message;
@@ -432,8 +439,7 @@ function ensureGitHubPublishSettings(statusEl = null) {
   const settings = getGitHubPublishSettings();
   const missing = getMissingGitHubFields(settings);
   if (missing.length) {
-    const message = revealGitHubSettings(missing, statusEl);
-    alert(`${message}\n\nBitte im Bereich "GitHub-Einstellungen anzeigen" ergänzen und danach erneut veröffentlichen.`);
+    revealGitHubSettings(missing, statusEl);
     return null;
   }
   return settings;
