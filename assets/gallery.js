@@ -39,23 +39,41 @@ const DEFAULT_LOGO_URL = './assets/logo_wb.png';
 const DEFAULT_LOGO_WIDTH = 180;
 const DEFAULT_BRAND_TITLE = 'Blaurock Pix';
 
+function withCacheVersion(url, version) {
+  const clean = String(url || '').trim();
+  if (!clean) return '';
+  if (!version || clean.includes('?')) return clean;
+  return `${clean}?v=${encodeURIComponent(version)}`;
+}
+
 function getSavedLogoUrl() {
+  const settings = galleryConfig?.siteSettings;
+  const published = settings?.logoUrl;
+  if (published && String(published).trim()) {
+    return withCacheVersion(published, settings?.updated);
+  }
   const saved = localStorage.getItem('wbg_logo_url');
   return saved && saved.trim() ? saved.trim() : DEFAULT_LOGO_URL;
 }
 
 function getSavedLogoWidth() {
+  const published = Number(galleryConfig?.siteSettings?.logoWidth);
+  if (Number.isFinite(published) && published > 0) return published;
   const raw = localStorage.getItem('wbg_logo_width');
   const value = Number(raw);
   return Number.isFinite(value) && value > 0 ? value : DEFAULT_LOGO_WIDTH;
 }
 
 function getSavedBrandTitle() {
+  const published = galleryConfig?.siteSettings?.brandTitle;
+  if (published && String(published).trim()) return String(published).trim();
   const raw = localStorage.getItem('wbg_brand_title');
   return raw && raw.trim() ? raw.trim() : DEFAULT_BRAND_TITLE;
 }
 
 function getSavedBrandFont() {
+  const published = galleryConfig?.siteSettings?.brandFont;
+  if (published && String(published).trim()) return String(published).trim();
   const raw = localStorage.getItem('wbg_brand_font');
   return raw && raw.trim() ? raw.trim() : '';
 }
@@ -87,6 +105,12 @@ function applyBranding() {
   const logoUrl = getSavedLogoUrl();
   if (brandLogo) brandLogo.src = logoUrl;
   if (faviconEl) faviconEl.href = logoUrl;
+}
+
+function applySiteSettings() {
+  applyLogoWidth();
+  applyBrandText();
+  applyBranding();
 }
 
 function applyTheme(theme) {
@@ -585,6 +609,7 @@ async function init() {
     const res = await fetch(`./gallery.json?v=${cacheBust}`, { cache: 'no-store' });
     if (!res.ok) throw new Error('gallery.json konnte nicht geladen werden');
     galleryConfig = await res.json();
+    applySiteSettings();
     const id = getParam('id');
     currentGallery = (galleryConfig.galleries || []).find((g) => g.id === id) || (galleryConfig.galleries || [])[0];
     if (!currentGallery) throw new Error('Keine Galerie gefunden');

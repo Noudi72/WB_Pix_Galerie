@@ -16,6 +16,8 @@ const portfolioRightMedia = document.getElementById('portfolio-right-media');
 const portfolioLightbox = document.getElementById('portfolio-lightbox');
 const portfolioLightboxImg = document.getElementById('portfolio-lightbox-image');
 const portfolioLightboxClose = document.getElementById('portfolio-lightbox-close');
+const heroImage = document.getElementById('hero-image');
+const heroMedia = document.getElementById('hero-media');
 
 const brandLogo = document.getElementById('brand-logo');
 const faviconEl = document.querySelector('link[rel="icon"]');
@@ -28,23 +30,41 @@ const DEFAULT_LOGO_URL = './assets/logo_wb.png';
 const DEFAULT_LOGO_WIDTH = 180;
 const DEFAULT_BRAND_TITLE = 'Blaurock Pix';
 
+function withCacheVersion(url, version) {
+  const clean = String(url || '').trim();
+  if (!clean) return '';
+  if (!version || clean.includes('?')) return clean;
+  return `${clean}?v=${encodeURIComponent(version)}`;
+}
+
 function getSavedLogoUrl() {
+  const settings = galleryConfig?.siteSettings;
+  const published = settings?.logoUrl;
+  if (published && String(published).trim()) {
+    return withCacheVersion(published, settings?.updated);
+  }
   const saved = localStorage.getItem('wbg_logo_url');
   return saved && saved.trim() ? saved.trim() : DEFAULT_LOGO_URL;
 }
 
 function getSavedLogoWidth() {
+  const published = Number(galleryConfig?.siteSettings?.logoWidth);
+  if (Number.isFinite(published) && published > 0) return published;
   const raw = localStorage.getItem('wbg_logo_width');
   const value = Number(raw);
   return Number.isFinite(value) && value > 0 ? value : DEFAULT_LOGO_WIDTH;
 }
 
 function getSavedBrandTitle() {
+  const published = galleryConfig?.siteSettings?.brandTitle;
+  if (published && String(published).trim()) return String(published).trim();
   const raw = localStorage.getItem('wbg_brand_title');
   return raw && raw.trim() ? raw.trim() : DEFAULT_BRAND_TITLE;
 }
 
 function getSavedBrandFont() {
+  const published = galleryConfig?.siteSettings?.brandFont;
+  if (published && String(published).trim()) return String(published).trim();
   const raw = localStorage.getItem('wbg_brand_font');
   return raw && raw.trim() ? raw.trim() : '';
 }
@@ -76,6 +96,12 @@ function applyBranding() {
   const logoUrl = getSavedLogoUrl();
   if (brandLogo) brandLogo.src = logoUrl;
   if (faviconEl) faviconEl.href = logoUrl;
+}
+
+function applySiteSettings() {
+  applyLogoWidth();
+  applyBrandText();
+  applyBranding();
 }
 
 function applyTheme(theme) {
@@ -188,6 +214,20 @@ function renderPortfolio() {
     nextBtn: portfolioRightNext,
     mediaEl: portfolioRightMedia
   });
+}
+
+function renderHero() {
+  if (!heroImage || !heroMedia) return;
+  const manual = resolveManualPortfolioItems();
+  const items = manual ? [...manual.left, ...manual.right] : collectPortfolioItems();
+  const item = items.find(entry => entry?.fullSrc || entry?.thumbSrc);
+  if (!item) {
+    heroMedia.classList.add('is-empty');
+    return;
+  }
+  heroMedia.classList.remove('is-empty');
+  heroImage.src = buildThumbUrl(item.fullSrc || item.thumbSrc, 1400, 900);
+  heroImage.alt = getSavedBrandTitle();
 }
 
 function collectPortfolioItems() {
@@ -371,8 +411,10 @@ async function init() {
     const res = await fetch(`./gallery.json?v=${cacheBust}`, { cache: 'no-store' });
     if (!res.ok) throw new Error('gallery.json konnte nicht geladen werden');
     galleryConfig = await res.json();
+    applySiteSettings();
     renderCategories(galleryConfig.categories || []);
     renderGalleries();
+    renderHero();
     renderPortfolio();
   } catch (err) {
     galleryGrid.innerHTML = '';

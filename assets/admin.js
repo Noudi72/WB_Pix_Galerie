@@ -37,6 +37,12 @@ const galleryTableSortButtons = galleryTable?.querySelectorAll('.table-sort') ||
 const globalPushBtn = document.getElementById('push-json-global-btn');
 const saveOrderBtn = document.getElementById('save-order-btn');
 const applyPrivateFixBtn = document.getElementById('apply-private-fix-btn');
+const adminPublishStatus = document.getElementById('admin-publish-status');
+const adminStatBrand = document.getElementById('admin-stat-brand');
+const adminStatPortfolio = document.getElementById('admin-stat-portfolio');
+const adminStatGalleries = document.getElementById('admin-stat-galleries');
+const adminStatImages = document.getElementById('admin-stat-images');
+const githubSettingsDetails = document.getElementById('github-settings-details');
 
 const brandLogoPathInput = document.getElementById('brand-logo-path');
 const brandLogoFileInput = document.getElementById('brand-logo-file');
@@ -121,6 +127,13 @@ const DEFAULT_LOGO_URL = './assets/logo_wb.png';
 const DEFAULT_LOGO_REPO_PATH = 'assets/logo_wb.png';
 const DEFAULT_LOGO_WIDTH = 180;
 const DEFAULT_BRAND_TITLE = 'Blaurock Pix';
+
+function withCacheVersion(url, version) {
+  const clean = String(url || '').trim();
+  if (!clean) return '';
+  if (!version || clean.includes('?')) return clean;
+  return `${clean}?v=${encodeURIComponent(version)}`;
+}
 
 let galleryConfig = null;
 let currentGallery = null;
@@ -220,22 +233,33 @@ function initTheme() {
 }
 
 function getSavedLogoUrl() {
+  const settings = galleryConfig?.siteSettings;
+  const published = settings?.logoUrl;
+  if (published && String(published).trim()) {
+    return withCacheVersion(published, settings?.updated);
+  }
   const saved = localStorage.getItem('wbg_logo_url');
   return saved && saved.trim() ? saved.trim() : DEFAULT_LOGO_URL;
 }
 
 function getSavedLogoWidth() {
+  const published = Number(galleryConfig?.siteSettings?.logoWidth);
+  if (Number.isFinite(published) && published > 0) return published;
   const raw = localStorage.getItem('wbg_logo_width');
   const value = Number(raw);
   return Number.isFinite(value) && value > 0 ? value : DEFAULT_LOGO_WIDTH;
 }
 
 function getSavedBrandTitle() {
+  const published = galleryConfig?.siteSettings?.brandTitle;
+  if (published && String(published).trim()) return String(published).trim();
   const raw = localStorage.getItem('wbg_brand_title');
   return raw && raw.trim() ? raw.trim() : DEFAULT_BRAND_TITLE;
 }
 
 function getSavedBrandFont() {
+  const published = galleryConfig?.siteSettings?.brandFont;
+  if (published && String(published).trim()) return String(published).trim();
   const raw = localStorage.getItem('wbg_brand_font');
   return raw && raw.trim() ? raw.trim() : '';
 }
@@ -327,6 +351,48 @@ function applyBranding() {
   applyBrandFont(getSavedBrandFont());
 }
 
+function ensureSiteSettings() {
+  if (!galleryConfig || typeof galleryConfig !== 'object') return null;
+  if (!galleryConfig.siteSettings || typeof galleryConfig.siteSettings !== 'object') {
+    galleryConfig.siteSettings = {};
+  }
+  return galleryConfig.siteSettings;
+}
+
+function syncBrandingToConfig() {
+  const settings = ensureSiteSettings();
+  if (!settings) return;
+  const localLogo = localStorage.getItem('wbg_logo_url');
+  const sourceLogo = localLogo && localLogo.trim() ? localLogo.trim() : getSavedLogoUrl();
+  settings.logoUrl = sourceLogo.split('?')[0] || DEFAULT_LOGO_URL;
+  settings.logoWidth = getSavedLogoWidth();
+  settings.brandTitle = brandTitleInput?.value?.trim() || getSavedBrandTitle();
+  settings.brandFont = brandTitleFontInput?.value?.trim() || getSavedBrandFont();
+  settings.updated = new Date().toISOString();
+}
+
+function updateAdminStats() {
+  const galleries = galleryConfig?.galleries || [];
+  const imageCount = galleries.reduce((sum, gallery) => sum + (gallery.images?.length || 0), 0);
+  const portfolioCount = (galleryConfig?.bestShotsLeft?.length || 0) + (galleryConfig?.bestShotsRight?.length || 0);
+  if (adminStatBrand) adminStatBrand.textContent = getSavedBrandTitle();
+  if (adminStatPortfolio) adminStatPortfolio.textContent = `${portfolioCount} Bilder`;
+  if (adminStatGalleries) adminStatGalleries.textContent = `${galleries.length} Galerien`;
+  if (adminStatImages) adminStatImages.textContent = `${imageCount} Bilder`;
+}
+
+function updateTechnicalSettingsVisibility() {
+  if (!githubSettingsDetails) return;
+  const hasRequiredGitHubSettings = Boolean(
+    ghOwnerInput?.value?.trim()
+    && ghRepoInput?.value?.trim()
+    && ghBranchInput?.value?.trim()
+    && ghPathInput?.value?.trim()
+    && ghTokenInput?.value?.trim()
+  );
+  githubSettingsDetails.open = !hasRequiredGitHubSettings;
+}
+
 function initBranding() {
   const logoUrl = getSavedLogoUrl();
   const width = getSavedLogoWidth();
@@ -349,6 +415,8 @@ function initBranding() {
       const next = Number(brandLogoSizeInput.value);
       if (!Number.isFinite(next)) return;
       localStorage.setItem('wbg_logo_width', String(next));
+      syncBrandingToConfig();
+      updateAdminStats();
     });
   }
   if (brandTitleInput) {
@@ -360,6 +428,8 @@ function initBranding() {
     });
     brandTitleInput.addEventListener('change', () => {
       localStorage.setItem('wbg_brand_title', brandTitleInput.value.trim());
+      syncBrandingToConfig();
+      updateAdminStats();
     });
   }
   if (brandTitleFontInput) {
@@ -375,6 +445,7 @@ function initBranding() {
     });
     brandTitleFontInput.addEventListener('change', () => {
       localStorage.setItem('wbg_brand_font', brandTitleFontInput.value.trim());
+      syncBrandingToConfig();
     });
   }
   if (saveTitleBtn) {
@@ -386,6 +457,8 @@ function initBranding() {
         applyBrandFont(brandTitleFontInput.value);
         updateFontStatus(brandTitleFontInput.value);
       }
+      syncBrandingToConfig();
+      updateAdminStats();
     });
   }
   if (brandFontPreset) {
@@ -397,6 +470,7 @@ function initBranding() {
       updateFontStatus(next);
       localStorage.setItem('wbg_brand_font', next);
       syncFontPreset(next);
+      syncBrandingToConfig();
     });
   }
   if (resetTitleBtn) {
@@ -408,14 +482,11 @@ function initBranding() {
       applyBrandTitle(DEFAULT_BRAND_TITLE);
       applyBrandFont('');
       updateFontStatus('');
+      syncBrandingToConfig();
+      updateAdminStats();
     });
   }
   applyBranding();
-  if (uploadLogoBtn && brandLogoFileInput) {
-    uploadLogoBtn.addEventListener('click', () => {
-      brandLogoFileInput.click();
-    });
-  }
   if (brandLogoFileInput) {
     brandLogoFileInput.addEventListener('change', async () => {
       const file = brandLogoFileInput.files?.[0];
@@ -427,7 +498,16 @@ function initBranding() {
   if (resetLogoBtn) {
     resetLogoBtn.addEventListener('click', () => {
       localStorage.removeItem('wbg_logo_url');
+      const settings = ensureSiteSettings();
+      if (settings) {
+        settings.logoUrl = DEFAULT_LOGO_URL;
+        settings.logoWidth = getSavedLogoWidth();
+        settings.brandTitle = brandTitleInput?.value?.trim() || DEFAULT_BRAND_TITLE;
+        settings.brandFont = brandTitleFontInput?.value?.trim() || '';
+        settings.updated = new Date().toISOString();
+      }
       applyBranding();
+      updateAdminStats();
     });
   }
   if (brandLogoDropzone) {
@@ -613,8 +693,17 @@ async function uploadLogoToGitHub(file) {
     const localUrl = deriveLocalLogoUrl(repoPath);
     const cacheBustedUrl = `${localUrl}?v=${Date.now()}`;
     localStorage.setItem('wbg_logo_url', cacheBustedUrl);
+    const settings = ensureSiteSettings();
+    if (settings) {
+      settings.logoUrl = localUrl;
+      settings.logoWidth = getSavedLogoWidth();
+      settings.brandTitle = getSavedBrandTitle();
+      settings.brandFont = getSavedBrandFont();
+      settings.updated = new Date().toISOString();
+    }
     applyBranding();
     previewLogoFile(file);
+    updateAdminStats();
     if (brandLogoStatus) {
       brandLogoStatus.textContent = '✅ Logo hochgeladen. GitHub Pages aktualisiert das Logo auf allen Geräten (kann kurz dauern).';
     }
@@ -1066,6 +1155,7 @@ function renderGalleryTable() {
   if (galleryTableStatus) {
     galleryTableStatus.textContent = rows.length ? `${rows.length} Galerien angezeigt.` : 'Keine Galerien gefunden.';
   }
+  updateAdminStats();
 }
 
 function selectGalleryByIndex(idx, { focusWizard = false } = {}) {
@@ -1298,6 +1388,7 @@ function renderBestShots() {
   };
   renderSide('left', bestShotsListLeft, bestShotsEmptyLeft);
   renderSide('right', bestShotsListRight, bestShotsEmptyRight);
+  updateAdminStats();
 }
 
 function applyPrivateFix() {
@@ -1783,6 +1874,7 @@ async function pushJsonToGitHub() {
       alert('Bitte Owner, Repo und Token angeben.');
       return false;
     }
+    syncBrandingToConfig();
     if (galleryConfig && typeof galleryConfig === 'object') {
       galleryConfig.generated = new Date().toISOString();
     }
@@ -1847,6 +1939,7 @@ async function pushJsonToGitHub() {
       '⏱️ WICHTIG: GitHub Pages braucht 2-10 Minuten für das Update.\n\n' +
       'Danach Galerie-Seite mit Cmd+Shift+R neu laden.'
     );
+    if (adminPublishStatus) adminPublishStatus.textContent = 'Veröffentlicht';
     return true;
   } catch (err) {
     const message = err?.message || String(err);
@@ -1879,9 +1972,8 @@ function buildCloudinaryFolder() {
 }
 
 async function init() {
-  initTheme();
-  initBranding();
   loadSettings();
+  initTheme();
   cloudNameInput.addEventListener('change', saveSettings);
   uploadPresetInput.addEventListener('change', saveSettings);
   ghOwnerInput.addEventListener('change', saveSettings);
@@ -1908,6 +2000,8 @@ async function init() {
   }
   if (!Array.isArray(galleryConfig.bestShotsLeft)) galleryConfig.bestShotsLeft = [];
   if (!Array.isArray(galleryConfig.bestShotsRight)) galleryConfig.bestShotsRight = [];
+  initBranding();
+  applyBranding();
   galleryConfig.galleries.forEach((g, idx) => {
     if (!g.id) {
       const base = slugify(g.subcategory || g.name || `gallery-${idx}`);
@@ -1933,6 +2027,14 @@ async function init() {
   updateTableSortState();
   renderGalleryTable();
   renderBestShots();
+  updateAdminStats();
+
+  document.querySelectorAll('[data-admin-target]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const target = document.getElementById(button.dataset.adminTarget || '');
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
 
   if (gallerySelect) gallerySelect.addEventListener('change', loadGalleryFromSelect);
   if (gallerySearchInput) {
@@ -2116,6 +2218,10 @@ async function init() {
   if (downloadBtn) downloadBtn.addEventListener('click', downloadJson);
   if (pushBtn) pushBtn.addEventListener('click', pushJsonToGitHub);
   if (globalPushBtn) globalPushBtn.addEventListener('click', pushJsonToGitHub);
+  document.querySelectorAll('[data-publish-action]').forEach((button) => {
+    button.addEventListener('click', pushJsonToGitHub);
+  });
+  updateTechnicalSettingsVisibility();
   if (saveOrderBtn) saveOrderBtn.addEventListener('click', async () => {
     const owner = ghOwnerInput.value.trim();
     const repo = ghRepoInput.value.trim();
