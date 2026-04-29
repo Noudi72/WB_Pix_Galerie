@@ -135,6 +135,38 @@ function withCacheVersion(url, version) {
   return `${clean}?v=${encodeURIComponent(version)}`;
 }
 
+function githubApiHeaders(token, extra = {}) {
+  return {
+    Authorization: `Bearer ${token}`,
+    Accept: 'application/vnd.github+json',
+    'X-GitHub-Api-Version': '2022-11-28',
+    ...extra
+  };
+}
+
+function describeGitHubError(status, message, { owner, repo, branch, path }) {
+  if (status === 404) {
+    return [
+      'GitHub meldet 404: Repo, Pfad oder Token-Zugriff nicht erreichbar.',
+      '',
+      `Geprüft: ${owner}/${repo} · Branch ${branch} · ${path}`,
+      '',
+      'Bitte prüfen:',
+      '- Repo exakt: WB_Pix_Galerie',
+      '- Classic Token: Scope "repo"',
+      '- Fine-grained Token: Repository WB_Pix_Galerie + Contents: Read and write',
+      '- Token nach dem Erstellen komplett neu in das Feld kopieren'
+    ].join('\n');
+  }
+  if (status === 401) {
+    return 'GitHub meldet 401: Token ist ungültig oder wurde widerrufen. Bitte neuen Token eintragen.';
+  }
+  if (status === 403) {
+    return `GitHub meldet 403: Token hat keine Schreibrechte.\n\n${message || ''}`;
+  }
+  return message || `HTTP ${status}`;
+}
+
 let galleryConfig = null;
 let currentGallery = null;
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
@@ -689,7 +721,7 @@ async function pushFileToGitHub({ owner, repo, branch, path, token, contentBase6
   const apiBase = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
   const fetchSha = async () => {
     const getRes = await fetch(`${apiBase}?ref=${encodeURIComponent(branch)}&_=${Date.now()}`, {
-      headers: { Authorization: `token ${token}` }
+      headers: githubApiHeaders(token)
     });
     if (!getRes.ok) return null;
     const data = await getRes.json();
@@ -698,10 +730,7 @@ async function pushFileToGitHub({ owner, repo, branch, path, token, contentBase6
   const tryPut = async (sha) => {
     return await fetch(apiBase, {
       method: 'PUT',
-      headers: {
-        Authorization: `token ${token}`,
-        'Content-Type': 'application/json'
-      },
+      headers: githubApiHeaders(token, { 'Content-Type': 'application/json' }),
       body: JSON.stringify({
         message,
         content: contentBase64,
@@ -753,7 +782,12 @@ async function uploadLogoToGitHub(file, publishSettings = null) {
     });
     if (!putRes.ok) {
       const err = await putRes.json().catch(() => ({}));
-      const messageText = err.message || `HTTP ${putRes.status}`;
+      const messageText = describeGitHubError(putRes.status, err.message, {
+        owner: settingsForUpload.owner,
+        repo: settingsForUpload.repo,
+        branch: settingsForUpload.branch,
+        path: repoPath
+      });
       alert(`GitHub Upload fehlgeschlagen:\n${messageText}`);
       if (brandLogoStatus) brandLogoStatus.textContent = 'Upload fehlgeschlagen.';
       return;
@@ -1967,9 +2001,7 @@ async function pushJsonToGitHub() {
 
     const fetchSha = async () => {
       const getRes = await fetch(`${apiBase}?ref=${encodeURIComponent(branch)}&_=${Date.now()}`, {
-        headers: {
-          Authorization: `token ${token}`
-        }
+        headers: githubApiHeaders(token)
       });
       if (!getRes.ok) return null;
       const data = await getRes.json();
@@ -1979,10 +2011,7 @@ async function pushJsonToGitHub() {
     const tryPut = async (sha) => {
       return await fetch(apiBase, {
         method: 'PUT',
-        headers: {
-          Authorization: `token ${token}`,
-          'Content-Type': 'application/json'
-        },
+        headers: githubApiHeaders(token, { 'Content-Type': 'application/json' }),
         body: JSON.stringify({
           message: 'Update gallery.json via admin',
           content,
@@ -2009,7 +2038,12 @@ async function pushJsonToGitHub() {
 
     if (!putRes.ok) {
       const err = await putRes.json().catch(() => ({}));
-      const message = err.message || `HTTP ${putRes.status}`;
+      const message = describeGitHubError(putRes.status, err.message, {
+        owner,
+        repo,
+        branch,
+        path
+      });
       alert(
         `GitHub Push fehlgeschlagen:\n${message}\n\n` +
         'Bitte Seite neu laden (Cmd+Shift+R) und nochmals versuchen.'
