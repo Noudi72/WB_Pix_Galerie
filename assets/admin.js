@@ -145,6 +145,8 @@ let gallerySort = [
   { key: 'folder', dir: 'asc' }
 ];
 let pendingUploadFiles = [];
+let pendingLogoFile = null;
+let pendingLogoPreviewUrl = '';
 let dragGalleryId = null;
 let mouseDragActive = false;
 let hoverGalleryId = null;
@@ -393,6 +395,50 @@ function updateTechnicalSettingsVisibility() {
   githubSettingsDetails.open = !hasRequiredGitHubSettings;
 }
 
+function getGitHubPublishSettings() {
+  return {
+    owner: ghOwnerInput?.value?.trim() || 'Noudi72',
+    repo: ghRepoInput?.value?.trim() || 'WB_Pix_Galerie',
+    branch: ghBranchInput?.value?.trim() || 'main',
+    path: ghPathInput?.value?.trim() || 'gallery.json',
+    token: ghTokenInput?.value?.trim() || ''
+  };
+}
+
+function getMissingGitHubFields(settings = getGitHubPublishSettings()) {
+  const missing = [];
+  if (!settings.owner) missing.push({ key: 'owner', label: 'Owner', input: ghOwnerInput });
+  if (!settings.repo) missing.push({ key: 'repo', label: 'Repo', input: ghRepoInput });
+  if (!settings.branch) missing.push({ key: 'branch', label: 'Branch', input: ghBranchInput });
+  if (!settings.path) missing.push({ key: 'path', label: 'Pfad', input: ghPathInput });
+  if (!settings.token) missing.push({ key: 'token', label: 'GitHub Token', input: ghTokenInput });
+  return missing;
+}
+
+function revealGitHubSettings(missing, statusEl = null) {
+  if (githubSettingsDetails) {
+    githubSettingsDetails.open = true;
+    githubSettingsDetails.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  const firstInput = missing[0]?.input;
+  if (firstInput) setTimeout(() => firstInput.focus(), 250);
+  const labels = missing.map(item => item.label).join(', ');
+  const message = `GitHub-Veröffentlichung unvollständig: ${labels || 'Einstellungen'} fehlt.`;
+  if (statusEl) statusEl.textContent = message;
+  return message;
+}
+
+function ensureGitHubPublishSettings(statusEl = null) {
+  const settings = getGitHubPublishSettings();
+  const missing = getMissingGitHubFields(settings);
+  if (missing.length) {
+    const message = revealGitHubSettings(missing, statusEl);
+    alert(`${message}\n\nBitte im Bereich "GitHub-Einstellungen anzeigen" ergänzen und danach erneut veröffentlichen.`);
+    return null;
+  }
+  return settings;
+}
+
 function initBranding() {
   const logoUrl = getSavedLogoUrl();
   const width = getSavedLogoWidth();
@@ -488,11 +534,11 @@ function initBranding() {
   }
   applyBranding();
   if (brandLogoFileInput) {
-    brandLogoFileInput.addEventListener('change', async () => {
+    brandLogoFileInput.addEventListener('change', () => {
       const file = brandLogoFileInput.files?.[0];
       brandLogoFileInput.value = '';
       if (!file) return;
-      await uploadLogoToGitHub(file);
+      markLogoPending(file);
     });
   }
   if (resetLogoBtn) {
@@ -529,8 +575,7 @@ function initBranding() {
     brandLogoDropzone.addEventListener('drop', async (event) => {
       const file = event.dataTransfer?.files?.[0];
       if (!file) return;
-      previewDropLogo(file);
-      await uploadLogoToGitHub(file);
+      markLogoPending(file);
     });
   }
 }
@@ -584,11 +629,32 @@ function validateLogoFile(file) {
 
 function previewLogoFile(file) {
   if (!brandLogoPreview) return;
+  if (pendingLogoPreviewUrl) URL.revokeObjectURL(pendingLogoPreviewUrl);
   const url = URL.createObjectURL(file);
+  pendingLogoPreviewUrl = url;
   brandLogoPreview.src = url;
   if (brandLogoPreviewHeader) brandLogoPreviewHeader.src = url;
   if (brandLogo) brandLogo.src = url;
-  brandLogoPreview.onload = () => URL.revokeObjectURL(url);
+}
+
+function markLogoPending(file) {
+  const error = validateLogoFile(file);
+  if (error) {
+    alert(error);
+    if (brandLogoStatus) brandLogoStatus.textContent = `Logo nicht übernommen: ${error}`;
+    setDropzoneState({ active: true, invalid: true, message: error });
+    return false;
+  }
+  pendingLogoFile = file;
+  previewLogoFile(file);
+  const repoPath = getLogoRepoPath();
+  if (brandLogoStatus) {
+    brandLogoStatus.textContent = `Logo ausgewählt: ${file.name}. Mit "Änderungen veröffentlichen" wird es nach ${repoPath} geschrieben.`;
+  }
+  const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+  setDropzoneState({ active: true, message: `Bereit zum Veröffentlichen: ${file.name} · ${sizeMb} MB` });
+  updateAdminStats();
+  return true;
 }
 
 function setDropzoneState({ active = false, invalid = false, message = '' } = {}) {
@@ -653,7 +719,7 @@ async function pushFileToGitHub({ owner, repo, branch, path, token, contentBase6
   return putRes;
 }
 
-async function uploadLogoToGitHub(file) {
+async function uploadLogoToGitHub(file, publishSettings = null) {
   try {
     const validationError = validateLogoFile(file);
     if (validationError) {
@@ -663,23 +729,19 @@ async function uploadLogoToGitHub(file) {
     }
     saveSettings();
     if (brandLogoStatus) brandLogoStatus.textContent = 'Logo wird hochgeladen…';
-    const owner = ghOwnerInput.value.trim();
-    const repo = ghRepoInput.value.trim();
-    const branch = ghBranchInput.value.trim() || 'main';
-    const token = ghTokenInput.value.trim();
-    if (!owner || !repo || !token) {
-      alert('Bitte Owner, Repo und Token angeben.');
+    const settingsForUpload = publishSettings || ensureGitHubPublishSettings(brandLogoStatus);
+    if (!settingsForUpload) {
       if (brandLogoStatus) brandLogoStatus.textContent = 'Upload abgebrochen: GitHub Daten fehlen.';
       return;
     }
     const repoPath = getLogoRepoPath();
     const contentBase64 = await readFileAsBase64(file);
     const putRes = await pushFileToGitHub({
-      owner,
-      repo,
-      branch,
+      owner: settingsForUpload.owner,
+      repo: settingsForUpload.repo,
+      branch: settingsForUpload.branch,
       path: repoPath,
-      token,
+      token: settingsForUpload.token,
       contentBase64,
       message: 'Update logo via admin'
     });
@@ -707,11 +769,26 @@ async function uploadLogoToGitHub(file) {
     if (brandLogoStatus) {
       brandLogoStatus.textContent = '✅ Logo hochgeladen. GitHub Pages aktualisiert das Logo auf allen Geräten (kann kurz dauern).';
     }
+    return true;
   } catch (err) {
     console.error(err);
     alert(`Logo Upload fehlgeschlagen:\n${err?.message || err}`);
     if (brandLogoStatus) brandLogoStatus.textContent = 'Upload fehlgeschlagen.';
+    return false;
   }
+}
+
+async function publishPendingLogoIfNeeded(publishSettings) {
+  if (!pendingLogoFile) return true;
+  const ok = await uploadLogoToGitHub(pendingLogoFile, publishSettings);
+  if (ok) {
+    pendingLogoFile = null;
+    if (pendingLogoPreviewUrl) {
+      URL.revokeObjectURL(pendingLogoPreviewUrl);
+      pendingLogoPreviewUrl = '';
+    }
+  }
+  return Boolean(ok);
 }
 
 function renderWizard() {
@@ -1865,13 +1942,13 @@ function downloadJson() {
 async function pushJsonToGitHub() {
   try {
     saveSettings();
-    const owner = ghOwnerInput.value.trim();
-    const repo = ghRepoInput.value.trim();
-    const branch = ghBranchInput.value.trim() || 'main';
-    const path = ghPathInput.value.trim() || 'gallery.json';
-    const token = ghTokenInput.value.trim();
-    if (!owner || !repo || !token) {
-      alert('Bitte Owner, Repo und Token angeben.');
+    const publishSettings = ensureGitHubPublishSettings(adminPublishStatus);
+    if (!publishSettings) {
+      return false;
+    }
+    const { owner, repo, branch, path, token } = publishSettings;
+    const logoOk = await publishPendingLogoIfNeeded(publishSettings);
+    if (!logoOk) {
       return false;
     }
     syncBrandingToConfig();
