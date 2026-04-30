@@ -1,12 +1,12 @@
 {
   "version": "3.0",
-  "generated": "2026-04-29T14:25:33.309Z",
+  "generated": "2026-04-30T12:50:53.161Z",
   "siteSettings": {
     "logoUrl": "./assets/logo_wb.png",
     "logoWidth": 180,
     "brandTitle": "Foto Manager",
     "brandFont": "Avenir Next",
-    "updated": "2026-04-29T14:25:33.309Z"
+    "updated": "2026-04-30T12:50:53.161Z"
   },
   "categories": [
     {
