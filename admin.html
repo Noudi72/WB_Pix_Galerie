@@ -45,7 +45,7 @@
       <button class="admin-stat-card" type="button" data-admin-target="portfolio-section-admin">
         <span>Portfolio</span>
         <strong id="admin-stat-portfolio">0 Bilder</strong>
-        <small>Best Shots Startseite</small>
+        <small>Startseiten-Highlights</small>
       </button>
       <button class="admin-stat-card" type="button" data-admin-target="gallery-overview-section">
         <span>Galerien</span>
@@ -268,40 +268,59 @@
     </section>
 
     <section class="admin-section" id="portfolio-section-admin">
-      <h3>Portfolio Best Shots</h3>
-      <p class="admin-note">Bilder vom PC per Drag&Drop oder Dateiauswahl hinzufügen und danach zu GitHub pushen.</p>
-      <div class="admin-actions">
-        <button class="btn danger" id="clear-best-shots-btn">Best Shots leeren</button>
-        <button class="btn" id="save-best-shots-btn">Best Shots speichern</button>
+      <div class="section-heading-row">
+        <div>
+          <p class="eyebrow">Startseite</p>
+          <h3>Startseiten-Highlights</h3>
+          <p class="admin-note">Die wichtigsten Portfolio-Bilder für die Startseite kuratieren. Bilder hier ablegen oder aus einer Galerie als Highlight markieren.</p>
+        </div>
+        <div class="admin-actions section-actions">
+          <button class="btn danger" id="clear-best-shots-btn">Highlights leeren</button>
+          <button class="btn primary" id="save-best-shots-btn">Highlights veröffentlichen</button>
+        </div>
       </div>
       <div class="best-shots-grid">
-        <div>
-          <h4>Portfolio links</h4>
-          <div class="best-shots-dropzone" id="best-shots-drop-left">Bilder hier ablegen</div>
-          <div class="admin-actions">
-            <input id="best-shots-file-left" type="file" accept="image/*" multiple class="file-input-hidden" title="Best Shots links auswählen">
-            <label class="btn" for="best-shots-file-left" id="best-shots-pick-left">Dateien auswählen</label>
+        <div class="best-shots-lane">
+          <div class="best-shots-lane-head">
+            <div>
+              <h4>Linke Startseite</h4>
+              <p>Erste Portfolio-Spalte auf der Startseite.</p>
+            </div>
           </div>
-          <p class="admin-note" id="best-shots-empty-left">Noch keine Best Shots.</p>
+          <div class="best-shots-dropzone" id="best-shots-drop-left">Bilder hier ablegen oder klicken</div>
+          <div class="admin-actions">
+            <input id="best-shots-file-left" type="file" accept="image/*" multiple class="file-input-hidden" title="Highlights links auswählen">
+            <label class="btn" for="best-shots-file-left" id="best-shots-pick-left">Bilder auswählen</label>
+          </div>
+          <p class="admin-note" id="best-shots-empty-left">Noch keine Highlights.</p>
           <div class="best-shots-list" id="best-shots-list-left"></div>
         </div>
-        <div>
-          <h4>Portfolio rechts</h4>
-          <div class="best-shots-dropzone" id="best-shots-drop-right">Bilder hier ablegen</div>
-          <div class="admin-actions">
-            <input id="best-shots-file-right" type="file" accept="image/*" multiple class="file-input-hidden" title="Best Shots rechts auswählen">
-            <label class="btn" for="best-shots-file-right" id="best-shots-pick-right">Dateien auswählen</label>
+        <div class="best-shots-lane">
+          <div class="best-shots-lane-head">
+            <div>
+              <h4>Rechte Startseite</h4>
+              <p>Zweite Portfolio-Spalte auf der Startseite.</p>
+            </div>
           </div>
-          <p class="admin-note" id="best-shots-empty-right">Noch keine Best Shots.</p>
+          <div class="best-shots-dropzone" id="best-shots-drop-right">Bilder hier ablegen oder klicken</div>
+          <div class="admin-actions">
+            <input id="best-shots-file-right" type="file" accept="image/*" multiple class="file-input-hidden" title="Highlights rechts auswählen">
+            <label class="btn" for="best-shots-file-right" id="best-shots-pick-right">Bilder auswählen</label>
+          </div>
+          <p class="admin-note" id="best-shots-empty-right">Noch keine Highlights.</p>
           <div class="best-shots-list" id="best-shots-list-right"></div>
         </div>
       </div>
       <p class="admin-note" id="best-shots-status"></p>
     </section>
 
-    <section class="admin-section admin-wizard" id="gallery-wizard-section">
+    <section class="admin-section admin-wizard gallery-wizard-v3" id="gallery-wizard-section">
       <div class="wizard-header">
-        <h3>Galerie‑Wizard</h3>
+        <div>
+          <p class="eyebrow">Upload</p>
+          <h3>Galerie Upload</h3>
+          <p class="admin-note">Galerie wählen oder erstellen, Bilder ablegen und danach veröffentlichen. Die technischen Einstellungen bleiben unten eingeklappt.</p>
+        </div>
         <div class="wizard-steps">
           <span class="wizard-step active" data-step-label="1">1</span>
           <span class="wizard-step" data-step-label="2">2</span>
@@ -311,8 +330,8 @@
 
       <div class="wizard-body">
         <div class="wizard-step-panel" data-step="1">
-          <h4>Schritt 1: Struktur & Daten</h4>
-          <p class="admin-note">Kategorie → Unterkategorie → Galerie/Ordner → Datum festlegen.</p>
+          <h4>1 · Galerie wählen oder erstellen</h4>
+          <p class="admin-note">Kategorie, Ordner und Datum einmal festlegen. Bestehende Galerien kannst du oben in der Tabelle öffnen.</p>
           <div class="admin-actions wizard-inline-actions">
             <button class="btn" id="wizard-new-gallery-btn">Neue Galerie anlegen</button>
           </div>
@@ -355,8 +374,8 @@
         </div>
 
         <div class="wizard-step-panel" data-step="2">
-          <h4>Schritt 2: Bilder hochladen</h4>
-          <p class="admin-note">Drag & Drop oder Datei auswählen. Dateien werden in Cloudinary abgelegt.</p>
+          <h4>2 · Bilder hochladen</h4>
+          <p class="admin-note">Drag & Drop oder Datei auswählen. Die Bilder werden optimiert und in Cloudinary abgelegt.</p>
           <div class="wizard-tip">
             <strong>Empfohlener Weg:</strong>
             <span>Fotos hier hineinziehen, danach auf <b>Hochladen</b> klicken. Größenoptimierung ist bereits aktiv.</span>
@@ -415,8 +434,8 @@
         </div>
 
         <div class="wizard-step-panel" data-step="3">
-          <h4>Schritt 3: Speichern & Push</h4>
-          <p class="admin-note">Damit andere Geräte die Änderungen sehen, müssen sie nach GitHub Pages veröffentlicht werden.</p>
+          <h4>3 · Veröffentlichen</h4>
+          <p class="admin-note">Wenn alles stimmt, werden Galerie-Daten, Branding und Startseiten-Highlights nach GitHub Pages geschrieben.</p>
           <div class="publish-panel">
             <div>
               <strong>Bereit zum Veröffentlichen</strong>

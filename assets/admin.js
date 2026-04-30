@@ -832,9 +832,10 @@ async function publishPendingLogoIfNeeded(publishSettings) {
 }
 
 function renderWizard() {
+  const showAllPanels = Boolean(document.getElementById('gallery-wizard-section')?.classList.contains('gallery-wizard-v3'));
   wizardPanels.forEach((panel) => {
     const step = Number(panel.dataset.step);
-    panel.classList.toggle('is-active', step === wizardStep);
+    panel.classList.toggle('is-active', showAllPanels || step === wizardStep);
   });
   wizardSteps.forEach((badge, idx) => {
     badge.classList.toggle('active', idx + 1 === wizardStep);
@@ -846,6 +847,11 @@ function renderWizard() {
 function goWizardStep(nextStep) {
   wizardStep = Math.min(3, Math.max(1, nextStep));
   renderWizard();
+  const showAllPanels = Boolean(document.getElementById('gallery-wizard-section')?.classList.contains('gallery-wizard-v3'));
+  if (showAllPanels) {
+    const panel = document.querySelector(`.wizard-step-panel[data-step="${wizardStep}"]`);
+    if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
 }
 
 function getAdminPassword() {
@@ -1416,8 +1422,8 @@ function renderImageList() {
         <span>${img.url ? img.url.split('/').slice(-1)[0] : ''}</span>
       </div>
       <div class="admin-actions">
-        <button class="btn" data-action="best-shot-left" data-idx="${idx}">Best Shot links</button>
-        <button class="btn" data-action="best-shot-right" data-idx="${idx}">Best Shot rechts</button>
+        <button class="btn" data-action="best-shot-left" data-idx="${idx}">Highlight links</button>
+        <button class="btn" data-action="best-shot-right" data-idx="${idx}">Highlight rechts</button>
         <button class="btn danger" data-action="delete-image" data-idx="${idx}">Bild löschen</button>
       </div>
     `;
@@ -1469,6 +1475,23 @@ function removeBestShot(side, idx) {
   renderBestShots();
 }
 
+function getBestShotDisplayName(shot, img, idx) {
+  const raw = img?.name || shot?.name || shot?.originalName || shot?.imageId || (shot?.url ? shot.url.split('/').pop() : '');
+  if (!raw) return `Highlight ${idx + 1}`;
+  const cleanRaw = String(raw).split('?')[0];
+  let decoded = cleanRaw;
+  try {
+    decoded = decodeURIComponent(cleanRaw);
+  } catch (_) {
+    decoded = cleanRaw;
+  }
+  const withoutExtension = decoded.replace(/\.[a-z0-9]{2,5}$/i, '');
+  if (!withoutExtension || /^[a-z0-9]{16,}$/i.test(withoutExtension)) {
+    return `Highlight ${idx + 1}`;
+  }
+  return withoutExtension;
+}
+
 function renderBestShots() {
   const renderSide = (side, listEl, emptyEl) => {
     if (!listEl) return;
@@ -1488,17 +1511,17 @@ function renderBestShots() {
       const images = gallery?.images || [];
       const img = images.find(i => (i.publicId || i.id || i.name) === shot.imageId) || null;
       const thumb = buildThumbUrl(resolveUrl(img?.thumbnailUrl || img?.url || shot.url), 180, 120);
-      const title = gallery?.name || gallery?.subcategory || (shot.galleryId ? 'Galerie' : 'Upload');
-      const meta = img?.name || shot.imageId || (shot.url ? shot.url.split('/').pop() : '');
+      const title = getBestShotDisplayName(shot, img, idx);
+      const meta = gallery?.name || gallery?.folder || gallery?.subcategory || (shot.galleryId ? 'Galerie' : 'Direkt-Upload');
       const item = document.createElement('div');
       item.className = 'best-shots-item';
       item.innerHTML = `
         <img class="best-shots-thumb" src="${thumb}" alt="">
         <div class="best-shots-meta">
-          <strong>#${idx + 1} · ${title}</strong>
+          <strong>${title}</strong>
           <span>${meta}</span>
         </div>
-        <button class="btn danger" data-action="remove-best-shot" data-idx="${idx}" data-side="${side}">Entfernen</button>
+        <button class="btn icon danger" title="Highlight entfernen" aria-label="Highlight entfernen" data-action="remove-best-shot" data-idx="${idx}" data-side="${side}">×</button>
       `;
       listEl.appendChild(item);
     });
@@ -1946,7 +1969,7 @@ async function uploadBestShotFiles(files, side) {
     }
   }
   if (bestShotsStatus) {
-    bestShotsStatus.textContent = `Best Shots Upload: ${okCount} ok, ${errorCount} Fehler.`;
+    bestShotsStatus.textContent = `Highlight-Upload: ${okCount} ok, ${errorCount} Fehler.`;
   }
 }
 
@@ -2499,7 +2522,7 @@ async function init() {
       const left = getBestShots('left');
       const right = getBestShots('right');
       if (!left.length && !right.length) return;
-      const ok = confirm('Alle Best Shots wirklich löschen?');
+      const ok = confirm('Alle Startseiten-Highlights wirklich löschen?');
       if (!ok) return;
       galleryConfig.bestShotsLeft = [];
       galleryConfig.bestShotsRight = [];
@@ -2514,19 +2537,19 @@ async function init() {
       const token = ghTokenInput.value.trim();
       if (!owner || !repo || !token) {
         if (bestShotsStatus) {
-          bestShotsStatus.textContent = 'Bitte Owner, Repo und Token in Schritt 3 eintragen.';
+          bestShotsStatus.textContent = 'Bitte Owner, Repo und Token im Bereich Veröffentlichen eintragen.';
         }
         goWizardStep(3);
         const wizardSection = document.querySelector('.admin-wizard');
         if (wizardSection) wizardSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        alert('Bitte Owner, Repo und Token in Schritt 3 eintragen.');
+        alert('Bitte Owner, Repo und Token im Bereich Veröffentlichen eintragen.');
         return;
       }
-      if (bestShotsStatus) bestShotsStatus.textContent = 'Speichere Best Shots zu GitHub…';
+      if (bestShotsStatus) bestShotsStatus.textContent = 'Veröffentliche Startseiten-Highlights…';
       const ok = await pushJsonToGitHub();
       if (bestShotsStatus) {
         bestShotsStatus.textContent = ok
-          ? 'Best Shots gespeichert. Bitte Startseite mit Cmd+Shift+R neu laden.'
+          ? 'Startseiten-Highlights veröffentlicht. Bitte Startseite mit Cmd+Shift+R neu laden.'
           : 'Speichern fehlgeschlagen. Bitte nochmals versuchen.';
       }
     });
@@ -2589,7 +2612,10 @@ async function init() {
   setupBestShotDrop(bestShotsDropRight, 'right');
 
   if (bestShotsPickLeft && bestShotsFileLeft) {
-    bestShotsPickLeft.addEventListener('click', () => bestShotsFileLeft.click());
+    bestShotsPickLeft.addEventListener('click', (event) => {
+      event.preventDefault();
+      bestShotsFileLeft.click();
+    });
     bestShotsFileLeft.addEventListener('change', () => {
       const files = Array.from(bestShotsFileLeft.files || []);
       if (files.length) uploadBestShotFiles(files, 'left');
@@ -2597,7 +2623,10 @@ async function init() {
     });
   }
   if (bestShotsPickRight && bestShotsFileRight) {
-    bestShotsPickRight.addEventListener('click', () => bestShotsFileRight.click());
+    bestShotsPickRight.addEventListener('click', (event) => {
+      event.preventDefault();
+      bestShotsFileRight.click();
+    });
     bestShotsFileRight.addEventListener('change', () => {
       const files = Array.from(bestShotsFileRight.files || []);
       if (files.length) uploadBestShotFiles(files, 'right');
