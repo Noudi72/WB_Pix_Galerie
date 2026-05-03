@@ -1,12 +1,12 @@
 {
   "version": "3.0",
-  "generated": "2026-04-30T12:50:53.161Z",
+  "generated": "2026-05-03T11:45:21.339Z",
   "siteSettings": {
     "logoUrl": "./assets/logo_wb.png",
     "logoWidth": 180,
     "brandTitle": "Foto Manager",
     "brandFont": "Avenir Next",
-    "updated": "2026-04-30T12:50:53.161Z"
+    "updated": "2026-05-03T11:45:21.339Z"
   },
   "categories": [
     {
@@ -1103,6 +1103,16 @@
       "folder": "",
       "date": "",
       "order": 25
+    },
+    {
+      "id": "gallery-1777808695939",
+      "name": "Shooting",
+      "description": "",
+      "images": [],
+      "category": "privat",
+      "subcategory": "Shooting",
+      "folder": "Noël",
+      "date": "2026-05-03"
     }
   ],
   "portfolio": [
