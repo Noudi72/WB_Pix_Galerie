@@ -34,6 +34,8 @@ const gallerySortModeSelect = document.getElementById('gallery-sort-mode');
 const galleryTableStatus = document.getElementById('gallery-table-status');
 const galleryOrderStatus = document.getElementById('gallery-order-status');
 const galleryTableSortButtons = galleryTable?.querySelectorAll('.table-sort') || [];
+const currentGalleryTitle = document.getElementById('current-gallery-title');
+const currentGalleryMeta = document.getElementById('current-gallery-meta');
 const globalPushBtn = document.getElementById('push-json-global-btn');
 const saveOrderBtn = document.getElementById('save-order-btn');
 const applyPrivateFixBtn = document.getElementById('apply-private-fix-btn');
@@ -1065,6 +1067,47 @@ function buildCategoryOptions(selected) {
   }).join('');
 }
 
+function formatGalleryLabel(gallery) {
+  if (!gallery) return '';
+  const title = gallery.subcategory || gallery.name || 'Unbenannte Galerie';
+  const details = [
+    getCategoryName(gallery.category),
+    gallery.folder,
+    gallery.date
+  ].filter(Boolean).join(' · ');
+  return details ? `${title} (${details})` : title;
+}
+
+function updateCurrentGalleryPanel() {
+  const count = currentGallery?.images?.length || 0;
+  if (currentGalleryTitle) {
+    currentGalleryTitle.textContent = currentGallery
+      ? (currentGallery.subcategory || currentGallery.name || 'Unbenannte Galerie')
+      : 'Keine Galerie ausgewählt';
+  }
+  if (currentGalleryMeta) {
+    if (currentGallery) {
+      const meta = [
+        getCategoryName(currentGallery.category),
+        currentGallery.folder,
+        currentGallery.date,
+        `${count} Bild${count === 1 ? '' : 'er'}`
+      ].filter(Boolean).join(' · ');
+      currentGalleryMeta.textContent = `${meta}. Neue Bilder werden direkt in diese Galerie hochgeladen.`;
+    } else {
+      currentGalleryMeta.textContent = 'Galerie wählen oder neu anlegen, danach Bilder direkt hier hineinziehen.';
+    }
+  }
+  if (uploadDropzone) {
+    uploadDropzone.textContent = currentGallery
+      ? `Bilder hier ablegen -> ${formatGalleryLabel(currentGallery)}`
+      : 'Erst eine Galerie auswählen, dann Bilder hierher ziehen';
+    uploadDropzone.classList.toggle('has-gallery', Boolean(currentGallery));
+  }
+  if (deleteGalleryBtn) deleteGalleryBtn.disabled = !currentGallery;
+  if (openGalleryBtn) openGalleryBtn.disabled = !currentGallery;
+}
+
 function populateUploadModalOptions() {
   if (!uploadCategorySelect || !uploadSubcategoryList) return;
   uploadCategorySelect.innerHTML = buildCategoryOptions(galleryCategorySelect?.value || '');
@@ -1199,6 +1242,7 @@ function populateGallerySelect() {
     galleryFolderInput.value = '';
     galleryDateInput.value = '';
     galleryPasswordInput.value = '';
+    updateCurrentGalleryPanel();
     return;
   }
 
@@ -1209,6 +1253,7 @@ function populateGallerySelect() {
     gallerySelect.value = options[0].value;
   }
   loadGalleryFromSelect();
+  updateCurrentGalleryPanel();
 }
 
 function renderGalleryTable() {
@@ -1332,11 +1377,13 @@ function renderGalleryTable() {
     galleryTableStatus.textContent = rows.length ? `${rows.length} Galerien angezeigt.` : 'Keine Galerien gefunden.';
   }
   updateAdminStats();
+  updateCurrentGalleryPanel();
 }
 
 function selectGalleryByIndex(idx, { focusWizard = false } = {}) {
   const gallery = (galleryConfig?.galleries || [])[idx];
   if (!gallery) return;
+  setAdminView('galleries', { target: document.getElementById('gallery-wizard-section'), scroll: false });
   if (gallerySelect) {
     gallerySelect.value = String(idx);
     loadGalleryFromSelect();
@@ -1459,6 +1506,7 @@ function renderImageList() {
   if (!adminImageList) return;
   if (!currentGallery || !(currentGallery.images || []).length) {
     adminImageList.innerHTML = '<p class="admin-note">Keine Bilder in dieser Galerie.</p>';
+    updateCurrentGalleryPanel();
     return;
   }
   adminImageList.innerHTML = '';
@@ -1482,6 +1530,7 @@ function renderImageList() {
     `;
     adminImageList.appendChild(item);
   });
+  updateCurrentGalleryPanel();
 }
 
 function getBestShots(side) {
@@ -1719,6 +1768,7 @@ function loadGalleryFromSelect() {
   const gallery = (galleryConfig?.galleries || [])[idx] || null;
   if (!gallery) return;
   applyGalleryToForm(gallery);
+  updateCurrentGalleryPanel();
 }
 
 function applyGalleryToForm(gallery) {
@@ -1736,6 +1786,7 @@ function applyGalleryToForm(gallery) {
   galleryDateInput.value = gallery.date || '';
   galleryPasswordInput.value = gallery.password || '';
   renderImageList();
+  updateCurrentGalleryPanel();
 }
 
 function resetWizardFields() {
@@ -1749,6 +1800,7 @@ function resetWizardFields() {
   currentGallery = null;
   if (gallerySelect) gallerySelect.value = '';
   renderImageList();
+  updateCurrentGalleryPanel();
 }
 
 function ensureCategoryExists() {
@@ -1859,7 +1911,11 @@ async function uploadFiles() {
     alert('Bitte mindestens eine Datei auswählen.');
     return;
   }
-  openUploadModal(files);
+  if (currentGallery) {
+    await uploadFilesWithFiles(files);
+  } else {
+    openUploadModal(files);
+  }
 }
 
 async function uploadFilesWithFiles(files) {
@@ -1964,13 +2020,8 @@ async function uploadFilesWithFiles(files) {
   }
   
   if (okCount > 0) {
-    const doSave = confirm(
-      `Upload abgeschlossen: ${okCount} Bild(er) erfolgreich hochgeladen!${errorCount > 0 ? `\n(${errorCount} Fehler - siehe Console)` : ''}\n\n` +
-      'Möchtest du jetzt zu Schritt 3 springen und die Änderungen zu GitHub pushen?\n\n' +
-      '(Ohne Push sind die Bilder nur lokal im Admin sichtbar!)'
-    );
-    if (doSave) {
-      goWizardStep(3);
+    if (uploadStatus) {
+      uploadStatus.textContent = `Upload abgeschlossen: ${okCount} Bild(er) in "${currentGallery?.subcategory || currentGallery?.name || 'Galerie'}". Bitte danach veröffentlichen.`;
     }
   } else {
     alert(`Upload fehlgeschlagen: ${errorCount} Fehler (siehe Console)`);
@@ -2263,7 +2314,12 @@ async function init() {
   });
   saveGalleryBtn.addEventListener('click', saveGallery);
   if (openGalleryBtn) openGalleryBtn.addEventListener('click', openCurrentGallery);
-  if (newGalleryBtn) newGalleryBtn.addEventListener('click', createGallery);
+  if (newGalleryBtn) newGalleryBtn.addEventListener('click', () => {
+    resetWizardFields();
+    goWizardStep(1);
+    const focusTarget = gallerySubcategoryInput || galleryNameInput;
+    if (focusTarget) focusTarget.focus({ preventScroll: true });
+  });
   if (wizardNewGalleryBtn) wizardNewGalleryBtn.addEventListener('click', () => {
     setAdminView('galleries', { target: document.getElementById('gallery-wizard-section'), scroll: true });
     resetWizardFields();
@@ -2482,7 +2538,12 @@ async function init() {
       if (e.dataTransfer?.files?.length) {
         // Leere File-Input um Duplikate zu vermeiden
         if (imageFilesInput) imageFilesInput.value = '';
-        openUploadModal(Array.from(e.dataTransfer.files));
+        const droppedFiles = Array.from(e.dataTransfer.files);
+        if (currentGallery) {
+          uploadFilesWithFiles(droppedFiles);
+        } else {
+          openUploadModal(droppedFiles);
+        }
       }
     });
   }

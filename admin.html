@@ -290,9 +290,31 @@
       </div>
 
       <div class="wizard-body">
+        <div class="gallery-current-panel">
+          <div class="gallery-current-main">
+            <p class="eyebrow">Aktuelle Galerie</p>
+            <h4 id="current-gallery-title">Keine Galerie ausgewählt</h4>
+            <p class="admin-note" id="current-gallery-meta">Galerie wählen oder neu anlegen, danach Bilder direkt hier hineinziehen.</p>
+          </div>
+          <div class="gallery-current-controls">
+            <div class="admin-field">
+              <label for="gallery-search">Galerie suchen</label>
+              <input id="gallery-search" type="text" placeholder="z. B. Eishockey, Noel, 2026">
+            </div>
+            <div class="admin-field">
+              <label for="gallery-select">Bestehende Galerie</label>
+              <select id="gallery-select"></select>
+            </div>
+            <div class="admin-actions gallery-current-actions">
+              <button class="btn" id="new-gallery-btn" type="button">Neue Galerie</button>
+              <button class="btn danger" id="delete-gallery-btn" type="button">Galerie löschen</button>
+            </div>
+          </div>
+        </div>
+
         <div class="wizard-step-panel" data-step="1">
           <h4>1 · Galerie wählen oder erstellen</h4>
-          <p class="admin-note">Kategorie, Ordner und Datum einmal festlegen. Bestehende Galerien kannst du oben in der Tabelle öffnen.</p>
+          <p class="admin-note">Kategorie, Ordner und Datum einmal festlegen. Bestehende Galerien kannst du oben auswählen oder in der Tabelle öffnen.</p>
           <div class="admin-actions wizard-inline-actions">
             <button class="btn" id="wizard-new-gallery-btn">Neue Galerie anlegen</button>
           </div>
@@ -336,13 +358,13 @@
 
         <div class="wizard-step-panel" data-step="2">
           <h4>2 · Bilder hochladen</h4>
-          <p class="admin-note">Drag & Drop oder Datei auswählen. Die Bilder werden optimiert und in Cloudinary abgelegt.</p>
+          <p class="admin-note">Bilder direkt in die aktuell ausgewählte Galerie ziehen. Die Bilder werden optimiert und in Cloudinary abgelegt.</p>
           <div class="wizard-tip">
             <strong>Empfohlener Weg:</strong>
-            <span>Fotos hier hineinziehen, danach auf <b>Hochladen</b> klicken. Größenoptimierung ist bereits aktiv.</span>
+            <span>Bestehende Galerie auswählen, Fotos in die Dropzone ziehen, Upload läuft direkt in diese Galerie.</span>
           </div>
           <div class="admin-dropzone" id="upload-dropzone">
-            Dateien hierher ziehen & ablegen (Drag & Drop)
+            Erst eine Galerie auswählen, dann Bilder hierher ziehen
           </div>
           <div class="admin-grid">
             <div class="admin-field">

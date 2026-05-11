@@ -942,17 +942,28 @@ img {
 .admin-dropzone {
   border: 2px dashed var(--border);
   border-radius: var(--radius-md);
-  padding: 18px;
+  padding: 26px 18px;
   text-align: center;
   margin-bottom: 12px;
   color: var(--muted);
   background: var(--surface-2);
+  font-weight: 800;
+  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.admin-dropzone.has-gallery {
+  border-color: rgba(127, 201, 211, 0.78);
+  color: var(--text);
+  background:
+    linear-gradient(135deg, rgba(31, 109, 122, 0.24), rgba(212, 165, 116, 0.12)),
+    var(--surface-2);
 }
 
 .admin-dropzone.is-dragover {
   border-color: var(--accent);
   color: var(--text);
   background: rgba(212, 165, 116, 0.12);
+  transform: translateY(-2px);
 }
 
 .admin-grid {
@@ -1010,6 +1021,36 @@ img {
 .section-actions {
   margin-top: 0;
   flex: 0 0 auto;
+}
+
+.gallery-current-panel {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.9fr) minmax(320px, 1.4fr);
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid rgba(127, 201, 211, 0.35);
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(135deg, rgba(31, 109, 122, 0.2), rgba(212, 165, 116, 0.1)),
+    var(--surface);
+}
+
+.gallery-current-main h4 {
+  margin: 4px 0 8px;
+  font-size: 1.25rem;
+}
+
+.gallery-current-controls {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(220px, 1fr) auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.gallery-current-actions {
+  margin-top: 0;
+  align-items: center;
+  flex-wrap: nowrap;
 }
 
 .admin-image-list {
@@ -1676,6 +1717,13 @@ img {
   }
   .best-shots-grid {
     grid-template-columns: 1fr;
+  }
+  .gallery-current-panel,
+  .gallery-current-controls {
+    grid-template-columns: 1fr;
+  }
+  .gallery-current-actions {
+    flex-wrap: wrap;
   }
   .wizard-header {
     flex-direction: column;
