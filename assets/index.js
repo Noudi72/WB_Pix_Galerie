@@ -3,7 +3,6 @@ const categoryList = document.getElementById('category-list');
 const searchInput = document.getElementById('search-input');
 const emptyState = document.getElementById('empty-state');
 const countChip = document.getElementById('gallery-count-chip');
-const themeToggle = document.getElementById('theme-toggle');
 const portfolioSection = document.getElementById('portfolio-section');
 const portfolioLeftImage = document.getElementById('portfolio-left-image');
 const portfolioLeftPrev = document.getElementById('portfolio-left-prev');
@@ -104,29 +103,17 @@ function applySiteSettings() {
   applyBranding();
 }
 
-function applyTheme(theme) {
-  const isDark = theme === 'dark';
-  document.documentElement.classList.toggle('dark-mode', isDark);
-  document.body.classList.toggle('dark-mode', isDark);
-  localStorage.setItem('wbg_theme', isDark ? 'dark' : 'light');
-  if (themeToggle) {
-    themeToggle.textContent = isDark ? 'Hell' : 'Dunkel';
-    themeToggle.setAttribute('aria-pressed', isDark ? 'true' : 'false');
-  }
+function applyTheme() {
+  document.documentElement.classList.add('dark-mode');
+  document.body.classList.add('dark-mode');
+  localStorage.setItem('wbg_theme', 'dark');
 }
 
 function initTheme() {
-  const saved = localStorage.getItem('wbg_theme') || 'light';
-  applyTheme(saved);
+  applyTheme();
   applyLogoWidth();
   applyBrandText();
   applyBranding();
-  if (themeToggle) {
-    themeToggle.addEventListener('click', () => {
-      const next = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
-      applyTheme(next);
-    });
-  }
 }
 
 function isCloudinaryTransformSegment(segment) {

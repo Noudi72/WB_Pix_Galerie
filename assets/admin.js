@@ -121,7 +121,6 @@ const ghRepoInput = document.getElementById('gh-repo');
 const ghBranchInput = document.getElementById('gh-branch');
 const ghPathInput = document.getElementById('gh-path');
 const ghTokenInput = document.getElementById('gh-token');
-const themeToggle = document.getElementById('theme-toggle');
 
 const DEFAULT_LOGO_URL = './assets/logo_wb.png';
 const DEFAULT_LOGO_REPO_PATH = 'assets/logo_wb.png';
@@ -244,26 +243,14 @@ async function downscaleImage(file) {
 }
 
 
-function applyTheme(theme) {
-  const isDark = theme === 'dark';
-  document.documentElement.classList.toggle('dark-mode', isDark);
-  document.body.classList.toggle('dark-mode', isDark);
-  localStorage.setItem('wbg_theme', isDark ? 'dark' : 'light');
-  if (themeToggle) {
-    themeToggle.textContent = isDark ? 'Hell' : 'Dunkel';
-    themeToggle.setAttribute('aria-pressed', isDark ? 'true' : 'false');
-  }
+function applyTheme() {
+  document.documentElement.classList.add('dark-mode');
+  document.body.classList.add('dark-mode');
+  localStorage.setItem('wbg_theme', 'dark');
 }
 
 function initTheme() {
-  const saved = localStorage.getItem('wbg_theme') || 'light';
-  applyTheme(saved);
-  if (themeToggle) {
-    themeToggle.addEventListener('click', () => {
-      const next = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
-      applyTheme(next);
-    });
-  }
+  applyTheme();
 }
 
 function getSavedLogoUrl() {

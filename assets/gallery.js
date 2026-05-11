@@ -6,7 +6,6 @@ const countChip = document.getElementById('image-count-chip');
 const searchInput = document.getElementById('gallery-search');
 const filterAllBtn = document.getElementById('filter-all');
 const filterFavBtn = document.getElementById('filter-favorites');
-const themeToggle = document.getElementById('theme-toggle');
 const brandLogo = document.getElementById('brand-logo');
 const faviconEl = document.querySelector('link[rel="icon"]');
 const headerTitle = document.getElementById('header-title');
@@ -113,29 +112,17 @@ function applySiteSettings() {
   applyBranding();
 }
 
-function applyTheme(theme) {
-  const isDark = theme === 'dark';
-  document.documentElement.classList.toggle('dark-mode', isDark);
-  document.body.classList.toggle('dark-mode', isDark);
-  localStorage.setItem('wbg_theme', isDark ? 'dark' : 'light');
-  if (themeToggle) {
-    themeToggle.textContent = isDark ? 'Hell' : 'Dunkel';
-    themeToggle.setAttribute('aria-pressed', isDark ? 'true' : 'false');
-  }
+function applyTheme() {
+  document.documentElement.classList.add('dark-mode');
+  document.body.classList.add('dark-mode');
+  localStorage.setItem('wbg_theme', 'dark');
 }
 
 function initTheme() {
-  const saved = localStorage.getItem('wbg_theme') || 'light';
-  applyTheme(saved);
+  applyTheme();
   applyLogoWidth();
   applyBrandText();
   applyBranding();
-  if (themeToggle) {
-    themeToggle.addEventListener('click', () => {
-      const next = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
-      applyTheme(next);
-    });
-  }
 }
 
 function normalize(text) {
