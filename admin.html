@@ -35,77 +35,39 @@
       </div>
     </section>
 
-    <section class="admin-dashboard">
-      <button class="admin-stat-card" type="button" data-admin-target="branding-section">
-        <span>Branding</span>
-        <strong id="admin-stat-brand">Logo & Titel</strong>
-        <small>Logo, Titel und Look</small>
-      </button>
-      <button class="admin-stat-card" type="button" data-admin-target="portfolio-section-admin">
-        <span>Portfolio</span>
-        <strong id="admin-stat-portfolio">0 Bilder</strong>
-        <small>Startseiten-Highlights</small>
-      </button>
-      <button class="admin-stat-card" type="button" data-admin-target="gallery-overview-section">
-        <span>Galerien</span>
-        <strong id="admin-stat-galleries">0 Galerien</strong>
-        <small>Sortieren und prüfen</small>
-      </button>
-      <button class="admin-stat-card" type="button" data-admin-target="gallery-wizard-section">
-        <span>Upload</span>
-        <strong id="admin-stat-images">0 Bilder</strong>
-        <small>Neue Galerie anlegen</small>
-      </button>
+    <section class="admin-studio" aria-label="Admin Arbeitsbereiche">
+      <div class="admin-nav">
+        <button class="admin-nav-card is-active" type="button" data-admin-view-button="appearance" data-admin-target="branding-section" aria-pressed="true">
+          <span class="workflow-number">1</span>
+          <span>
+            <strong>Auftritt</strong>
+            <small>Logo, Titel und Startseiten-Highlights</small>
+          </span>
+        </button>
+        <button class="admin-nav-card" type="button" data-admin-view-button="galleries" data-admin-target="gallery-wizard-section" aria-pressed="false">
+          <span class="workflow-number">2</span>
+          <span>
+            <strong>Galerien</strong>
+            <small>Galerie anlegen, Bilder hochladen, prüfen</small>
+          </span>
+        </button>
+        <button class="admin-nav-card" type="button" data-admin-view-button="publish" data-admin-target="publish-section" aria-pressed="false">
+          <span class="workflow-number">3</span>
+          <span>
+            <strong>Veröffentlichen</strong>
+            <small>GitHub Pages aktualisieren</small>
+          </span>
+        </button>
+      </div>
+      <div class="admin-progress-strip" aria-label="Aktueller Inhalt">
+        <span class="admin-metric"><small>Branding</small><strong id="admin-stat-brand">Logo & Titel</strong></span>
+        <span class="admin-metric"><small>Highlights</small><strong id="admin-stat-portfolio">0 Bilder</strong></span>
+        <span class="admin-metric"><small>Galerien</small><strong id="admin-stat-galleries">0 Galerien</strong></span>
+        <span class="admin-metric"><small>Bilder</small><strong id="admin-stat-images">0 Bilder</strong></span>
+      </div>
     </section>
 
-    <section class="admin-workflow" aria-label="Empfohlener Workflow">
-      <article class="workflow-card">
-        <span class="workflow-number">1</span>
-        <div>
-          <h3>Auftritt festlegen</h3>
-          <p>Logo, Titel und Header-Vorschau direkt prüfen.</p>
-        </div>
-        <button class="btn" type="button" data-admin-target="branding-section">Branding öffnen</button>
-      </article>
-      <article class="workflow-card">
-        <span class="workflow-number">2</span>
-        <div>
-          <h3>Galerie befüllen</h3>
-          <p>Galerie wählen oder neu anlegen, Bilder hochladen und prüfen.</p>
-        </div>
-        <button class="btn" type="button" data-admin-target="gallery-wizard-section">Upload starten</button>
-      </article>
-      <article class="workflow-card">
-        <span class="workflow-number">3</span>
-        <div>
-          <h3>Veröffentlichen</h3>
-          <p>Alle Änderungen einmalig nach GitHub Pages schreiben.</p>
-        </div>
-        <button class="btn primary" type="button" data-publish-action>Jetzt veröffentlichen</button>
-      </article>
-    </section>
-
-    <section class="admin-section" id="cloudinary-section">
-      <details class="admin-advanced">
-        <summary>
-          <span>Technische Upload-Einstellungen</span>
-          <small>Nur nötig, wenn Cloudinary neu verbunden wird.</small>
-        </summary>
-        <div class="admin-grid">
-          <div class="admin-field">
-            <label for="cloud-name">Cloud Name</label>
-            <input id="cloud-name" type="text" placeholder="z. B. dnvqw9wif">
-          </div>
-          <div class="admin-field">
-            <label for="upload-preset">Upload Preset (Unsigned)</label>
-            <input id="upload-preset" type="text" placeholder="z. B. wb_pix_upload">
-          </div>
-        </div>
-        <p class="admin-note">Diese Werte werden lokal im Browser gespeichert und müssen normalerweise nicht erneut angepasst werden.</p>
-      </details>
-    </section>
-
-    <section class="admin-section" id="branding-section">
+    <section class="admin-section" id="branding-section" data-admin-view="appearance">
       <h3>Branding</h3>
       <div class="admin-grid">
         <div class="admin-field">
@@ -196,7 +158,7 @@
       </div>
     </section>
 
-    <section class="admin-section" id="password-section">
+    <section class="admin-section" id="password-section" data-admin-view="publish">
       <h3>Admin Passwort</h3>
       <div class="admin-grid">
         <div class="admin-field">
@@ -214,7 +176,7 @@
       <p class="admin-note">Passwort wird lokal im Browser gespeichert.</p>
     </section>
 
-    <section class="admin-section" id="gallery-overview-section">
+    <section class="admin-section" id="gallery-overview-section" data-admin-view="galleries">
       <h3>Galerien Übersicht</h3>
       <div class="admin-grid">
         <div class="admin-field">
@@ -266,7 +228,7 @@
       <p class="admin-note" id="gallery-order-status"></p>
     </section>
 
-    <section class="admin-section" id="portfolio-section-admin">
+    <section class="admin-section" id="portfolio-section-admin" data-admin-view="appearance">
       <div class="section-heading-row">
         <div>
           <p class="eyebrow">Startseite</p>
@@ -313,7 +275,7 @@
       <p class="admin-note" id="best-shots-status"></p>
     </section>
 
-    <section class="admin-section admin-wizard gallery-wizard-v3" id="gallery-wizard-section">
+    <section class="admin-section admin-wizard gallery-wizard-v3" id="gallery-wizard-section" data-admin-view="galleries">
       <div class="wizard-header">
         <div>
           <p class="eyebrow">Upload</p>
@@ -434,49 +396,92 @@
 
         <div class="wizard-step-panel" data-step="3">
           <h4>3 · Veröffentlichen</h4>
-          <p class="admin-note">Wenn alles stimmt, werden Galerie-Daten, Branding und Startseiten-Highlights nach GitHub Pages geschrieben.</p>
+          <p class="admin-note">Prüfen, ob Galerie und Bilder stimmen. Veröffentlichen kannst du direkt hier oder im Bereich „Veröffentlichen“.</p>
           <div class="publish-panel">
             <div>
               <strong>Bereit zum Veröffentlichen</strong>
-              <p>Schreibt `gallery.json` inklusive Branding, Portfolio und Galerien nach GitHub.</p>
+              <p>Schreibt `gallery.json` inklusive Branding, Highlights und Galerien nach GitHub.</p>
             </div>
             <button class="btn primary" type="button" data-publish-action>Änderungen veröffentlichen</button>
           </div>
-          <details class="admin-advanced wizard-grid-spacer" id="github-settings-details">
-            <summary>
-              <span>GitHub-Einstellungen anzeigen</span>
-              <small>Nur nötig, wenn Repository oder Token geändert werden.</small>
-            </summary>
-            <div class="admin-grid">
-              <div class="admin-field">
-                <label for="gh-owner">Owner</label>
-                <input id="gh-owner" type="text" placeholder="Noudi72">
-              </div>
-              <div class="admin-field">
-                <label for="gh-repo">Repo</label>
-                <input id="gh-repo" type="text" placeholder="WB_Pix_Galerie">
-              </div>
-              <div class="admin-field">
-                <label for="gh-branch">Branch</label>
-                <input id="gh-branch" type="text" placeholder="main">
-              </div>
-              <div class="admin-field">
-                <label for="gh-path">Pfad</label>
-                <input id="gh-path" type="text" placeholder="gallery.json">
-              </div>
-              <div class="admin-field">
-                <label for="gh-token">GitHub Token</label>
-                <input id="gh-token" type="password" placeholder="ghp_... oder github_pat_...">
-              </div>
-            </div>
-            <p class="admin-note">Token braucht Repo-Rechte für Inhalte (Contents).</p>
-          </details>
+
         </div>
       </div>
 
       <div class="wizard-footer">
         <button class="btn" id="wizard-prev">Zurück</button>
         <button class="btn" id="wizard-next">Weiter</button>
+      </div>
+    </section>
+
+
+
+    <section class="admin-section" id="publish-section" data-admin-view="publish">
+      <div class="section-heading-row">
+        <div>
+          <p class="eyebrow">GitHub Pages</p>
+          <h3>Veröffentlichen</h3>
+          <p class="admin-note">Wenn alles stimmt, werden Branding, Startseiten-Highlights und alle Galerien nach GitHub Pages geschrieben.</p>
+        </div>
+        <div class="admin-actions section-actions">
+          <button class="btn primary" type="button" data-publish-action>Änderungen veröffentlichen</button>
+        </div>
+      </div>
+      <div class="publish-panel">
+        <div>
+          <strong>Bereit zum Veröffentlichen</strong>
+          <p>Schreibt `gallery.json` inklusive Logo-Pfad, Portfolio und Galerien in das GitHub-Repository.</p>
+        </div>
+        <button class="btn primary" type="button" data-publish-action>Jetzt veröffentlichen</button>
+      </div>
+      <div class="publish-tech" aria-label="Veröffentlichen und Technik">
+        <h4>Technik</h4>
+        <details class="admin-advanced" id="github-settings-details">
+          <summary>
+            <span>GitHub-Einstellungen anzeigen</span>
+            <small>Nur nötig, wenn Repository oder Token geändert werden.</small>
+          </summary>
+          <div class="admin-grid">
+            <div class="admin-field">
+              <label for="gh-owner">Owner</label>
+              <input id="gh-owner" type="text" placeholder="Noudi72">
+            </div>
+            <div class="admin-field">
+              <label for="gh-repo">Repo</label>
+              <input id="gh-repo" type="text" placeholder="WB_Pix_Galerie">
+            </div>
+            <div class="admin-field">
+              <label for="gh-branch">Branch</label>
+              <input id="gh-branch" type="text" placeholder="main">
+            </div>
+            <div class="admin-field">
+              <label for="gh-path">Pfad</label>
+              <input id="gh-path" type="text" placeholder="gallery.json">
+            </div>
+            <div class="admin-field">
+              <label for="gh-token">GitHub Token</label>
+              <input id="gh-token" type="password" placeholder="ghp_... oder github_pat_...">
+            </div>
+          </div>
+          <p class="admin-note">Token braucht Repo-Rechte für Inhalte (Contents).</p>
+        </details>
+        <details class="admin-advanced" id="cloudinary-settings-details">
+          <summary>
+            <span>Cloudinary-Einstellungen anzeigen</span>
+            <small>Nur nötig, wenn Uploads neu verbunden werden.</small>
+          </summary>
+          <div class="admin-grid">
+            <div class="admin-field">
+              <label for="cloud-name">Cloud Name</label>
+              <input id="cloud-name" type="text" placeholder="z. B. dnvqw9wif">
+            </div>
+            <div class="admin-field">
+              <label for="upload-preset">Upload Preset (Unsigned)</label>
+              <input id="upload-preset" type="text" placeholder="z. B. wb_pix_upload">
+            </div>
+          </div>
+          <p class="admin-note">Diese Werte werden lokal im Browser gespeichert und müssen normalerweise nicht erneut angepasst werden.</p>
+        </details>
       </div>
     </section>
 

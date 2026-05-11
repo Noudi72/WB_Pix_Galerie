@@ -43,6 +43,7 @@ const adminStatPortfolio = document.getElementById('admin-stat-portfolio');
 const adminStatGalleries = document.getElementById('admin-stat-galleries');
 const adminStatImages = document.getElementById('admin-stat-images');
 const githubSettingsDetails = document.getElementById('github-settings-details');
+const cloudinarySettingsDetails = document.getElementById('cloudinary-settings-details');
 
 const brandLogoPathInput = document.getElementById('brand-logo-path');
 const brandLogoFileInput = document.getElementById('brand-logo-file');
@@ -182,6 +183,46 @@ let dragGalleryId = null;
 let mouseDragActive = false;
 let hoverGalleryId = null;
 let gallerySortMode = 'manual';
+let activeAdminView = 'appearance';
+
+function getAdminViewForTarget(target) {
+  const section = target?.closest?.('[data-admin-view]') || target;
+  return section?.dataset?.adminView || '';
+}
+
+function setAdminView(view, { target = null, remember = true, scroll = false } = {}) {
+  const requestedView = view || 'appearance';
+  const availableViews = Array.from(document.querySelectorAll('[data-admin-view]'))
+    .map((section) => section.dataset.adminView)
+    .filter(Boolean);
+  activeAdminView = availableViews.includes(requestedView) ? requestedView : 'appearance';
+
+  document.querySelectorAll('[data-admin-view]').forEach((section) => {
+    section.classList.toggle('is-active', section.dataset.adminView === activeAdminView);
+  });
+
+  document.querySelectorAll('[data-admin-view-button]').forEach((button) => {
+    const isActive = button.dataset.adminViewButton === activeAdminView;
+    button.classList.toggle('is-active', isActive);
+    button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+  });
+
+  if (remember) localStorage.setItem('wbg_admin_view', activeAdminView);
+  if (scroll) {
+    const targetEl = target || document.querySelector(`[data-admin-view="${activeAdminView}"]`);
+    if (targetEl) {
+      setTimeout(() => targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' }), 20);
+    }
+  }
+}
+
+function revealPublishTech(detailsEl = githubSettingsDetails) {
+  setAdminView('publish', { target: document.getElementById('publish-section'), scroll: true });
+  if (!detailsEl) return;
+  detailsEl.open = true;
+  detailsEl.classList.add('needs-attention');
+  setTimeout(() => detailsEl.classList.remove('needs-attention'), 3200);
+}
 
 function ensureGalleryOrder() {
   const galleries = galleryConfig?.galleries || [];
@@ -403,7 +444,6 @@ function updateAdminStats() {
 }
 
 function updateTechnicalSettingsVisibility() {
-  if (!githubSettingsDetails) return;
   const hasRequiredGitHubSettings = Boolean(
     ghOwnerInput?.value?.trim()
     && ghRepoInput?.value?.trim()
@@ -411,7 +451,12 @@ function updateTechnicalSettingsVisibility() {
     && ghPathInput?.value?.trim()
     && ghTokenInput?.value?.trim()
   );
-  githubSettingsDetails.open = !hasRequiredGitHubSettings;
+  const hasRequiredCloudinarySettings = Boolean(
+    cloudNameInput?.value?.trim()
+    && uploadPresetInput?.value?.trim()
+  );
+  if (githubSettingsDetails) githubSettingsDetails.open = !hasRequiredGitHubSettings;
+  if (cloudinarySettingsDetails) cloudinarySettingsDetails.open = !hasRequiredCloudinarySettings;
 }
 
 function getGitHubPublishSettings() {
@@ -436,10 +481,8 @@ function getMissingGitHubFields(settings = getGitHubPublishSettings()) {
 
 function revealGitHubSettings(missing, statusEl = null) {
   goWizardStep(3);
+  revealPublishTech(githubSettingsDetails);
   if (githubSettingsDetails) {
-    githubSettingsDetails.open = true;
-    githubSettingsDetails.classList.add('needs-attention');
-    setTimeout(() => githubSettingsDetails.classList.remove('needs-attention'), 3200);
     setTimeout(() => githubSettingsDetails.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
   }
   const firstInput = missing[0]?.input;
@@ -452,6 +495,29 @@ function revealGitHubSettings(missing, statusEl = null) {
   const message = `GitHub-Veröffentlichung unvollständig: ${labels || 'Einstellungen'} fehlt.`;
   if (statusEl) statusEl.textContent = message;
   return message;
+}
+
+function revealCloudinarySettings(statusEl = null) {
+  revealPublishTech(cloudinarySettingsDetails);
+  const firstInput = !cloudNameInput?.value?.trim() ? cloudNameInput : uploadPresetInput;
+  if (firstInput) {
+    firstInput.classList.add('needs-attention');
+    setTimeout(() => firstInput.classList.remove('needs-attention'), 3200);
+    setTimeout(() => firstInput.focus(), 450);
+  }
+  const message = 'Cloudinary-Upload unvollständig: Cloud Name oder Upload Preset fehlt.';
+  if (statusEl) statusEl.textContent = message;
+  return message;
+}
+
+function ensureCloudinarySettings(statusEl = null) {
+  const cloudName = cloudNameInput?.value?.trim() || '';
+  const preset = uploadPresetInput?.value?.trim() || '';
+  if (!cloudName || !preset) {
+    revealCloudinarySettings(statusEl);
+    return null;
+  }
+  return { cloudName, preset };
 }
 
 function ensureGitHubPublishSettings(statusEl = null) {
@@ -1806,12 +1872,12 @@ async function uploadFilesWithFiles(files) {
   if (uploadStatus) uploadStatus.textContent = '';
   if (uploadProgress) uploadProgress.value = 0;
   if (uploadProgressLabel) uploadProgressLabel.textContent = '';
-  const cloudName = cloudNameInput.value.trim();
-  const preset = uploadPresetInput.value.trim();
-  if (!cloudName || !preset) {
-    alert('Bitte Cloud Name und Upload Preset angeben.');
+  const cloudinary = ensureCloudinarySettings(uploadStatus);
+  if (!cloudinary) {
+    alert('Bitte Cloud Name und Upload Preset unter Veröffentlichen / Technik angeben.');
     return;
   }
+  const { cloudName, preset } = cloudinary;
 
   const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
   const folderPath = buildCloudinaryFolder();
@@ -1913,12 +1979,12 @@ async function uploadFilesWithFiles(files) {
 
 async function uploadBestShotFiles(files, side) {
   saveSettings();
-  const cloudName = cloudNameInput.value.trim();
-  const preset = uploadPresetInput.value.trim();
-  if (!cloudName || !preset) {
-    alert('Bitte Cloud Name und Upload Preset angeben.');
+  const cloudinary = ensureCloudinarySettings(bestShotsStatus);
+  if (!cloudinary) {
+    alert('Bitte Cloud Name und Upload Preset unter Veröffentlichen / Technik angeben.');
     return;
   }
+  const { cloudName, preset } = cloudinary;
   const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
   const folderPath = 'portfolio';
   let okCount = 0;
@@ -2155,11 +2221,17 @@ async function init() {
   renderGalleryTable();
   renderBestShots();
   updateAdminStats();
+  setAdminView(localStorage.getItem('wbg_admin_view') || 'appearance', { remember: false });
 
   document.querySelectorAll('[data-admin-target]').forEach((button) => {
     button.addEventListener('click', () => {
       const target = document.getElementById(button.dataset.adminTarget || '');
-      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const view = button.dataset.adminViewButton || getAdminViewForTarget(target);
+      if (view) {
+        setAdminView(view, { target, scroll: Boolean(target) });
+      } else if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     });
   });
 
@@ -2193,6 +2265,7 @@ async function init() {
   if (openGalleryBtn) openGalleryBtn.addEventListener('click', openCurrentGallery);
   if (newGalleryBtn) newGalleryBtn.addEventListener('click', createGallery);
   if (wizardNewGalleryBtn) wizardNewGalleryBtn.addEventListener('click', () => {
+    setAdminView('galleries', { target: document.getElementById('gallery-wizard-section'), scroll: true });
     resetWizardFields();
     goWizardStep(1);
   });
@@ -2355,12 +2428,10 @@ async function init() {
     const token = ghTokenInput.value.trim();
     if (!owner || !repo || !token) {
       if (galleryOrderStatus) {
-        galleryOrderStatus.textContent = 'Bitte Owner, Repo und Token in Schritt 3 eintragen.';
+        galleryOrderStatus.textContent = 'Bitte Owner, Repo und Token unter Veröffentlichen / Technik eintragen.';
       }
-      goWizardStep(3);
-      const wizardSection = document.querySelector('.admin-wizard');
-      if (wizardSection) wizardSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      alert('Bitte Owner, Repo und Token in Schritt 3 eintragen.');
+      revealPublishTech(githubSettingsDetails);
+      alert('Bitte Owner, Repo und Token unter Veröffentlichen / Technik eintragen.');
       return;
     }
     if (galleryOrderStatus) galleryOrderStatus.textContent = 'Speichere Reihenfolge zu GitHub…';
